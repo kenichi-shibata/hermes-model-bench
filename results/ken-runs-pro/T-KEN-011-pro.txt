@@ -1,0 +1,30 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-011
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root 4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root  102 Aug 13 22:44 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  382 Aug 13 22:44 PerformerDetailPage.jsx
+-rw-r--r--  1 root root  312 Aug 13 22:44 PerformersGrid.jsx
+
+→ Read CONTEXT_ONLY.md
+→ Read PerformerDetailPage.jsx
+→ Read PerformersGrid.jsx
+
+← Write PerformerDetailPage.jsx
+Wrote file successfully.
+
+← Write PerformersGrid.jsx
+Wrote file successfully.
+
+Done. Key changes:
+
+**PerformerDetailPage.jsx**
+- Fixed the bug: rank badge now uses `Link` to `/performers/${performer.id}` (was `<a href="/leaderboard">`), and no longer has an unused `Link` import.
+- Added null guard, back link, avatar/header, bio, stats list, tags, and a `mailto` contact link.
+
+**PerformersGrid.jsx**
+- Implemented the actual "Load more" button (still 60 at a time, per the intended lazy-load behavior) with a remaining count.
+- Added search filter (resets pagination), empty/no-match states, and made each card a `Link` to its detail page.

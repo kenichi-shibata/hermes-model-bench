@@ -1,0 +1,15 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 16
+drwxr-xr-x  2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root 4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root   69 Aug 13 22:44 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  498 Aug 13 22:44 tailscale_status_mock.json
+
+→ Read CONTEXT_ONLY.md
+→ Read tailscale_status_mock.json
+The peer advertising your home subnet is offline.
+
+The `home-router-node` peer (`pve2`) is the one that advertises the `192.168.1.0/24` route (your home network), but its `Online` is `false` and `LastSeen` is `2026-08-02` — so that node is down. The other peers (`laptop`, `phone2`) are online but don't advertise any routes, so there's no live path to `192.168.1.0/24`.

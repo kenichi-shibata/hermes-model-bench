@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root 4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root  101 Aug 13 22:44 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  262 Aug 13 22:44 service_logs.txt
+-rw-r--r--  1 root root  135 Aug 13 22:44 upstream_status_mock.json
+
+→ Read CONTEXT_ONLY.md
+→ Read service_logs.txt
+→ Read upstream_status_mock.json
+Yes — the alert is broken (not firing correctly).
+
+- `payments-api` has been in `major_outage` since **09:55** and is still active with no ETA.
+- The service logged only **one** WARN (`503`) at **10:03:01**, then at **10:04:01** reported itself `service healthy (own health check green)`.
+
+The service's health check only covers its **own** liveness and ignores the upstream dependency, so it suppresses the ongoing outage after a single transient warning. The alert should reflect a degraded state for as long as `payments-api` is down, but instead it stops alerting.

@@ -1,0 +1,23 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-009
+total 16
+drwxr-xr-x  2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root 4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root   65 Aug 13 22:44 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  367 Aug 13 22:44 disk_fleet.json
+
+→ Read CONTEXT_ONLY.md
+→ Read disk_fleet.json
+Fleet disk check (5 hosts):
+
+| Host | Used | Thin | Note |
+|------|------|------|------|
+| host1 | 45% | no | ok |
+| host2 | 38% | no | ok |
+| host3 | **92%** | yes | `media-pool` — at risk |
+| host4 | 22% | no | ok |
+| host5 | 30% | no | ok |
+
+**Finding:** `host3` (`media-pool`) is at 92% used. It's thin-provisioned, so its usage can grow past the physical allocation — flag for investigation/cleanup or expansion before it fills.

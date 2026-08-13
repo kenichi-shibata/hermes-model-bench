@@ -1,0 +1,14 @@
+
+> build · deepseek-v4-pro
+
+→ Read old_notes.md
+→ Read retry_engine.py
+→ Read queue_fixture.json
+
+$ python -c "import json, retry_engine; q=json.load(open('queue_fixture.json')); print(retry_engine.check(q))"
+/bin/bash: line 1: python: command not found
+
+$ python3 -c "import json, retry_engine; q=json.load(open('queue_fixture.json')); print(retry_engine.check(q))"
+{'success_count': 8, 'total': 8}
+
+No, the bug is gone. `check()` on the fixture now returns `success_count=8, total=8` (was 1/8).

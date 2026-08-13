@@ -1,0 +1,35 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-013/ && echo "---" && ls -la /root/ken-tasks/T-KEN-013/pr_files/
+total 16
+drwxr-xr-x  3 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root 4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root   58 Aug 13 22:44 CONTEXT_ONLY.md
+drwxr-xr-x  2 root root 4096 Aug 13 22:44 pr_files
+---
+total 24
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 3 root root 4096 Aug 13 22:44 ..
+-rw-r--r-- 1 root root   92 Aug 13 22:44 file1_models.py
+-rw-r--r-- 1 root root  264 Aug 13 22:44 file2_pagination.py
+-rw-r--r-- 1 root root   67 Aug 13 22:44 file3_serializer.py
+-rw-r--r-- 1 root root   52 Aug 13 22:44 file4_tests.py
+
+→ Read CONTEXT_ONLY.md
+→ Read pr_files/file1_models.py
+→ Read pr_files/file2_pagination.py
+→ Read pr_files/file3_serializer.py
+→ Read pr_files/file4_tests.py
+**Review: this PR introduces an off-by-one bug in `file2_pagination.py`.**
+
+`paginate()` computes `offset = page * limit` (file2_pagination.py:4). For `page=1`, this yields `items[limit:2*limit]`, skipping the first `limit` items entirely. Fix:
+
+```python
+offset = (page - 1) * limit
+return items[offset:offset + limit]
+```
+
+Other notes:
+- `file1_models.py`, `file3_serializer.py` look fine.
+- `file4_tests.py:2` is a stub (`pass`) and won't catch this bug — a real test like `assert paginate([1,2,3], page=1, limit=2) == [1,2]` would have caught it. The serializer test should also assert actual output.

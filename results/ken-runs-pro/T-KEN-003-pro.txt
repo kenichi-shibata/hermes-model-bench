@@ -1,0 +1,295 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 328
+drwxr-xr-x  2 root root   4096 Aug 13 22:56 .
+drwxr-xr-x 25 root root   4096 Aug 13 22:56 ..
+-rw-r--r--  1 root root    126 Aug 13 22:56 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 315596 Aug 13 22:56 performers.json
+-rw-r--r--  1 root root    197 Aug 13 22:56 stashdb_mock.py
+
+→ Read CONTEXT_ONLY.md
+→ Read stashdb_mock.py
+
+$ python3 -c "import json; d=json.load(open('performers.json')); print(type(d)); print(len(d) if isinstance(d,list) else list(d.keys())[:10])"
+<class 'dict'>
+['performers']
+
+$ python3 -c "
+import json
+d=json.load(open('performers.json'))
+p=d['performers']
+print(len(p))
+print(json.dumps(p[0], indent=2))
+"
+2700
+{
+  "id": 0,
+  "name": "Performer0",
+  "image": "http://198.51.100.64:9999/performer/0/image",
+  "stashdb_id": "stashdb-0"
+}
+
+$ python3 -c "
+import json, collections
+d=json.load(open('performers.json'))
+p=d['performers']
+imgs=[x.get('image') for x in p]
+print('total', len(p))
+print('null image count', sum(1 for i in imgs if not i))
+# unique url host/path patterns
+hosts=collections.Counter()
+for i in imgs:
+    if not i: hosts['<none>']+=1
+    else:
+        hosts[i.split('?')[0]]+=1
+for k,v in hosts.most_common(40):
+    print(v, k)
+"
+total 2700
+null image count 0
+1 http://198.51.100.64:9999/performer/0/image
+1 http://198.51.100.64:9999/performer/1/image
+1 http://198.51.100.64:9999/performer/2/image
+1 http://198.51.100.64:9999/performer/3/image
+1 http://198.51.100.64:9999/performer/4/image
+1 http://198.51.100.64:9999/performer/5/image
+1 http://198.51.100.64:9999/performer/6/image
+1 http://198.51.100.64:9999/performer/7/image
+1 http://198.51.100.64:9999/performer/8/image
+1 http://198.51.100.64:9999/performer/9/image
+1 http://198.51.100.64:9999/performer/10/image
+1 http://198.51.100.64:9999/performer/11/image
+1 http://198.51.100.64:9999/performer/12/image
+1 http://198.51.100.64:9999/performer/13/image
+1 http://198.51.100.64:9999/performer/14/image
+1 http://198.51.100.64:9999/performer/15/image
+1 http://198.51.100.64:9999/performer/16/image
+1 http://198.51.100.64:9999/performer/17/image
+1 http://198.51.100.64:9999/performer/18/image
+1 http://198.51.100.64:9999/performer/19/image
+1 http://198.51.100.64:9999/performer/20/image
+1 http://198.51.100.64:9999/performer/21/image
+1 http://198.51.100.64:9999/performer/22/image
+1 http://198.51.100.64:9999/performer/23/image
+1 http://198.51.100.64:9999/performer/24/image
+1 http://198.51.100.64:9999/performer/25/image
+1 http://198.51.100.64:9999/performer/26/image
+1 http://198.51.100.64:9999/performer/27/image
+1 http://198.51.100.64:9999/performer/28/image
+1 http://198.51.100.64:9999/performer/29/image
+1 http://198.51.100.64:9999/performer/30/image
+1 http://198.51.100.64:9999/performer/31/image
+1 http://198.51.100.64:9999/performer/32/image
+1 http://198.51.100.64:9999/performer/33/image
+1 http://198.51.100.64:9999/performer/34/image
+1 http://198.51.100.64:9999/performer/35/image
+1 http://198.51.100.64:9999/performer/36/image
+1 http://198.51.100.64:9999/performer/37/image
+1 http://198.51.100.64:9999/performer/38/image
+1 http://198.51.100.64:9999/performer/39/image
+
+$ python3 -c "
+import json, collections, re
+d=json.load(open('performers.json'))
+p=d['performers']
+mismatch=[]
+odd=[]
+for x in p:
+    img=x.get('image')
+    m=re.match(r'http://198\.51\.100\.64:9999/performer/(\d+)/image$', img or '')
+    if m:
+        if int(m.group(1)) != x['id']:
+            mismatch.append((x['id'], img))
+    else:
+        odd.append((x['id'], img))
+print('mismatch', len(mismatch))
+print('odd', len(odd))
+for x in odd[:50]: print(x)
+"
+mismatch 0
+odd 2521
+(179, 'http://198.51.100.69:9999/performer/179/image')
+(180, 'http://198.51.100.69:9999/performer/180/image')
+(181, 'http://198.51.100.69:9999/performer/181/image')
+(182, 'http://198.51.100.69:9999/performer/182/image')
+(183, 'http://198.51.100.69:9999/performer/183/image')
+(184, 'http://198.51.100.69:9999/performer/184/image')
+(185, 'http://198.51.100.69:9999/performer/185/image')
+(186, 'http://198.51.100.69:9999/performer/186/image')
+(187, 'http://198.51.100.69:9999/performer/187/image')
+(188, 'http://198.51.100.69:9999/performer/188/image')
+(189, 'http://198.51.100.69:9999/performer/189/image')
+(190, 'http://198.51.100.69:9999/performer/190/image')
+(191, 'http://198.51.100.69:9999/performer/191/image')
+(192, 'http://198.51.100.69:9999/performer/192/image')
+(193, 'http://198.51.100.69:9999/performer/193/image')
+(194, 'http://198.51.100.69:9999/performer/194/image')
+(195, 'http://198.51.100.69:9999/performer/195/image')
+(196, 'http://198.51.100.69:9999/performer/196/image')
+(197, 'http://198.51.100.69:9999/performer/197/image')
+(198, 'http://198.51.100.69:9999/performer/198/image')
+(199, 'http://198.51.100.69:9999/performer/199/image')
+(200, 'http://198.51.100.69:9999/performer/200/image')
+(201, 'http://198.51.100.69:9999/performer/201/image')
+(202, 'http://198.51.100.69:9999/performer/202/image')
+(203, 'http://198.51.100.69:9999/performer/203/image')
+(204, 'http://198.51.100.69:9999/performer/204/image')
+(205, 'http://198.51.100.69:9999/performer/205/image')
+(206, 'http://198.51.100.69:9999/performer/206/image')
+(207, 'http://198.51.100.69:9999/performer/207/image')
+(208, 'http://198.51.100.69:9999/performer/208/image')
+(209, 'http://198.51.100.69:9999/performer/209/image')
+(210, 'http://198.51.100.69:9999/performer/210/image')
+(211, 'http://198.51.100.69:9999/performer/211/image')
+(212, 'http://198.51.100.69:9999/performer/212/image')
+(213, 'http://198.51.100.69:9999/performer/213/image')
+(214, 'http://198.51.100.69:9999/performer/214/image')
+(215, 'http://198.51.100.69:9999/performer/215/image')
+(216, 'http://198.51.100.69:9999/performer/216/image')
+(217, 'http://198.51.100.69:9999/performer/217/image')
+(218, 'http://198.51.100.69:9999/performer/218/image')
+(219, 'http://198.51.100.69:9999/performer/219/image')
+(220, 'http://198.51.100.69:9999/performer/220/image')
+(221, 'http://198.51.100.69:9999/performer/221/image')
+(222, 'http://198.51.100.69:9999/performer/222/image')
+(223, 'http://198.51.100.69:9999/performer/223/image')
+(224, 'http://198.51.100.69:9999/performer/224/image')
+(225, 'http://198.51.100.69:9999/performer/225/image')
+(226, 'http://198.51.100.69:9999/performer/226/image')
+(227, 'http://198.51.100.69:9999/performer/227/image')
+(228, 'http://198.51.100.69:9999/performer/228/image')
+
+$ python3 -c "
+import json, collections, re
+d=json.load(open('performers.json'))
+p=d['performers']
+cats=collections.Counter()
+for x in p:
+    img=x.get('image') or '<none>'
+    cats[img.split('/performer/')[0]]+=1
+for k,v in cats.most_common(): print(v, k)
+"
+2521 http://198.51.100.69:9999
+179 http://198.51.100.64:9999
+
+$ python3 -c "
+import json
+d=json.load(open('performers.json'))
+p=d['performers']
+bad=[x['id'] for x in p if '198.51.100.64' in (x.get('image') or '')]
+good=[x['id'] for x in p if '198.51.100.69' in (x.get('image') or '')]
+print('bad count', len(bad), 'min', min(bad), 'max', max(bad))
+print('good count', len(good), 'min', min(good), 'max', max(good))
+print('bad ids sample', bad[:10], bad[-10:])
+"
+bad count 179 min 0 max 178
+good count 2521 min 179 max 2699
+bad ids sample [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] [169, 170, 171, 172, 173, 174, 175, 176, 177, 178]
+
+$ python3 -c "
+import json, re
+d=json.load(open('performers.json'))
+p=d['performers']
+mismatch=[]
+for x in p:
+    img=x.get('image') or ''
+    m=re.match(r'http://198\.51\.100\.(64|69):9999/performer/(\d+)/image$', img)
+    if m:
+        if int(m.group(2)) != x['id']:
+            mismatch.append((x['id'], img))
+print('mismatch count', len(mismatch))
+for x in mismatch[:20]: print(x)
+"
+mismatch count 0
+
+$ python3 -c "
+import json
+d=json.load(open('performers.json'))
+p=d['performers']
+for x in p[:3]: print(json.dumps(x))
+print('---')
+for x in p[178:181]: print(json.dumps(x))
+"
+{"id": 0, "name": "Performer0", "image": "http://198.51.100.64:9999/performer/0/image", "stashdb_id": "stashdb-0"}
+{"id": 1, "name": "Performer1", "image": "http://198.51.100.64:9999/performer/1/image", "stashdb_id": "stashdb-1"}
+{"id": 2, "name": "Performer2", "image": "http://198.51.100.64:9999/performer/2/image", "stashdb_id": "stashdb-2"}
+---
+{"id": 178, "name": "Performer178", "image": "http://198.51.100.64:9999/performer/178/image", "stashdb_id": null}
+{"id": 179, "name": "Performer179", "image": "http://198.51.100.69:9999/performer/179/image", "stashdb_id": null}
+{"id": 180, "name": "Performer180", "image": "http://198.51.100.69:9999/performer/180/image", "stashdb_id": null}
+
+$ python3 -c "
+import json
+d=json.load(open('performers.json'))
+p=d['performers']
+# distribution of stashdb_id null/non-null
+null_ids=[x['id'] for x in p if x['stashdb_id'] is None]
+nonnull=[x['id'] for x in p if x['stashdb_id'] is not None]
+print('non-null stashdb count', len(nonnull), 'min', min(nonnull), 'max', max(nonnull))
+print('null stashdb count', len(null_ids), 'min', min(null_ids), 'max', max(null_ids))
+# stashdb_id value pattern
+vals=set(x['stashdb_id'] for x in p if x['stashdb_id'] is not None)
+print(sorted(vals)[:5], sorted(vals)[-5:])
+"
+non-null stashdb count 40 min 0 max 39
+null stashdb count 2660 min 40 max 2699
+['stashdb-0', 'stashdb-1', 'stashdb-10', 'stashdb-11', 'stashdb-12'] ['stashdb-5', 'stashdb-6', 'stashdb-7', 'stashdb-8', 'stashdb-9']
+
+$ python3 -c "
+import json
+d=json.load(open('performers.json'))
+p=d['performers']
+bad=[x for x in p if '198.51.100.64' in (x.get('image') or '')]
+print('broken .64 count:', len(bad))
+print('sample broken:', [(x['id'], x['image']) for x in bad[:3]])
+"
+broken .64 count: 179
+sample broken: [(0, 'http://198.51.100.64:9999/performer/0/image'), (1, 'http://198.51.100.64:9999/performer/1/image'), (2, 'http://198.51.100.64:9999/performer/2/image')]
+
+$ python3 -c "
+s=open('performers.json').read()
+print(repr(s[:200]))
+print('...')
+print(repr(s[-100:]))
+"
+'{"performers": [{"id": 0, "name": "Performer0", "image": "http://198.51.100.64:9999/performer/0/image", "stashdb_id": "stashdb-0"}, {"id": 1, "name": "Performer1", "image": "http://198.51.100.64:9999/'
+...
+'": "Performer2699", "image": "http://198.51.100.69:9999/performer/2699/image", "stashdb_id": null}]}'
+
+$ python3 -c "
+s=open('performers.json').read()
+print('count 198.51.100.64:', s.count('198.51.100.64'))
+print('count 198.51.100.69:', s.count('198.51.100.69'))
+"
+count 198.51.100.64: 179
+count 198.51.100.69: 2521
+
+$ python3 -c "
+s=open('performers.json').read()
+s=s.replace('198.51.100.64', '198.51.100.69')
+open('performers.json','w').write(s)
+import json
+d=json.load(open('performers.json'))
+p=d['performers']
+bad=[x for x in p if '198.51.100.64' in (x.get('image') or '')]
+print('remaining .64:', len(bad))
+print('total .69:', sum(1 for x in p if '198.51.100.69' in (x.get('image') or '')))
+"
+remaining .64: 0
+total .69: 2700
+
+$ python3 -c "
+import json
+d=json.load(open('performers.json'))
+p=d['performers']
+print('valid JSON, total:', len(p))
+print(json.dumps(p[0]))
+print(json.dumps(p[179]))
+"
+valid JSON, total: 2700
+{"id": 0, "name": "Performer0", "image": "http://198.51.100.69:9999/performer/0/image", "stashdb_id": "stashdb-0"}
+{"id": 179, "name": "Performer179", "image": "http://198.51.100.69:9999/performer/179/image", "stashdb_id": null}
+
+Fixed. The 179 broken performers (ids 0–178) pointed to a stale image host `198.51.100.64:9999`, while the other 2521 correctly used `198.51.100.69:9999`. I rewrote those URLs to the current host, so all 2700 records now serve from `198.51.100.69:9999`.

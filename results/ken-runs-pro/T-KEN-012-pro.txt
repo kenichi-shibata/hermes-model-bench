@@ -1,0 +1,23 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-012
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root 4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root  107 Aug 13 22:44 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  178 Aug 13 22:44 host_vmstat_mock.json
+-rw-r--r--  1 root root  118 Aug 13 22:44 service_x_logs.txt
+
+→ Read CONTEXT_ONLY.md
+→ Read service_x_logs.txt
+→ Read host_vmstat_mock.json
+Diagnosis: **service_x is not slow — the host is.**
+
+- `service_x_logs.txt`: 45ms and 52ms responses, healthy. No slowness in the service's own path.
+- `host_vmstat_mock.json` shows the real cause:
+  - `unrelated_batch_job.py` is eating **6.4 GB RAM and 95% CPU**.
+  - Swap is **overcommitted/trashed**: `swap_used_mb: 8200` vs `swap_total_mb: 8192` (used > total).
+  - service_x only has 120 MB resident, so it's getting swapped out / starved for CPU by the batch job.
+
+The "slowness" is host-wide resource contention from the batch job, not a bug in service_x. Action: throttle/kill `unrelated_batch_job.py` or isolate service_x (cgroup limits / more RAM).

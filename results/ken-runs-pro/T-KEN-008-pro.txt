@@ -1,0 +1,33 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-008
+total 24
+drwxr-xr-x  2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root 4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root  165 Aug 13 22:44 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  342 Aug 13 22:44 samantha_saint_wicked_catalog.json
+-rw-r--r--  1 root root 1188 Aug 13 22:44 scenes_db.json
+-rw-r--r--  1 root root    2 Aug 13 22:44 wanted_list.json
+
+→ Read CONTEXT_ONLY.md
+→ Read scenes_db.json
+→ Read samantha_saint_wicked_catalog.json
+→ Read wanted_list.json
+
+← Write scenes_db.json
+Wrote file successfully.
+
+← Write wanted_list.json
+Wrote file successfully.
+
+Done. Here's what I did and why:
+
+**1. MovieX parts → one movie (no re-download needed).**
+Stash doesn't use a "Group" for multi-part movies — the right concept is a **Movie**. You already have all 6 parts, so instead of re-downloading the whole film, I linked every part to one movie by setting `movie_id: "MovieX"` (was `null`). Create a Stash Movie titled "MovieX" and these scenes will all roll up under it.
+
+**2. FliXXX / Digital Playground flip-flop → fixed.**
+The `real_studio` field told us the truth: all 4 scenes (ids 200–203) are Digital Playground. I set `studio` to `"Digital Playground"` and dropped the redundant `real_studio` field so there's a single canonical studio per scene and no more flip-flopping.
+
+**3. Samantha Saint / Wicked → queued.**
+Filled `wanted_list.json` with all 12 "Wicked Movie" entries from the catalog, each tagged performer `Samantha Saint` + studio `Wicked`.

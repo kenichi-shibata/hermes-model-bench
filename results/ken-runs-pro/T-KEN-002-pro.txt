@@ -1,0 +1,92 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-002
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root 4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root   87 Aug 13 22:44 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  813 Aug 13 22:44 dedupe.py
+-rw-r--r--  1 root root  127 Aug 13 22:44 mirror_groups.json
+
+→ Read dedupe.py
+→ Read mirror_groups.json
+→ Read CONTEXT_ONLY.md
+
+← Edit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -8,11 +8,13 @@
+ 
+ 
+ def suggest_keep(candidates):
+     """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    Playability first, then size -- so a dead file is never preferred
++    over a playable one."""
++    playable = [c for c in candidates if c["playable"]]
++    pool = playable if playable else candidates
++    return max(pool, key=lambda c: c["size_gb"])
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+
+$ cd /root/ken-tasks/T-KEN-002 && python3 -c "
+import json, dedupe
+db = json.load(open('mirror_groups.json'))
+for gid in db:
+    print(dedupe.scan_mirror_group(gid, db))
+"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+
+← Edit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -1,20 +1,23 @@
+ """Dedupe engine - two ranking functions."""
+ 
+-def pick_canonical(candidates):
+-    """Real write-path ranking: playability first, then size."""
++def _rank(candidates):
++    """Shared ranking: playability first, then size."""
+     playable = [c for c in candidates if c["playable"]]
+     pool = playable if playable else candidates
+     return max(pool, key=lambda c: c["size_gb"])
+ 
+ 
++def pick_canonical(candidates):
++    """Real write-path ranking: playability first, then size."""
++    return _rank(candidates)
++
++
+ def suggest_keep(candidates):
+     """DISPLAY-ONLY ranking shown on the review page.
+-    Playability first, then size -- so a dead file is never preferred
++    Shares the write-path ranking so a dead file is never preferred
+     over a playable one."""
+-    playable = [c for c in candidates if c["playable"]]
+-    pool = playable if playable else candidates
+-    return max(pool, key=lambda c: c["size_gb"])
++    return _rank(candidates)
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+
+$ cd /root/ken-tasks/T-KEN-002 && python3 -c "
+import json, dedupe
+db = json.load(open('mirror_groups.json'))
+print(dedupe.scan_mirror_group('group_42', db))
+"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+
+Fixed. `suggest_keep` had no playability check, so it recommended the dead 5.2GB file (`scenes:100`) over the playable 1.8GB one (`scenes:101`). Now both display and write paths share a single `_rank` helper (playability first, then size), and `scan_mirror_group('group_42', db)` correctly returns `scenes:101` for both.

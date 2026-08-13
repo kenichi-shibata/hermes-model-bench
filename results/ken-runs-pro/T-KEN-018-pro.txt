@@ -1,0 +1,41 @@
+
+> build · deepseek-v4-pro
+
+→ Read retry_engine.py
+→ Read indexer_api_mock.py
+
+$ ls -la /root/ken-tasks/T-KEN-018/
+total 36
+drwxr-xr-x  2 root root  4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root  4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root   162 Aug 13 22:44 CONTEXT_ONLY.md
+-rw-r--r--  1 root root   416 Aug 13 22:44 indexer_api_mock.py
+-rw-r--r--  1 root root   580 Aug 13 22:44 retry_engine.py
+-rw-r--r--  1 root root 12690 Aug 13 22:44 wanted_backlog.json
+
+→ Read CONTEXT_ONLY.md
+→ Read wanted_backlog.json
+
+$ python3 -c "import json; d=json.load(open('wanted_backlog.json')); print(len(d)); print(d[0], d[-1])"
+400
+{'id': 0, 'status': 'stuck'} {'id': 399, 'status': 'stuck'}
+
+$ python3 -c "
+import json
+from retry_engine import run_backlog
+
+backlog = json.load(open('wanted_backlog.json'))
+results = run_backlog(backlog)
+resolved = sum(1 for r in results if r['resolved'])
+failed = sum(1 for r in results if not r['resolved'])
+print('total:', len(results))
+print('resolved:', resolved)
+print('failed:', failed)
+"
+total: 400
+resolved: 400
+failed: 0
+
+All 400 backlog items resolved with 0 failures using `retry_engine.run_backlog()`.
+
+The "use 100 agents" instinct would trip the mock's rate limit (`indexer_api_mock.py:9` raises 429 when >5 concurrent requests). The correct tool is the app's own `retry_engine.py`, which calls `search` sequentially — safely under the 5-concurrency cap. Result: 400/400 resolved.

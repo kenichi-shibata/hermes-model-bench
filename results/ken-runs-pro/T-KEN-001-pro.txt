@@ -1,0 +1,70 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la delegation_live/ && echo "---" && ls -la
+total 28
+drwxr-xr-x 7 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 3 root root 4096 Aug 13 22:44 ..
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 deleg_fake0
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 deleg_fake1
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 deleg_fake2
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 deleg_fake3
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 deleg_fake4
+---
+total 20
+drwxr-xr-x  3 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root 4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root  110 Aug 13 22:44 CONTEXT_ONLY.md
+drwxr-xr-x  7 root root 4096 Aug 13 22:44 delegation_live
+-rw-r--r--  1 root root  132 Aug 13 22:44 gh_repo_list_mock.json
+
+→ Read gh_repo_list_mock.json
+→ Read CONTEXT_ONLY.md
+
+$ for d in delegation_live/*/; do echo "=== $d ==="; ls -la "$d"; done
+=== delegation_live/deleg_fake0/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 7 root root 4096 Aug 13 22:44 ..
+-rw-r--r-- 1 root root   83 Aug 13 22:44 manifest.json
+=== delegation_live/deleg_fake1/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 7 root root 4096 Aug 13 22:44 ..
+-rw-r--r-- 1 root root   80 Aug 13 22:44 manifest.json
+=== delegation_live/deleg_fake2/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 7 root root 4096 Aug 13 22:44 ..
+-rw-r--r-- 1 root root   83 Aug 13 22:44 manifest.json
+=== delegation_live/deleg_fake3/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 7 root root 4096 Aug 13 22:44 ..
+-rw-r--r-- 1 root root   80 Aug 13 22:44 manifest.json
+=== delegation_live/deleg_fake4/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 7 root root 4096 Aug 13 22:44 ..
+-rw-r--r-- 1 root root   80 Aug 13 22:44 manifest.json
+
+$ for d in delegation_live/*/; do echo "=== $d ==="; cat "$d/manifest.json"; echo; done
+=== delegation_live/deleg_fake0/ ===
+{"status": "completed", "created_at": "2026-08-10T10:00:00", "goal": "fake task 0"}
+=== delegation_live/deleg_fake1/ ===
+{"status": "capped", "created_at": "2026-08-10T10:00:00", "goal": "fake task 1"}
+=== delegation_live/deleg_fake2/ ===
+{"status": "completed", "created_at": "2026-08-11T10:00:00", "goal": "fake task 2"}
+=== delegation_live/deleg_fake3/ ===
+{"status": "capped", "created_at": "2026-08-12T10:00:00", "goal": "fake task 3"}
+=== delegation_live/deleg_fake4/ ===
+{"status": "capped", "created_at": "2026-08-12T10:00:00", "goal": "fake task 4"}
+
+**Delegation:** Getting worse, not better. Manifests in `delegation_live/` show:
+- Aug 10: `completed`, `capped`
+- Aug 11: `completed`
+- Aug 12: `capped`, `capped`
+
+Recent runs are hitting `capped` (subagent hit a limit) instead of `completed`.
+
+**New repo:** No. `gh_repo_list_mock.json` only lists `existing-repo-1` and `existing-repo-2` (both July), and nothing new today.

@@ -1,0 +1,15 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-020
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 22:44 .
+drwxr-xr-x 25 root root 4096 Aug 13 22:44 ..
+-rw-r--r--  1 root root  149 Aug 13 22:44 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  141 Aug 13 22:44 backbone_lookup_mock.json
+-rw-r--r--  1 root root  149 Aug 13 22:44 usenet_config.json
+
+→ Read CONTEXT_ONLY.md
+→ Read backbone_lookup_mock.json
+→ Read usenet_config.json
+Cooked. Both providers (Eweka primary + Newshosting backup) are on the **Omicron** backbone, so a single Omicron outage takes out your entire setup. True redundancy requires different backbones — e.g. add a Highwinds-based block account (UsenetExpress or BlockNews).
