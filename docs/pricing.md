@@ -48,3 +48,37 @@ All prices in USD per million tokens, standard (non-batch, non-cached) rate.
 3. Update `harness/scoring.py`'s `PRICING_USD_PER_M` dict to match.
 4. Note in the arm's next result file which pricing snapshot was used,
    so historical results stay interpretable even after prices move again.
+
+## Executor billing: API pay-per-token vs a subscription plan (2026-08-13)
+
+The `sonnet-5`/`opus-5`/`haiku-4.5` arms run through the Claude Code CLI,
+which needs its OWN login separate from any API key Hermes itself has —
+confirmed live: Hermes's `ANTHROPIC_API_KEY` in `/root/.hermes/.env` does
+NOT satisfy `claude -p`. Two real paths, with very different cost shapes
+for this project:
+
+1. **`claude auth login --console`** — OAuth into an Anthropic Console
+   (API-billing) account. Confirmed working (needs a human to visit a URL
+   and paste back a code once per machine), but the account this landed
+   on had **$0 credit** — every real call failed with `"Credit balance is
+   too low"`. If you go this route, load real $ credits on the console
+   account first; every task run then bills per-token at this file's
+   published rates, same as the DeepSeek arms.
+2. **`claude auth login`** (no `--console`) — logs into an actual
+   claude.ai subscription (Pro/Max) instead. Usage is metered in
+   **active Claude Code CLI hours** against the plan's weekly/5-hour
+   window, NOT per-token — this file's $/M-token rates do NOT apply to
+   subscription-metered usage, and `harness/scoring.py`'s cost-efficiency
+   dimension needs a DIFFERENT model for this arm shape (e.g. amortized
+   $/hour rather than $/token) if a subscription plan is used instead of
+   API billing. This is an open design question, not yet resolved — see
+   `docs/methodology.md`'s open-questions section.
+
+**Recommendation for THIS project specifically (real workloads, short
+bounded task runs, not 8-hour continuous sessions): Claude Max 5x
+($100/mo), not the $200 20x tier** — the 5x tier is documented as covering
+"a full workday of heavy usage," which is well above what a bounded
+per-task benchmark run needs; the $200 tier's extra headroom targets users
+running Opus continuously all day, which this bench doesn't do. DeepSeek's
+arms are unaffected by this decision — they already work cleanly via
+direct API billing with existing credits.
