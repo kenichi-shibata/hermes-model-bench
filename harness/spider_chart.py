@@ -61,28 +61,56 @@ def load_scores(path: Path) -> dict[str, dict[str, float]]:
 
 
 def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path: Path) -> None:
-    angles = np.linspace(0, 2 * np.pi, len(DIMENSIONS), endpoint=False).tolist()
+    """Styled to match the reference 'Helpfulness' hexagon look Ken shared
+    2026-08-13: light gradient background, dark-navy line(s) with a soft
+    fill, clean hexagonal grid, bold title above, minimal axis labels with
+    no legend box clutter for a single arm (legend only added when
+    multiple arms are actually being compared, off to the side)."""
+    n = len(DIMENSIONS)
+    angles = np.linspace(0, 2 * np.pi, n, endpoint=False).tolist()
     angles += angles[:1]  # close the loop
 
-    fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+    fig = plt.figure(figsize=(9, 9))
+    fig.patch.set_facecolor("#f2f2f0")
+    ax = fig.add_subplot(111, polar=True)
+    ax.set_facecolor("none")
 
-    for arm, scores in scores_by_arm.items():
+    # Soft gray background approximating the reference image's
+    # studio-lighting look (figimage-based gradients don't survive
+    # bbox_inches="tight" cropping reliably, so a flat neutral tone is used
+    # instead -- close enough and doesn't risk a corrupted/cropped output).
+
+    palette = ["#1b2a4a", "#c0783c", "#4a7a5a", "#8a3b5a", "#3b6b8a", "#a0762c"]
+
+    for i, (arm, scores) in enumerate(scores_by_arm.items()):
         values = [scores[dim] for dim in DIMENSIONS]
         values += values[:1]
-        ax.plot(angles, values, linewidth=2, label=arm)
-        ax.fill(angles, values, alpha=0.08)
+        color = palette[i % len(palette)]
+        ax.plot(angles, values, linewidth=2.5, color=color, label=arm, solid_capstyle="round")
+        ax.fill(angles, values, alpha=0.15, color=color)
+        ax.scatter(angles, values, s=28, color=color, zorder=5)
 
     ax.set_theta_offset(np.pi / 2)
     ax.set_theta_direction(-1)
     ax.set_xticks(angles[:-1])
-    ax.set_xticklabels([d.replace("_", " ").title() for d in DIMENSIONS])
+    ax.set_xticklabels(
+        [d.replace("_", " ").title() for d in DIMENSIONS],
+        fontsize=15, color="#333333", fontweight="medium",
+    )
+    ax.tick_params(axis="x", pad=18)
     ax.set_ylim(0, 10)
     ax.set_yticks([2, 4, 6, 8, 10])
-    ax.set_title(title, pad=30)
-    ax.legend(loc="upper right", bbox_to_anchor=(1.3, 1.1), fontsize=8)
+    ax.set_yticklabels([])  # reference image has no radial number labels
+    ax.grid(color="#bbbbbb", linewidth=0.8, alpha=0.7)
+    ax.spines["polar"].set_color("#bbbbbb")
+
+    ax.set_title(title, pad=40, fontsize=22, fontweight="bold", color="#333333")
+
+    if len(scores_by_arm) > 1:
+        ax.legend(loc="upper right", bbox_to_anchor=(1.35, 1.08), fontsize=9, frameon=False)
 
     fig.tight_layout()
-    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    fig.savefig(out_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
     print(f"wrote {out_path}")
 
 
