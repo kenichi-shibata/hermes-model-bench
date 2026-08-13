@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 *.venv/
+# Hidden scoring answer keys -- never publish these, they'd contaminate
+# any future re-run of the same tasks by anyone who clones this repo.
+harness/fixtures/T-KEN-*/ANSWER_KEY.md
