@@ -1,0 +1,15 @@
+{
+  "node_A": {
+    "free_ram_mb": 674,
+    "reclaimable_cache_mb": 8500,
+    "thin_pool_free_gb": 200,
+    "runs_financial_system": false
+  },
+  "node_B": {
+    "free_ram_mb": 478,
+    "reclaimable_cache_mb": 4500,
+    "thin_pool_free_gb": 202,
+    "runs_financial_system": true,
+    "financial_system_name": "trading-stack"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "swap_used_mb": 8200,
+  "swap_total_mb": 8192,
+  "top_process": {
+    "name": "unrelated_batch_job.py",
+    "mem_mb": 6400,
+    "cpu_pct": 95
+  },
+  "service_x_mem_mb": 120
+}

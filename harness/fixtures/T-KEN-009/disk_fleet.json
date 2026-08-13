@@ -1,0 +1,23 @@
+{
+  "host1": {
+    "used_pct": 45,
+    "thin_provisioned": false
+  },
+  "host2": {
+    "used_pct": 38,
+    "thin_provisioned": false
+  },
+  "host3": {
+    "used_pct": 92,
+    "thin_provisioned": true,
+    "name": "media-pool"
+  },
+  "host4": {
+    "used_pct": 22,
+    "thin_provisioned": false
+  },
+  "host5": {
+    "used_pct": 30,
+    "thin_provisioned": false
+  }
+}

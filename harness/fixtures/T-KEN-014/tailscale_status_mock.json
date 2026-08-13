@@ -1,0 +1,28 @@
+{
+  "Self": {
+    "HostName": "phone",
+    "TailscaleIPs": [
+      "100.1.1.1"
+    ]
+  },
+  "Peer": {
+    "home-router-node": {
+      "HostName": "pve2",
+      "Online": false,
+      "LastSeen": "2026-08-02T00:00:00Z",
+      "PrimaryRoutes": [
+        "192.168.1.0/24"
+      ]
+    },
+    "other-node-1": {
+      "HostName": "laptop",
+      "Online": true,
+      "PrimaryRoutes": []
+    },
+    "other-node-2": {
+      "HostName": "phone2",
+      "Online": true,
+      "PrimaryRoutes": []
+    }
+  }
+}

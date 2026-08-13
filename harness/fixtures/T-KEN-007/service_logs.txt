@@ -1,0 +1,5 @@
+2026-08-13 10:00:01 INFO service healthy
+2026-08-13 10:01:01 INFO service healthy
+2026-08-13 10:02:01 INFO service healthy
+2026-08-13 10:03:01 WARN upstream dependency (payments-api) returned 503
+2026-08-13 10:04:01 INFO service healthy (own health check green)

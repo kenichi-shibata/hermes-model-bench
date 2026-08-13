@@ -1,0 +1,10 @@
+{
+  "primary": {
+    "provider": "Eweka",
+    "backbone": "Omicron"
+  },
+  "backup": {
+    "provider": "Newshosting",
+    "backbone": "Omicron"
+  }
+}

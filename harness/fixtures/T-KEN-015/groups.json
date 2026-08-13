@@ -1,0 +1,26 @@
+{
+  "group_1": [
+    {
+      "id": "s1",
+      "playable": false,
+      "play_count": 12
+    },
+    {
+      "id": "s2",
+      "playable": true,
+      "play_count": 0
+    }
+  ],
+  "group_2": [
+    {
+      "id": "s3",
+      "playable": false,
+      "play_count": 3
+    },
+    {
+      "id": "s4",
+      "playable": true,
+      "play_count": 0
+    }
+  ]
+}
