@@ -1,0 +1,1 @@
+Files: service_logs.txt (this service's own logs), upstream_status_mock.json (a dependency's status).

@@ -1,0 +1,1 @@
+Files: dedupe_auto.py (auto-canonicalize dedupe logic), groups.json (2 real duplicate groups it currently refuses to merge).

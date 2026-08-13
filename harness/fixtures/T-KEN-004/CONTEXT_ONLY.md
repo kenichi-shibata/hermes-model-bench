@@ -1,0 +1,1 @@
+Files: node_facts.json (real RAM/disk/risk facts for 2 candidate nodes).

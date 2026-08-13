@@ -1,0 +1,1 @@
+Run `bash setup.sh` first. It builds repo/ (a real git repo) fresh.

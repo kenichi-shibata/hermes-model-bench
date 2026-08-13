@@ -1,0 +1,1 @@
+Files: wanted_backlog.json (400 stuck items), indexer_api_mock.py (a rate-limited external API you can import), retry_engine.py (the app's existing retry engine).

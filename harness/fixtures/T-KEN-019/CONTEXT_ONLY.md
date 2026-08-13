@@ -1,0 +1,1 @@
+Run `bash setup.sh` first. It builds job_a_repo/, job_b_repo/, and job_c_log.txt fresh -- 3 real background job artifacts to check the status of.

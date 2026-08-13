@@ -1,0 +1,1 @@
+Files: bot.py (Discord track/follow handler code), follow_log.json (real follow history).

@@ -1,0 +1,1 @@
+Files: PerformerDetailPage.jsx, PerformersGrid.jsx (real frontend component code for a performer app).

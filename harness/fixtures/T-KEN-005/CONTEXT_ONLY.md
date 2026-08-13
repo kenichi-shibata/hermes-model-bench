@@ -1,0 +1,1 @@
+Files: api.py (scene homepage section builders), scenes.json (real scene data for trending + resume sections).

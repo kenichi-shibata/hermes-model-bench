@@ -1,0 +1,1 @@
+Files: scenes_db.json (scene records), samantha_saint_wicked_catalog.json (a performer's studio catalog), wanted_list.json (current download queue, currently empty).

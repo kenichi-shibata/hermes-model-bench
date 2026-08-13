@@ -1,0 +1,1 @@
+Files: performers.json (performer records with image URLs), stashdb_mock.py (a StashDB lookup helper you can import and call).
