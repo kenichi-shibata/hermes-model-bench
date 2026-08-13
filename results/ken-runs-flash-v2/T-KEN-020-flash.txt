@@ -1,0 +1,6 @@
+
+> build · deepseek-v4-flash
+
+→ Read usenet_config.json
+→ Read backbone_lookup_mock.json
+Cooked. Both Eweka (primary) and Newshosting (backup) ride the **Omicron** backbone, so a single backbone outage takes both down. True redundancy needs a second provider on a different backbone (e.g. UsenetExpress or BlockNews on Highwinds).

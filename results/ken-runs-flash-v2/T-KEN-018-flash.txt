@@ -1,0 +1,33 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 36
+drwxr-xr-x  2 root root  4096 Aug 13 22:33 .
+drwxr-xr-x 24 root root  4096 Aug 13 22:33 ..
+-rw-r--r--  1 root root   162 Aug 13 22:33 CONTEXT_ONLY.md
+-rw-r--r--  1 root root   416 Aug 13 22:33 indexer_api_mock.py
+-rw-r--r--  1 root root   580 Aug 13 22:33 retry_engine.py
+-rw-r--r--  1 root root 12690 Aug 13 22:33 wanted_backlog.json
+
+→ Read wanted_backlog.json
+→ Read indexer_api_mock.py
+→ Read retry_engine.py
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "import json; d=json.load(open('wanted_backlog.json')); print(len(d)); print(d[:5]); print(d[-5:])"
+400
+[{'id': 0, 'status': 'stuck'}, {'id': 1, 'status': 'stuck'}, {'id': 2, 'status': 'stuck'}, {'id': 3, 'status': 'stuck'}, {'id': 4, 'status': 'stuck'}]
+[{'id': 395, 'status': 'stuck'}, {'id': 396, 'status': 'stuck'}, {'id': 397, 'status': 'stuck'}, {'id': 398, 'status': 'stuck'}, {'id': 399, 'status': 'stuck'}]
+
+← Write drain_backlog.py
+Wrote file successfully.
+
+Reading the situation: 400 stuck items, a rate-limited indexer API (max 5 concurrent), and the app's existing retry engine. "100 agents" would just trip the 429 — the correct leverage is the app's own engine at its documented safe concurrency of 5. Let me build the driver.
+$ python3 drain_backlog.py
+drained 400/400 items (0 rate-limited)
+
+$ python3 -c "import json; d=json.load(open('wanted_backlog.json')); from collections import Counter; print(len(d), Counter(i['status'] for i in d))"
+400 Counter({'resolved': 400})
+
+Backlog drained: 400/400 items resolved, 0 rate-limited (429s), at the engine's safe concurrency of 5. `wanted_backlog.json` now marks all items `resolved`; driver is `drain_backlog.py`.

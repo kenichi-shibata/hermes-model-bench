@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read tailscale_status_mock.json
+Your subnet router is offline. The node advertising your home network route — `home-router-node` (pve2, `192.168.1.0/24`) — has `Online: false` and was last seen over a week ago (`tailscale_status_mock.json:9-15`). Since that peer is the only one carrying the route, your phone can't reach `192.168.1.0/24` until it comes back online (or you enable that node to advertise/route traffic again).

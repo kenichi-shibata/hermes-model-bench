@@ -1,0 +1,8 @@
+
+> build · deepseek-v4-flash
+
+→ Read service_x_logs.txt
+→ Read host_vmstat_mock.json
+Service X is not slow — its logs show requests at 45ms and 52ms.
+
+The host is the problem in `host_vmstat_mock.json:2-3`: `swap_used_mb: 8200` exceeds `swap_total_mb: 8192`. The system is thrashing/out of swap, and an `unrelated_batch_job.py` is pegging 95% CPU with 6.4GB RAM. That host pressure, not service_x, is what would make X appear slow.

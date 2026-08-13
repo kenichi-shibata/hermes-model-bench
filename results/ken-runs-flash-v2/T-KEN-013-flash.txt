@@ -1,0 +1,29 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la && echo "---" && find . -type f | head -100
+total 16
+drwxr-xr-x  3 root root 4096 Aug 13 22:33 .
+drwxr-xr-x 24 root root 4096 Aug 13 22:33 ..
+-rw-r--r--  1 root root   58 Aug 13 22:33 CONTEXT_ONLY.md
+drwxr-xr-x  2 root root 4096 Aug 13 22:33 pr_files
+---
+./CONTEXT_ONLY.md
+./pr_files/file3_serializer.py
+./pr_files/file2_pagination.py
+./pr_files/file1_models.py
+./pr_files/file4_tests.py
+
+→ Read CONTEXT_ONLY.md
+→ Read pr_files/file1_models.py
+→ Read pr_files/file2_pagination.py
+→ Read pr_files/file3_serializer.py
+→ Read pr_files/file4_tests.py
+**PR review**
+
+- `file2_pagination.py:4` — **Blocking bug**: `offset = page * limit` is an off-by-one. `page=1` returns `items[limit:limit*2]`, skipping the first page. Should be `offset = (page - 1) * limit` (the docstring even says so).
+- Same function: `limit` is never validated. `limit=0` or negative produces empty slices, and `page <= 0` yields undefined behavior — add a guard (`limit <= 0` / `page < 1`).
+- `file1_models.py`, `file3_serializer.py` — fine as written.
+- `file4_tests.py:2` — `test_serialize` is an empty stub; there is no test covering `paginate`, which is why the bug shipped. Add a pagination test (`page=1, limit=2` on a 5-item list → first 2 items).
+
+Verdict: request changes on the off-by-one fix and add test coverage; the rest is acceptable.

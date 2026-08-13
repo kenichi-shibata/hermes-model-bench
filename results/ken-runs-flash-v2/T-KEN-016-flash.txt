@@ -1,0 +1,70 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 36
+drwxr-xr-x  2 root root  4096 Aug 13 22:33 .
+drwxr-xr-x 24 root root  4096 Aug 13 22:33 ..
+-rw-r--r--  1 root root    83 Aug 13 22:33 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 22814 Aug 13 22:33 threads.json
+
+→ Read CONTEXT_ONLY.md
+→ Read threads.json
+
+$ python3 -c "
+import json
+data = json.load(open('threads.json'))
+print('total threads:', len(data))
+from collections import Counter
+print(Counter(t['has_unfollow_button'] for t in data))
+print('keys:', set(t.keys()) for t in data if len(t)!=2)
+"
+File "<string>", line 7
+    print('keys:', set(t.keys()) for t in data if len(t)!=2)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: Generator expression must be parenthesized
+
+$ python3 -c "
+import json
+data = json.load(open('threads.json'))
+print('total threads:', len(data))
+from collections import Counter
+print(Counter(t['has_unfollow_button'] for t in data))
+print('unusual keys:', [t for t in data if set(t.keys()) != {'thread_id','has_unfollow_button'}])
+print('distinct thread_id sample:', [t['thread_id'] for t in data[:5]])
+"
+total threads: 432
+Counter({False: 428, True: 4})
+unusual keys: []
+distinct thread_id sample: ['t0', 't1', 't2', 't3', 't4']
+
+$ python3 -c "
+import json
+data = json.load(open('threads.json'))
+print([t for t in data if t['has_unfollow_button']])
+"
+[{'thread_id': 'already_ok_0', 'has_unfollow_button': True}, {'thread_id': 'already_ok_1', 'has_unfollow_button': True}, {'thread_id': 'already_ok_2', 'has_unfollow_button': True}, {'thread_id': 'already_ok_3', 'has_unfollow_button': True}]
+
+$ python3 -c "
+import json
+data = json.load(open('threads.json'))
+for t in data:
+    t['has_unfollow_button'] = True
+out = json.dumps(data, separators=(',', ':'))
+with open('threads.json','w') as f:
+    f.write(out + '\n')
+print('done, lines:', out.count(chr(10))+1)
+"
+done, lines: 1
+
+$ python3 -c "
+import json
+data = json.load(open('threads.json'))
+from collections import Counter
+print('total:', len(data))
+print(Counter(t['has_unfollow_button'] for t in data))
+"
+total: 432
+Counter({True: 432})
+
+All 432 threads now have `has_unfollow_button: true` in threads.json (previously 428 were `false`). The file stays valid JSON on a single line.

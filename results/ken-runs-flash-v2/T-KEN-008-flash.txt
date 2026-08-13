@@ -1,0 +1,34 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x  2 root root 4096 Aug 13 22:33 .
+drwxr-xr-x 24 root root 4096 Aug 13 22:33 ..
+-rw-r--r--  1 root root  165 Aug 13 22:33 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  342 Aug 13 22:33 samantha_saint_wicked_catalog.json
+-rw-r--r--  1 root root 1188 Aug 13 22:33 scenes_db.json
+-rw-r--r--  1 root root    2 Aug 13 22:33 wanted_list.json
+
+→ Read CONTEXT_ONLY.md
+→ Read samantha_saint_wicked_catalog.json
+→ Read scenes_db.json
+→ Read wanted_list.json
+
+← Write wanted_list.json
+Wrote file successfully.
+
+All three files read. Here's what I found and what I'm doing with it.
+$ python3 -m json.tool wanted_list.json > /dev/null && echo "valid JSON" && python3 -c "import json; d=json.load(open('wanted_list.json')); print(len(d),'entries')"
+valid JSON
+17 entries
+
+wanted_list.json populated (17 entries). Answers:
+
+**Movie-part scenes (MovieX 1-6):** Yes, group them. They all belong to the same film but have `movie_id: null`, so I created a Stash-style `group` entry referencing scene ids 100-105 — they download as one unit. A whole-movie download isn't possible here because no movie record is linked to them; the group is the workaround.
+
+**FliXXX ↔ Digital Playground flip-flop:** You're right, downloading by `studio` is unreliable. Scenes 200-203 have `studio: "FliXXX"` but `real_studio: "Digital Playground"` in the db. I pinned each to **Digital Playground** (the `real_studio` field is the trusted source) and kept "FliXXX" as an `alias` so dedupe stays stable if attribution flips again.
+
+**Samantha Saint / Wicked:** All 12 `Wicked Movie N` titles added as `movie` entries (with performer + studio).
+
+Schema used in the queue: `type` (`group`/`scene`/`movie`), plus `scene_ids` for groups, `scene_id` + `aliases` for scenes, and `title`/`performer`/`studio` for movies.

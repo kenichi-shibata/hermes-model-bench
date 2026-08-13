@@ -1,0 +1,15 @@
+
+> build · deepseek-v4-flash
+
+→ Read disk_fleet.json
+Disk fleet check:
+
+| Host | Used % | Thin? | Note |
+|------|--------|-------|------|
+| host1 | 45% | no | |
+| host2 | 38% | no | |
+| host3 | **92%** | yes | `media-pool` |
+| host4 | 22% | no | |
+| host5 | 30% | no | |
+
+**Flag:** host3 is near capacity at 92% (thin-provisioned `media-pool`). All others are healthy.

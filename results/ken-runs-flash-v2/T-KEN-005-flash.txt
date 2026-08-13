@@ -1,0 +1,88 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la /root/ken-tasks/T-KEN-005
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 22:33 .
+drwxr-xr-x 24 root root 4096 Aug 13 22:33 ..
+-rw-r--r--  1 root root  110 Aug 13 22:33 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 1136 Aug 13 22:33 api.py
+-rw-r--r--  1 root root  224 Aug 13 22:33 scenes.json
+
+→ Read CONTEXT_ONLY.md
+→ Read api.py
+→ Read scenes.json
+→ Read api.py
+
+← Edit api.py
+Index: /root/ken-tasks/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-005/api.py
++++ /root/ken-tasks/T-KEN-005/api.py
+@@ -1,13 +1,24 @@
+ """Scene homepage sections."""
+ 
+-def _scene_out(scene, translate=False):
++
++def _is_japanese(text):
++    """True if the text contains any Japanese kana or kanji."""
++    return any(
++        "\u3040" <= ch <= "\u30ff" or "\u4e00" <= ch <= "\u9fff" for ch in text
++    )
++
++
++def _scene_out(scene, translate=True):
+     """Builds a scene card payload.
+-    BUG: translate defaults to False, and _hydrate_code() below never
+-    passes translate=True, so performer names never get romanized on
+-    the resume/continue-watching section even though _home_trending
+-    correctly passes translate=True."""
++
++    translate defaults to True so every homepage card carries the
++    romanized text the UI renders as the blue translation line below
++    the Japanese: title_en below a Japanese title, and name_en below
++    each Japanese performer name. Cards never ship untranslated."""
+     out = {"id": scene["id"], "title": scene["title"], "performers": []}
++    if translate and _is_japanese(scene["title"]):
++        out["title_en"] = romanize(scene["title"])
+     for p in scene["performers"]:
+         name_en = p.get("name_en")
+         if translate and not name_en:
+             name_en = romanize(p["name_jp"])
+@@ -19,10 +30,10 @@
+     return [_scene_out(s, translate=True) for s in scenes]
+ 
+ 
+ def _hydrate_code(scene):
+-    """Used by the resume/continue-watching section. BUG: forgot translate=True."""
+-    return _scene_out(scene)  # missing translate=True
++    """Used by the resume/continue-watching section."""
++    return _scene_out(scene, translate=True)
+ 
+ 
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+
+
+$ python3 - <<'EOF'
+import json, sys
+sys.path.insert(0, '/root/ken-tasks/T-KEN-005')
+import api
+
+data = json.load(open('/root/ken-tasks/T-KEN-005/scenes.json'))
+print("trending:", json.dumps(api._home_trending(data["trending"]), ensure_ascii=False))
+print("resume:  ", json.dumps(api._hydrate_code(data["resume"][0]), ensure_ascii=False))
+
+jp = {"id": 3, "title": "彩月七緒の新作", "performers": [{"name_jp": "彩月七緒", "name_en": None}]}
+print("jp title:", json.dumps(api._scene_out(jp), ensure_ascii=False))
+EOF
+trending: [{"id": 1, "title": "Trending Scene", "performers": [{"name_jp": "彩月七緒", "name_en": "Nanao Ayatsuki"}]}]
+resume:   {"id": 2, "title": "Resume Scene", "performers": [{"name_jp": "彩月七緒", "name_en": "Nanao Ayatsuki"}]}
+jp title: {"id": 3, "title": "彩月七緒の新作", "performers": [{"name_jp": "彩月七緒", "name_en": "Nanao Ayatsuki"}], "title_en": "Romanized-彩月七緒の新作"}
+
+Fixed in api.py:
+
+- `_scene_out` now defaults `translate=True` and adds `title_en` (blue translation below a Japanese title via `_is_japanese` + `romanize`), so cards never ship untranslated.
+- `_hydrate_code` now passes `translate=True`, so resume/continue-watching performer names get romanized (`name_en: "Nanao Ayatsuki"`) instead of `null`.
+
+Verified: both trending and resume cards now emit `name_en` for 彩月七緒, and Japanese titles emit `title_en`.

@@ -1,0 +1,35 @@
+
+> build · deepseek-v4-flash
+
+$ bash setup.sh
+Fixture ready: job_a committed, job_b untracked file, job_c empty (failed).
+
+→ Read .
+→ Read CONTEXT_ONLY.md
+→ Read setup.sh
+
+$ git status && echo "---LOG---" && git log --oneline -5
+On branch master
+nothing to commit, working tree clean
+---LOG---
+b3aee71 job A: committed and pushed (simulated)
+
+$ git status && echo "---LOG---" && git log --oneline -5 2>&1
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	downloaded_file.dat
+
+nothing added to commit but untracked files present (use "git add" to track)
+---LOG---
+fatal: your current branch 'master' does not have any commits yet
+
+→ Read job_c_log.txt
+Status of the 3 jobs:
+
+- **job_a** — done ✅: `file.py` committed (`b3aee71`), clean working tree (pushed/committed as simulated).
+- **job_b** — downloaded but NOT committed ❌: `downloaded_file.dat` is untracked, zero commits yet.
+- **job_c** — failed ❌: `job_c_log.txt` is empty (0 lines), no output produced.

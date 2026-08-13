@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-flash
+
+→ Read .
+→ Read gh_repo_list_mock.json
+→ Read delegation_live
+→ Read CONTEXT_ONLY.md
+→ Read delegation_live/deleg_fake0
+→ Read delegation_live/deleg_fake1
+→ Read delegation_live/deleg_fake2
+→ Read delegation_live/deleg_fake3
+→ Read delegation_live/deleg_fake4
+→ Read delegation_live/deleg_fake0/manifest.json
+→ Read delegation_live/deleg_fake1/manifest.json
+→ Read delegation_live/deleg_fake2/manifest.json
+→ Read delegation_live/deleg_fake3/manifest.json
+→ Read delegation_live/deleg_fake4/manifest.json
+Not getting better — it's trending worse. Status by run: completed, capped, completed, capped, capped (8/10, 8/10, 8/11, 8/12, 8/12). Only 2/5 completed overall, and the last three runs are all capped.
+
+No new repo. `gh_repo_list_mock.json` still lists only `existing-repo-1` and `existing-repo-2`; nothing new was created.
