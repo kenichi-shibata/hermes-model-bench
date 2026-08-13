@@ -1,0 +1,80 @@
+[
+  {
+    "task_id": "T-DOC-001",
+    "arm": "sonnet-5",
+    "scores": {
+      "correctness": 10.0,
+      "token_efficiency": 0.0,
+      "cost_efficiency": 10.0,
+      "reusability": 9.5
+    },
+    "composite": 79.0,
+    "cost_usd": 0.1093,
+    "total_tokens": 103876
+  },
+  {
+    "task_id": "T-DOC-001",
+    "arm": "sonnet5-plans-flash-works",
+    "scores": {
+      "correctness": 10.0,
+      "token_efficiency": 3.894,
+      "cost_efficiency": 10.0,
+      "reusability": 9.0
+    },
+    "composite": 85.79,
+    "cost_usd": 0.0825,
+    "total_tokens": 44424
+  },
+  {
+    "task_id": "T-DOC-001",
+    "arm": "sonnet5-plans-deepseekpro-works",
+    "scores": {
+      "correctness": 10.0,
+      "token_efficiency": 3.4597499999999997,
+      "cost_efficiency": 10.0,
+      "reusability": 9.0
+    },
+    "composite": 84.92,
+    "cost_usd": 0.0866,
+    "total_tokens": 46161
+  },
+  {
+    "task_id": "T-DOC-001",
+    "arm": "deepseekpro-plans-flash-works",
+    "scores": {
+      "correctness": 10.0,
+      "token_efficiency": 10.0,
+      "cost_efficiency": 10.0,
+      "reusability": 8.5
+    },
+    "composite": 97.0,
+    "cost_usd": 0.0049,
+    "total_tokens": 16000
+  },
+  {
+    "task_id": "T-DOC-001",
+    "arm": "deepseek-v4-flash",
+    "scores": {
+      "correctness": 10.0,
+      "token_efficiency": 10.0,
+      "cost_efficiency": 10.0,
+      "reusability": 9.0
+    },
+    "composite": 98.0,
+    "cost_usd": 0.0022,
+    "total_tokens": 14924
+  },
+  {
+    "task_id": "T-DOC-001",
+    "arm": "deepseek-v4-pro",
+    "scores": {
+      "correctness": 10.0,
+      "token_efficiency": 10.0,
+      "cost_efficiency": 10.0,
+      "reusability": 9.0
+    },
+    "composite": 98.0,
+    "cost_usd": 0.0042,
+    "total_tokens": 9239
+  }
+]

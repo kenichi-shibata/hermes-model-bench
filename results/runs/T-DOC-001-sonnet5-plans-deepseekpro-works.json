@@ -1,0 +1,19 @@
+{
+  "task_id": "T-DOC-001",
+  "arm": "sonnet5-plans-deepseekpro-works",
+  "plan_model": "sonnet-5",
+  "work_model": "deepseek-v4-pro",
+  "input_tokens": {
+    "plan": 33000,
+    "work": 8400
+  },
+  "output_tokens": {
+    "plan": 1400,
+    "work": 3361
+  },
+  "verification_passed": true,
+  "verification_output": "Work model correctly identified max_position_pct_check; independently flagged _post_to_webhook as a candidate before correctly ruling it out.",
+  "calibrated_token_budget": 20000,
+  "reusability_score": 9.0,
+  "notes": "real split run. plan cost $0.0876 (sonnet), work delta from opencode stats before/after (approximate, K-rounded); plan token count approximated from sibling call, not independently measured for THIS exact call"
+}

@@ -53,8 +53,24 @@ class TaskRun:
     calibrated_token_budget: int
     reusability_score: float      # 0-10, from independent scorer read (not self-report)
     notes: str = ""
+    real_cost_usd_override: dict[str, float] | None = None
+    # {"plan": $, "work": $} - pass the EXECUTOR CLI's own reported cost
+    # (e.g. Claude Code's total_cost_usd) here when available and it will
+    # be used VERBATIM instead of recomputed from input_tokens x
+    # PRICING_USD_PER_M. Real gap found 2026-08-13: naive token*rate
+    # costing double-counted an Anthropic run's cost by ~2x because
+    # cache_creation_input_tokens and cache_read_input_tokens were folded
+    # into plain input_tokens, which PRICING_USD_PER_M prices at the full
+    # fresh-input rate -- Anthropic actually bills these at different
+    # (much cheaper) tiers this file doesn't model. When the executor CLI
+    # already reports a real total cost (Claude Code does; OpenCode's own
+    # `opencode stats` table does too), prefer that number over any
+    # token*rate estimate for THAT run's cost -- it is real billing data,
+    # not a rate-table approximation with an unmodeled cache tier.
 
     def cost_usd(self) -> float:
+        if self.real_cost_usd_override:
+            return sum(self.real_cost_usd_override.values())
         total = 0.0
         for role, model in (("plan", self.plan_model), ("work", self.work_model)):
             if model is None:

@@ -1,0 +1,19 @@
+{
+  "task_id": "T-DOC-001",
+  "arm": "deepseekpro-plans-flash-works",
+  "plan_model": "deepseek-v4-pro",
+  "work_model": "deepseek-v4-flash",
+  "input_tokens": {
+    "plan": 7000,
+    "work": 7000
+  },
+  "output_tokens": {
+    "plan": 600,
+    "work": 1400
+  },
+  "verification_passed": true,
+  "verification_output": "Plan model (pro) actually read files and solved the task itself during planning (OpenCode's plan-pass has no hard read-only restriction, unlike Claude Code's --allowedTools ''). Work model (flash) independently re-verified rather than blindly trusting the hint, and reached the same correct answer.",
+  "calibrated_token_budget": 20000,
+  "reusability_score": 8.5,
+  "notes": "real split run, all-DeepSeek. NOTE: plan model was not tool-restricted (OpenCode has no per-call allowedTools flag as of v1.18.18) so it read the fixture during planning -- a real methodology gap flagged honestly, not hidden."
+}

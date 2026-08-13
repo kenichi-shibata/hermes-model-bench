@@ -1,0 +1,19 @@
+{
+  "task_id": "T-DOC-001",
+  "arm": "sonnet5-plans-flash-works",
+  "plan_model": "sonnet-5",
+  "work_model": "deepseek-v4-flash",
+  "input_tokens": {
+    "plan": 33438,
+    "work": 8100
+  },
+  "output_tokens": {
+    "plan": 1410,
+    "work": 1476
+  },
+  "verification_passed": true,
+  "verification_output": "Work model correctly identified max_position_pct_check, independently explained why each decoy was excluded.",
+  "calibrated_token_budget": 20000,
+  "reusability_score": 9.0,
+  "notes": "real split run. plan cost $0.0806 (sonnet), work delta from opencode stats before/after (approximate, K-rounded)"
+}

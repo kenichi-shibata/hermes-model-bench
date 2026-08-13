@@ -1,0 +1,20 @@
+{
+  "task_id": "T-DOC-001",
+  "arm": "sonnet-5",
+  "plan_model": null,
+  "work_model": "sonnet-5",
+  "input_tokens": {
+    "work": 102723
+  },
+  "output_tokens": {
+    "work": 1153
+  },
+  "verification_passed": true,
+  "verification_output": "Correctly identified max_position_pct_check in pipeline.py; correctly dismissed all 4 decoys with explicit reasoning.",
+  "calibrated_token_budget": 20000,
+  "reusability_score": 9.5,
+  "notes": "real claude -p --model sonnet run, 5 turns, real cost $0.1093 (includes 1h cache-creation tokens)",
+  "real_cost_usd_override": {
+    "work": 0.1093
+  }
+}
