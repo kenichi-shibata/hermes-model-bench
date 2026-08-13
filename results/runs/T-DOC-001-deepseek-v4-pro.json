@@ -1,0 +1,17 @@
+{
+  "task_id": "T-DOC-001",
+  "arm": "deepseek-v4-pro",
+  "plan_model": null,
+  "work_model": "deepseek-v4-pro",
+  "input_tokens": {
+    "work": 8800
+  },
+  "output_tokens": {
+    "work": 439
+  },
+  "verification_passed": true,
+  "verification_output": "Correctly identified max_position_pct_check in pipeline.py as the real gap; explicitly distinguished it from the cosmetic/no-op placeholders in the other two files.",
+  "calibrated_token_budget": 20000,
+  "reusability_score": 9.0,
+  "notes": "real opencode run, live task, deepseek/deepseek-v4-pro, cache_read=15.4K tokens not counted in total_tokens (scoring.py limitation, noted)"
+}

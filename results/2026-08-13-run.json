@@ -1,0 +1,28 @@
+[
+  {
+    "task_id": "T-DOC-001",
+    "arm": "deepseek-v4-flash",
+    "scores": {
+      "correctness": 10.0,
+      "token_efficiency": 10.0,
+      "cost_efficiency": 10.0,
+      "reusability": 9.0
+    },
+    "composite": 98.0,
+    "cost_usd": 0.0022,
+    "total_tokens": 14924
+  },
+  {
+    "task_id": "T-DOC-001",
+    "arm": "deepseek-v4-pro",
+    "scores": {
+      "correctness": 10.0,
+      "token_efficiency": 10.0,
+      "cost_efficiency": 10.0,
+      "reusability": 9.0
+    },
+    "composite": 98.0,
+    "cost_usd": 0.0042,
+    "total_tokens": 9239
+  }
+]
