@@ -1,0 +1,61 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la /root/ken-tasks/T-KEN-002
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 23 root root 4096 Aug 13 21:56 ..
+-rw-r--r--  1 root root   87 Aug 13 21:56 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  813 Aug 13 21:56 dedupe.py
+-rw-r--r--  1 root root  127 Aug 13 21:56 mirror_groups.json
+
+✱ Glob "**/*.py" 1 match
+✱ Glob "**/*.json" 1 match
+→ Read dedupe.py
+→ Read mirror_groups.json
+→ Read CONTEXT_ONLY.md
+The bug is documented right in the code. `suggest_keep` ranks by size alone and would recommend `scenes:100` (5.2GB, dead) over `scenes:101` (1.8GB, playable), contradicting `pick_canonical`. Let me confirm, then fix.
+
+$ python3 -c "import json; db=json.load(open('mirror_groups.json')); from dedupe import scan_mirror_group; print(scan_mirror_group('group_42', db))"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+
+← Edit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -8,11 +8,13 @@
+ 
+ 
+ def suggest_keep(candidates):
+     """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    Playability first, then size -- mirrors the canonical picker so it
++    never recommends a proven-dead file over a playable smaller one."""
++    playable = [c for c in candidates if c.get("playable")]
++    pool = playable if playable else candidates
++    return max(pool, key=lambda c: c.get("size_gb", 0))
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+
+Confirmed: the review page would suggest keeping the proven-dead `scenes:100` while the write path keeps the playable `scenes:101`. Fixing `suggest_keep` to match the playable-first ranking:
+$ python3 -c "import json; db=json.load(open('mirror_groups.json')); from dedupe import scan_mirror_group, suggest_keep, pick_canonical
+print(scan_mirror_group('group_42', db))
+# edge cases
+print(suggest_keep([{'id':'a','playable':True,'size_gb':1.0},{'id':'b','playable':True,'size_gb':2.0}]))
+print(suggest_keep([{'id':'c','playable':False,'size_gb':9.0}]))
+print(suggest_keep([{'id':'d','size_gb':3.0},{'id':'e','size_gb':4.0}]))"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+{'id': 'b', 'playable': True, 'size_gb': 2.0}
+{'id': 'c', 'playable': False, 'size_gb': 9.0}
+{'id': 'e', 'size_gb': 4.0}
+
+Fixed. `suggest_keep` (dedupe.py:11) now ranks playable-first then by size, matching `pick_canonical`:
+
+- **group_42**: now suggests `scenes:101` (playable) instead of the dead `scenes:100` — agrees with `canonical_would_be`.
+- Falls back to largest size only when nothing is playable, and tolerates missing keys via `.get()`.

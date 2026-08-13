@@ -1,0 +1,23 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 23 root root 4096 Aug 13 21:56 ..
+-rw-r--r--  1 root root  149 Aug 13 21:56 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  141 Aug 13 21:56 backbone_lookup_mock.json
+-rw-r--r--  1 root root  149 Aug 13 21:56 usenet_config.json
+
+✱ Glob "**/*.json" 2 matches
+→ Read usenet_config.json
+→ Read backbone_lookup_mock.json
+→ Read CONTEXT_ONLY.md
+You're cooked — not redundant at all. Both providers sit on the same backbone:
+
+- Primary **Eweka** → Omicron
+- Backup **Newshosting** → Omicron
+
+Backbone is the single point of failure: if Omicron has an outage or takedown, both providers die together, and your "backup" is worthless. Real redundancy needs two different backbones.
+
+To actually be redundant, swap your backup to a Highwinds provider — the lookup table has **UsenetExpress** or **BlockNews** (a block account works well as a cheap fallback since primary retention already covers most). That way Omicron + Highwinds gives you genuine coverage.

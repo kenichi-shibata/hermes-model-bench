@@ -1,0 +1,28 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 16
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 23 root root 4096 Aug 13 21:56 ..
+-rw-r--r--  1 root root   65 Aug 13 21:56 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  367 Aug 13 21:56 disk_fleet.json
+
+→ Read disk_fleet.json
+→ Read CONTEXT_ONLY.md
+Summary of `disk_fleet.json` (5 hosts):
+
+| host | used % | thin | notes |
+|------|--------|------|-------|
+| host1 | 45 | no | ok |
+| host2 | 38 | no | ok |
+| host3 | 92 | **yes** | `media-pool` — **critical** |
+| host4 | 22 | no | ok |
+| host5 | 30 | no | ok |
+
+**Alert:** `host3` (`media-pool`) is at **92%** and thin-provisioned — double risk. Thin-provisioned pools overcommit backing storage, so 92% can mean the pool is nearly full and writes may stall or fail outright. This is the only host needing action.
+
+**Recommendations:**
+- Free space on host3 or add capacity before it crosses ~95%.
+- For thin-provisioned volumes, also check the *pool's* actual free space, not just guest-reported `used_pct` — host3 has no pool-level data in this file.
+- Everything else (host1, host2, host4, host5) has ample headroom.

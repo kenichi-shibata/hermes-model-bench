@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-flash
+
+✱ Glob "**/*.json" 1 match
+
+$ ls -la
+total 16
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 23 root root 4096 Aug 13 21:56 ..
+-rw-r--r--  1 root root   69 Aug 13 21:56 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  498 Aug 13 21:56 tailscale_status_mock.json
+
+→ Read tailscale_status_mock.json
+→ Read CONTEXT_ONLY.md
+The node that advertises your home subnet is offline. In `tailscale_status_mock.json`:
+
+- Your phone (`Self` = 100.1.1.1) needs `192.168.1.0/24` to reach home, which is advertised only by `home-router-node` (pve2), as its `PrimaryRoutes`.
+- But that peer is `Online: false` with `LastSeen` over a week ago (2026-08-02) — it's down, so there's no live router to forward traffic to your LAN.
+
+Fix: power up / reconnect `pve2` to Tailscale (and make sure it still has subnet routes + IP forwarding enabled). Also confirm the phone has "Use Tailscale subnet routes" / "Accept routes" toggled on so it actually installs the `192.168.1.0/24` route.

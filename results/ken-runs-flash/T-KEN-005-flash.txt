@@ -1,0 +1,93 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 23 root root 4096 Aug 13 21:56 ..
+-rw-r--r--  1 root root  110 Aug 13 21:56 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 1136 Aug 13 21:56 api.py
+-rw-r--r--  1 root root  224 Aug 13 21:56 scenes.json
+
+✱ Glob "**/*.py" 1 match
+→ Read api.py
+→ Read scenes.json
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "
+import json, importlib.util
+spec = importlib.util.spec_from_file_location('api', 'api.py')
+api = importlib.util.module_from_spec(spec); spec.loader.exec_module(api)
+data = json.load(open('scenes.json'))
+print('trending:', api._home_trending(data['trending']))
+print('resume:  ', api._hydrate_code(data['resume'][0]))
+"
+trending: [{'id': 1, 'title': 'Trending Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+resume:   {'id': 2, 'title': 'Resume Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': None}]}
+
+← Edit api.py
+Index: /root/ken-tasks/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-005/api.py
++++ /root/ken-tasks/T-KEN-005/api.py
+@@ -19,10 +19,10 @@
+     return [_scene_out(s, translate=True) for s in scenes]
+ 
+ 
+ def _hydrate_code(scene):
+-    """Used by the resume/continue-watching section. BUG: forgot translate=True."""
+-    return _scene_out(scene)  # missing translate=True
++    """Used by the resume/continue-watching section."""
++    return _scene_out(scene, translate=True)
+ 
+ 
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+
+
+Confirmed: trending gets `name_en: 'Nanao Ayatsuki'`, but resume returns `name_en: None`. The bug is `_hydrate_code` never passing `translate=True`. Fixing:
+$ python3 -c "
+import json, importlib.util
+spec = importlib.util.spec_from_file_location('api', 'api.py')
+api = importlib.util.module_from_spec(spec); spec.loader.exec_module(api)
+data = json.load(open('scenes.json'))
+print('resume:  ', api._hydrate_code(data['resume'][0]))
+"
+resume:   {'id': 2, 'title': 'Resume Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}
+
+← Edit api.py
+Index: /root/ken-tasks/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-005/api.py
++++ /root/ken-tasks/T-KEN-005/api.py
+@@ -1,12 +1,8 @@
+ """Scene homepage sections."""
+ 
+ def _scene_out(scene, translate=False):
+-    """Builds a scene card payload.
+-    BUG: translate defaults to False, and _hydrate_code() below never
+-    passes translate=True, so performer names never get romanized on
+-    the resume/continue-watching section even though _home_trending
+-    correctly passes translate=True."""
++    """Builds a scene card payload with romanized performer names."""
+     out = {"id": scene["id"], "title": scene["title"], "performers": []}
+     for p in scene["performers"]:
+         name_en = p.get("name_en")
+         if translate and not name_en:
+
+
+Now let me clean up the stale BUG comment on `_scene_out`:
+$ python3 -c "
+import json, importlib.util
+spec = importlib.util.spec_from_file_location('api', 'api.py')
+api = importlib.util.module_from_spec(spec); spec.loader.exec_module(api)
+data = json.load(open('scenes.json'))
+trending = api._home_trending(data['trending'])[0]
+resume = api._hydrate_code(data['resume'][0])
+assert trending['performers'][0]['name_en'] == 'Nanao Ayatsuki'
+assert resume['performers'][0]['name_en'] == 'Nanao Ayatsuki'
+print('OK: both sections now translate performer names')
+"
+OK: both sections now translate performer names
+
+Fixed. `_hydrate_code` (resume/continue-watching) now passes `translate=True` like `_home_trending`, so performer names get romanized instead of staying `null` — the blue translation text will render below the Japanese on those cards too. `api.py:22` and `api.py:5`.

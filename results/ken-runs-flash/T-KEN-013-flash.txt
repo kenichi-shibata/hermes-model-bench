@@ -1,0 +1,27 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la pr_files/
+total 24
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 3 root root 4096 Aug 13 21:56 ..
+-rw-r--r-- 1 root root   92 Aug 13 21:56 file1_models.py
+-rw-r--r-- 1 root root  264 Aug 13 21:56 file2_pagination.py
+-rw-r--r-- 1 root root   67 Aug 13 21:56 file3_serializer.py
+-rw-r--r-- 1 root root   52 Aug 13 21:56 file4_tests.py
+
+→ Read pr_files/file1_models.py
+→ Read pr_files/file2_pagination.py
+→ Read pr_files/file3_serializer.py
+→ Read pr_files/file4_tests.py
+Review of the 4-file PR:
+
+**`file2_pagination.py` — bug (the real issue).** `offset = page * limit` on line 4 is off-by-one. With `page=1, limit=10` it returns `items[10:20]`, skipping the first page entirely. Fix: `offset = (page - 1) * limit`.
+
+**`file4_tests.py` — coverage gap.** `test_serialize` is a stub and there's no test for `paginate`, which is exactly where the bug is. The fix needs a test asserting `paginate([1,2,3], 1, 2) == [1,2]` and `page=2` returns `[3]`.
+
+**`file1_models.py` / `file3_serializer.py` — fine.** Simple, consistent with each other.
+
+One design note: after the fix, `page=0` would produce a negative offset (`-limit`), so consider validating `page >= 1` in `paginate` rather than relying on callers.
+
+Net: merge-blocking only because of the off-by-one; the stub test and missing pagination test should be addressed in the same PR.

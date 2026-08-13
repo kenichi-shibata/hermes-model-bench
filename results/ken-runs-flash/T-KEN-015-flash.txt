@@ -1,0 +1,22 @@
+
+> build · deepseek-v4-flash
+
+→ Read dedupe_auto.py
+→ Read groups.json
+
+$ python3 -c "
+import json
+from dedupe_auto import auto_canonicalize_plan
+groups = json.load(open('groups.json'))
+for k, g in groups.items():
+    print(k, auto_canonicalize_plan(g))
+"
+group_1 {'action': 'refuse', 'reason': 'playability vs user-data conflict -- needs human review'}
+group_2 {'action': 'refuse', 'reason': 'playability vs user-data conflict -- needs human review'}
+
+It *is* doing something — it's deliberately refusing, not skipping. Both groups trip the guard at dedupe_auto.py:12-13:
+
+- `s1`/`s3`: `play_count > 0` but not `playable` (user data on a broken/unplayable record)
+- `s2`/`s4`: `playable` but `play_count == 0` (playable, no user data)
+
+Auto-merge has no safe choice: keeping the playable id silently drops the play count, and keeping the unplayable id keeps a broken record. So it returns `refuse` for human review. The docstring calls this correct behavior, not a bug.

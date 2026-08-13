@@ -1,0 +1,47 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la /root/ken-tasks/T-KEN-019/
+total 24
+drwxr-xr-x  4 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 23 root root 4096 Aug 13 21:56 ..
+-rw-r--r--  1 root root  145 Aug 13 21:56 CONTEXT_ONLY.md
+drwxr-xr-x  3 root root 4096 Aug 13 21:56 job_a_repo
+drwxr-xr-x  3 root root 4096 Aug 13 21:56 job_b_repo
+-rw-r--r--  1 root root    0 Aug 13 21:56 job_c_log.txt
+-rwxr-xr-x  1 root root  637 Aug 13 21:56 setup.sh
+
+$ ls -la /root/ken-tasks/ 2>/dev/null | head -50
+total 104
+drwxr-xr-x 23 root root 4096 Aug 13 21:56 .
+drwx------ 12 root root 4096 Aug 13 21:56 ..
+drwxr-xr-x  3 root root 4096 Aug 13 21:56 T-KEN-001
+drwxr-xr-x  3 root root 4096 Aug 13 21:57 T-KEN-002
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-003
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-004
+drwxr-xr-x  3 root root 4096 Aug 13 21:59 T-KEN-005
+drwxr-xr-x  3 root root 4096 Aug 13 21:56 T-KEN-006
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-007
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-008
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-009
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-010
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-011
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-012
+drwxr-xr-x  3 root root 4096 Aug 13 21:56 T-KEN-013
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-014
+drwxr-xr-x  3 root root 4096 Aug 13 22:02 T-KEN-015
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-016
+drwxr-xr-x  3 root root 4096 Aug 13 22:02 T-KEN-017
+drwxr-xr-x  3 root root 4096 Aug 13 22:03 T-KEN-018
+drwxr-xr-x  4 root root 4096 Aug 13 21:56 T-KEN-019
+drwxr-xr-x  2 root root 4096 Aug 13 21:56 T-KEN-020
+-rw-r--r--  1 root root 2164 Aug 13 21:47 prompts.json
+drwxr-xr-x  2 root root 4096 Aug 13 22:03 results
+-rwxr-xr-x  1 root root 1142 Aug 13 21:49 run_ken_flash.sh
+-rw-r--r--  1 root root  200 Aug 13 21:56 task_order.txt
+
+→ Read CONTEXT_ONLY.md
+→ Read setup.sh
+! permission requested: external_directory (/root/ken-tasks/*); auto-rejecting
+✗ Read /root/ken-tasks/task_order.txt failed
+Error: The user rejected permission to use this specific tool call.

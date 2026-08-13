@@ -1,0 +1,71 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 20
+drwxr-xr-x  3 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 23 root root 4096 Aug 13 21:56 ..
+-rw-r--r--  1 root root  110 Aug 13 21:56 CONTEXT_ONLY.md
+drwxr-xr-x  7 root root 4096 Aug 13 21:56 delegation_live
+-rw-r--r--  1 root root  132 Aug 13 21:56 gh_repo_list_mock.json
+
+→ Read gh_repo_list_mock.json
+→ Read CONTEXT_ONLY.md
+
+$ ls -la delegation_live/
+total 28
+drwxr-xr-x 7 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 3 root root 4096 Aug 13 21:56 ..
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 deleg_fake0
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 deleg_fake1
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 deleg_fake2
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 deleg_fake3
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 deleg_fake4
+
+$ for d in delegation_live/deleg_fake*/; do echo "== $d =="; ls -la "$d"; done
+== delegation_live/deleg_fake0/ ==
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 7 root root 4096 Aug 13 21:56 ..
+-rw-r--r-- 1 root root   83 Aug 13 21:56 manifest.json
+== delegation_live/deleg_fake1/ ==
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 7 root root 4096 Aug 13 21:56 ..
+-rw-r--r-- 1 root root   80 Aug 13 21:56 manifest.json
+== delegation_live/deleg_fake2/ ==
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 7 root root 4096 Aug 13 21:56 ..
+-rw-r--r-- 1 root root   83 Aug 13 21:56 manifest.json
+== delegation_live/deleg_fake3/ ==
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 7 root root 4096 Aug 13 21:56 ..
+-rw-r--r-- 1 root root   80 Aug 13 21:56 manifest.json
+== delegation_live/deleg_fake4/ ==
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 21:56 .
+drwxr-xr-x 7 root root 4096 Aug 13 21:56 ..
+-rw-r--r-- 1 root root   80 Aug 13 21:56 manifest.json
+
+$ for d in delegation_live/deleg_fake*/; do echo "== $d =="; cat "$d/manifest.json"; echo; done
+== delegation_live/deleg_fake0/ ==
+{"status": "completed", "created_at": "2026-08-10T10:00:00", "goal": "fake task 0"}
+== delegation_live/deleg_fake1/ ==
+{"status": "capped", "created_at": "2026-08-10T10:00:00", "goal": "fake task 1"}
+== delegation_live/deleg_fake2/ ==
+{"status": "completed", "created_at": "2026-08-11T10:00:00", "goal": "fake task 2"}
+== delegation_live/deleg_fake3/ ==
+{"status": "capped", "created_at": "2026-08-12T10:00:00", "goal": "fake task 3"}
+== delegation_live/deleg_fake4/ ==
+{"status": "capped", "created_at": "2026-08-12T10:00:00", "goal": "fake task 4"}
+
+Delegation trend (by day):
+- Aug 10: 1/2 completed
+- Aug 11: 1/1 completed
+- Aug 12: 0/2 (both capped)
+
+So no — it's not getting better; the latest batch regressed (all capped), even though mid-run was clean.
+
+New repo: no. `gh_repo_list_mock.json` still only lists `existing-repo-1` and `existing-repo-2` — nothing new was created.
