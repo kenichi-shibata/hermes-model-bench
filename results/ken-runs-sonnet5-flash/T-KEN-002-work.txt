@@ -1,0 +1,85 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x  3 root root 4096 Aug 13 23:19 .
+drwxr-xr-x 27 1000 1000 4096 Aug 13 23:19 ..
+-rw-r--r--  1 root root   87 Aug 13 23:18 CONTEXT_ONLY.md
+drwxr-xr-x  2 root root 4096 Aug 13 23:19 __pycache__
+-rw-r--r--  1 root root  813 Aug 13 23:18 dedupe.py
+-rw-r--r--  1 root root  127 Aug 13 23:18 mirror_groups.json
+
+→ Read dedupe.py
+→ Read mirror_groups.json
+→ Read CONTEXT_ONLY.md
+
+$ python -c "import dedupe, json; db = json.load(open('mirror_groups.json')); print(dedupe.scan_mirror_group('group_42', db))"
+/bin/bash: line 1: python: command not found
+
+Plan verified against real files. Let me reproduce the current behavior first.
+$ python3 -c "import dedupe, json; db = json.load(open('mirror_groups.json')); print(dedupe.scan_mirror_group('group_42', db))"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+
+← Edit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -8,11 +8,11 @@
+ 
+ 
+ def suggest_keep(candidates):
+     """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    Mirrors pick_canonical so the review page always matches
++    what the real write path will actually keep."""
++    return pick_canonical(candidates)
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+
+Bug confirmed: `suggested_keep` is `scenes:100` (5.2GB, not playable) while `canonical_would_be` is `scenes:101`. Applying the fix.
+Now let me check the test environment and add the regression test.
+$ python3 -m pytest --version 2>&1; echo "---"; python3 -c "import dedupe, json; db = json.load(open('mirror_groups.json')); print(dedupe.scan_mirror_group('group_42', db))"
+/usr/bin/python3: No module named pytest
+---
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+
+← Write test_dedupe.py
+Wrote file successfully.
+
+Fix works. Writing the regression test (plain-assert style, pytest-compatible but runnable without pytest).
+← Edit test_dedupe.py
+Index: /root/ken-tasks/T-KEN-002/test_dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/test_dedupe.py
++++ /root/ken-tasks/T-KEN-002/test_dedupe.py
+@@ -9,9 +9,9 @@
+ 
+ 
+ def test_mixed_playability_group():
+     candidates = load_real_group("group_42")
+-    assert dedupe.suggest_keep(candidates) is dedupe.pick_canonical(candidates)
++    assert dedupe.suggest_keep(candidates) == dedupe.pick_canonical(candidates)
+     assert dedupe.suggest_keep(candidates)["id"] == "scenes:101"
+ 
+ 
+ def test_all_non_playable_group():
+
+
+$ python3 test_dedupe.py
+test_dedupe.py: all tests passed
+
+→ Read dedupe.py
+Done. The plan was accurate; applied it as specified.
+
+- `dedupe.py:10-14` — `suggest_keep` now delegates to `pick_canonical`, so the review page always agrees with the real write path. Stale `BUG:` note removed.
+- Verified: `scan_mirror_group('group_42', db)` now returns `suggested_keep == canonical_would_be == 'scenes:101'` (the 1.8GB playable file), instead of the old non-playable 5.2GB `scenes:100`.
+- Added `test_dedupe.py` with a mixed-playability case (`group_42`) and a synthetic all-non-playable case, asserting `suggest_keep == pick_canonical`. All tests pass.
+
+No changes to `mirror_groups.json` or `CONTEXT_ONLY.md` (data intentionally exposes the bug).

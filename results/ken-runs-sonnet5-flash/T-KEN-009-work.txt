@@ -1,0 +1,29 @@
+
+> build · deepseek-v4-flash
+
+→ Read disk_fleet.json
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "
+import json
+d = json.load(open('disk_fleet.json'))
+for h, v in d.items():
+    pct = v['used_pct']
+    thin = v['thin_provisioned']
+    if pct >= 90:
+        level = 'CRITICAL' if thin else 'WARN'
+    else:
+        level = 'OK'
+    print(f\"{h}: {pct}% used, thin={thin}, name={v.get('name','-')} -> {level}\")
+"
+host1: 45% used, thin=False, name=- -> OK
+host2: 38% used, thin=False, name=- -> OK
+host3: 92% used, thin=True, name=media-pool -> CRITICAL
+host4: 22% used, thin=False, name=- -> OK
+host5: 30% used, thin=False, name=- -> OK
+
+**CRITICAL — host3 (media-pool):** 92% used, thin-provisioned. This is the one to act on. Because it's thin-provisioned, the 92% is logical allocation; the real risk is the physical backing pool exhausting with little warning (I/O errors / filesystem going read-only). Investigate actual physical pool usage now and free space or expand the backing store before it hits out-of-space failures.
+
+**Healthy — no action:** host1 (45%), host2 (38%), host4 (22%), host5 (30%). All thick-provisioned, well under threshold.
+
+No files were changed; this was a read-only assessment.

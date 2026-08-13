@@ -1,0 +1,216 @@
+
+> build · deepseek-v4-flash
+
+→ Read scenes_db.json
+→ Read samantha_saint_wicked_catalog.json
+→ Read wanted_list.json
+
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -1,9 +1,9 @@
+ [
+   {
+     "id": 100,
+     "title": "MovieX Part 1",
+-    "movie_id": null,
++    "movie_id": "MOVIEX-001",
+     "studio": "Wicked"
+   },
+   {
+     "id": 101,
+
+
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -7,9 +7,9 @@
+ },
+ {
+   "id": 101,
+   "title": "MovieX Part 2",
+-  "movie_id": null,
++  "movie_id": "MOVIEX-001",
+   "studio": "Wicked"
+ },
+ {
+   "id": 102,
+
+
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -13,9 +13,9 @@
+ },
+ {
+   "id": 102,
+   "title": "MovieX Part 3",
+-  "movie_id": null,
++  "movie_id": "MOVIEX-001",
+   "studio": "Wicked"
+ },
+ {
+   "id": 103,
+
+
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -19,9 +19,9 @@
+ },
+ {
+   "id": 103,
+   "title": "MovieX Part 4",
+-  "movie_id": null,
++  "movie_id": "MOVIEX-001",
+   "studio": "Wicked"
+ },
+ {
+   "id": 104,
+
+
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -25,9 +25,9 @@
+ },
+ {
+   "id": 104,
+   "title": "MovieX Part 5",
+-  "movie_id": null,
++  "movie_id": "MOVIEX-001",
+   "studio": "Wicked"
+ },
+ {
+   "id": 105,
+
+
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -31,9 +31,9 @@
+ },
+ {
+   "id": 105,
+   "title": "MovieX Part 6",
+-  "movie_id": null,
++  "movie_id": "MOVIEX-001",
+   "studio": "Wicked"
+ },
+ {
+   "id": 200,
+
+
+Files match the plan. Executing the changes.
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -38,10 +38,9 @@
+ {
+   "id": 200,
+   "title": "Misattributed Scene 1",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 201,
+   "title": "Misattributed Scene 2",
+
+
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -44,10 +44,9 @@
+ {
+   "id": 201,
+   "title": "Misattributed Scene 2",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 202,
+   "title": "Misattributed Scene 3",
+
+
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -50,10 +50,9 @@
+ {
+   "id": 202,
+   "title": "Misattributed Scene 3",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 203,
+   "title": "Misattributed Scene 4",
+
+
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -56,8 +56,7 @@
+   {
+     "id": 203,
+     "title": "Misattributed Scene 4",
+     "movie_id": null,
+-    "studio": "FliXXX",
+-    "real_studio": "Digital Playground"
++    "studio": "Digital Playground"
+   }
+ ]
+\ No newline at end of file
+
+
+← Write wanted_list.json
+Wrote file successfully.
+
+Now fix the FliXXX records and write the wanted list.
+Verify both files are valid JSON and reflect the changes.
+$ python3 -c "import json; d=json.load(open('scenes_db.json')); print('scenes ok', len(d)); [print(s['id'], s['title'], '| movie_id:', s.get('movie_id'), '| studio:', s.get('studio'), '| real_studio:', s.get('real_studio')) for s in d]" && python3 -c "import json; w=json.load(open('wanted_list.json')); print('wanted ok', len(w)); print(w[0], '...', w[-1])"
+scenes ok 10
+100 MovieX Part 1 | movie_id: MOVIEX-001 | studio: Wicked | real_studio: None
+101 MovieX Part 2 | movie_id: MOVIEX-001 | studio: Wicked | real_studio: None
+102 MovieX Part 3 | movie_id: MOVIEX-001 | studio: Wicked | real_studio: None
+103 MovieX Part 4 | movie_id: MOVIEX-001 | studio: Wicked | real_studio: None
+104 MovieX Part 5 | movie_id: MOVIEX-001 | studio: Wicked | real_studio: None
+105 MovieX Part 6 | movie_id: MOVIEX-001 | studio: Wicked | real_studio: None
+200 Misattributed Scene 1 | movie_id: None | studio: Digital Playground | real_studio: None
+201 Misattributed Scene 2 | movie_id: None | studio: Digital Playground | real_studio: None
+202 Misattributed Scene 3 | movie_id: None | studio: Digital Playground | real_studio: None
+203 Misattributed Scene 4 | movie_id: None | studio: Digital Playground | real_studio: None
+wanted ok 12
+{'title': 'Wicked Movie 1', 'studio': 'Wicked', 'performer': 'Samantha Saint', 'type': 'movie'} ... {'title': 'Wicked Movie 12', 'studio': 'Wicked', 'performer': 'Samantha Saint', 'type': 'movie'}
+
+All done, both files are valid JSON.
+
+- **MovieX grouping**: ids 100–105 now share `movie_id: "MOVIEX-001"` so they resolve to one Stash Group/Movie. Nothing queued — parts already present.
+- **FliXXX fix**: ids 200–203 now `studio: "Digital Playground"`, `real_studio` removed.
+- **Samantha Saint/Wicked**: `wanted_list.json` now queues all 12 movies (`type: "movie"`, studio Wicked, performer Samantha Saint).

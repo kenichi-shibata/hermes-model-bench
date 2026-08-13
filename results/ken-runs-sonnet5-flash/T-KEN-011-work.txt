@@ -1,0 +1,80 @@
+
+> build · deepseek-v4-flash
+
+→ Read PerformerDetailPage.jsx
+→ Read PerformersGrid.jsx
+
+$ ls -la /root/ken-tasks/T-KEN-011
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 23:18 .
+drwxr-xr-x 27 1000 1000 4096 Aug 13 23:19 ..
+-rw-r--r--  1 root root  102 Aug 13 23:18 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  382 Aug 13 23:18 PerformerDetailPage.jsx
+-rw-r--r--  1 root root  312 Aug 13 23:18 PerformersGrid.jsx
+
+→ Read CONTEXT_ONLY.md
+
+← Write PerformerDetailPage.jsx
+Wrote file successfully.
+
+← Write PerformersGrid.jsx
+Wrote file successfully.
+
+Plan verified against the actual files. Executing now.
+$ ls /root/ken-tasks/T-KEN-011 && cat /root/ken-tasks/T-KEN-011/PerformerDetailPage.jsx && echo "---" && cat /root/ken-tasks/T-KEN-011/PerformersGrid.jsx
+CONTEXT_ONLY.md
+PerformerDetailPage.jsx
+PerformersGrid.jsx
+import { Link } from "react-router-dom";
+
+export default function PerformerDetailPage({ performer }) {
+  if (!performer) {
+    return <div>Performer not found</div>;
+  }
+  return (
+    <div>
+      <h1>{performer.name}</h1>
+      <Link to={`/performers/${performer.id}`}>5-star</Link>
+    </div>
+  );
+}
+---
+import { useState } from "react";
+import { Link } from "react-router-dom";
+
+const PAGE_SIZE = 60;
+
+export default function PerformersGrid({ performers = [] }) {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  if (performers.length === 0) {
+    return <div>No performers found</div>;
+  }
+
+  const hasMore = visibleCount < performers.length;
+
+  return (
+    <div>
+      <div>
+        {performers.slice(0, visibleCount).map(p => (
+          <Link key={p.id} to={`/performers/${p.id}`}>
+            {p.name}
+          </Link>
+        ))}
+      </div>
+      {hasMore && (
+        <button onClick={() => setVisibleCount(count => Math.min(count + PAGE_SIZE, performers.length))}>
+          Load more
+        </button>
+      )}
+    </div>
+  );
+}
+
+Done. Both files updated per plan:
+
+**`PerformerDetailPage.jsx`** — rank badge now a `Link` to `/performers/${performer.id}` (uses existing `Link` import), plus a `!performer` guard returning "Performer not found".
+
+**`PerformersGrid.jsx`** — implemented the real "Load more": `useState` visible count starting at 60, renders `slice(0, visibleCount)`, button hidden once all loaded; guarded `performers = []` with a "No performers found" empty state; each entry is now a `Link` to `/performers/${p.id}` so the grid can navigate into a detail page.
+
+Note: detail page still only shows `name`/`id` fields — per plan I didn't fabricate bio/image/stats data; that's a follow-up once the data model supports it.

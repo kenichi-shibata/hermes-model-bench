@@ -1,0 +1,41 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 23:18 .
+drwxr-xr-x 27 1000 1000 4096 Aug 13 23:19 ..
+-rw-r--r--  1 root root  101 Aug 13 23:18 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  262 Aug 13 23:18 service_logs.txt
+-rw-r--r--  1 root root  135 Aug 13 23:18 upstream_status_mock.json
+
+→ Read CONTEXT_ONLY.md
+→ Read service_logs.txt
+→ Read upstream_status_mock.json
+Verified against the real files — the plan's read is accurate. Only three files exist here (log, status mock, context label); there is no alerting source code in this directory to patch.
+
+## Verdict: yes, the alert is broken
+
+Cross-referencing the two files shows a false-negative during a live outage:
+
+| Time (UTC) | service_logs.txt | upstream_status_mock.json |
+|---|---|---|
+| 09:55:00 | — | payments-api **major_outage**, no ETA |
+| 10:00:01 | INFO healthy | still major_outage |
+| 10:01:01 | INFO healthy | still major_outage |
+| 10:02:01 | INFO healthy | still major_outage |
+| 10:03:01 | WARN upstream 503 | still major_outage |
+| 10:04:01 | INFO healthy (own health check green) | still major_outage |
+
+Two failures, one root cause:
+
+1. **Blind window (09:55–10:03):** the outage was active ~8 minutes before any log line showed it. Three consecutive "healthy" lines (10:00–10:02) while payments-api was already down.
+2. **False recovery (10:04):** one minute after the 503 WARN, the service logs "healthy (own health check green)" — but the dependency is still in `major_outage` with no ETA. The health check measures **only its own liveness**, so a single transient 503 gets logged once and forgotten. There's no sustained alert state for an ongoing upstream outage.
+
+The alert conflates "my process is up" with "the system works," with no hysteresis to keep alerting while the dependency stays down.
+
+## Recommendation (guidance only — no code exists here to edit)
+
+The health check should ingest dependency status (the `upstream_status_mock.json`-equivalent) and only revert to green once the upstream reports **resolved/healthy** — not merely because a recent error log line is absent. That alone closes both the blind window and the false-recovery.
+
+If you have the actual alerting/health-check source in another repo, point me at the file and I'll implement the fix — it's out of scope for this directory, which contains only logs and a status mock.

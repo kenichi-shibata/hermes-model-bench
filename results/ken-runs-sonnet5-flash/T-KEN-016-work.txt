@@ -1,0 +1,45 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la && wc -c threads.json && wc -l threads.json
+total 36
+drwxr-xr-x  2 root root  4096 Aug 13 23:18 .
+drwxr-xr-x 27 1000 1000  4096 Aug 13 23:19 ..
+-rw-r--r--  1 root root    83 Aug 13 23:18 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 22814 Aug 13 23:18 threads.json
+22814 threads.json
+0 threads.json
+
+$ grep -c false threads.json; grep -c true threads.json
+1
+1
+
+$ grep -o false threads.json | wc -l; grep -o true threads.json | wc -l
+428
+4
+
+→ Read threads.json
+
+$ grep -o '"false"' threads.json | wc -l; grep -o ': false' threads.json | wc -l
+0
+428
+
+$ sed -i 's/false/true/g' threads.json
+(no output)
+
+All 428 `false` occurrences are confirmed as `: false`. Now applying the change.
+$ grep -c false threads.json; grep -o false threads.json | wc -l; wc -l threads.json; python3 -c "import json; d=json.load(open('threads.json')); print(all(r['has_unfollow_button'] for r in d), len(d))"
+0
+0
+0 threads.json
+True 432
+
+$ grep -o true threads.json | wc -l; wc -c threads.json; tail -c 5 threads.json | od -c
+432
+22386 threads.json
+0000000   r   u   e   }   ]
+0000005
+
+Done. Replaced all 428 `false` → `true` in `threads.json` via `sed -i 's/false/true/g'`.
+
+Verified: 0 `false` remain, 432 `true`, `wc -l` = 0 (no trailing newline added), file still valid JSON (`True 432`).

@@ -1,0 +1,29 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 16
+drwxr-xr-x  2 root root 4096 Aug 13 23:18 .
+drwxr-xr-x 27 1000 1000 4096 Aug 13 23:19 ..
+-rw-r--r--  1 root root   69 Aug 13 23:18 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  498 Aug 13 23:18 tailscale_status_mock.json
+
+→ Read tailscale_status_mock.json
+→ Read CONTEXT_ONLY.md
+The plan's diagnosis matches the file exactly. No files need changing — the answer is diagnostic.
+
+## Why you can't reach your home network from your phone
+
+Your phone (`100.1.1.1`) can only reach `192.168.1.0/24` through a **subnet router** — a peer that advertises that route into the tailnet. That node is `home-router-node` (`pve2`), the only peer advertising `PrimaryRoutes: ["192.168.1.0/24"]`. It is currently **`Online: false`**, last seen **2026-08-02 — ~11 days stale** (today is 2026-08-13).
+
+So it's not your phone: the other two peers (`laptop`, `phone2`) are online but advertise **no routes**, so they also can't reach the home LAN. The subnet router itself dropped off the tailnet.
+
+### To restore it, fix `pve2` (your home node):
+
+1. Verify `pve2` is powered on and has internet access.
+2. On `pve2`, check Tailscale is running: `systemctl status tailscaled` (or `tailscale status`), and restart if needed.
+3. Confirm the route is still advertised: `tailscale up --advertise-routes=192.168.1.0/24`.
+4. Confirm the route is still **approved** in the Tailscale admin console (routes can silently lose approval).
+5. If `tailscaled` is running but still shows offline, check `pve2`'s local network/ISP connectivity.
+
+Once `pve2` is back online, your phone (and all peers) will route to `192.168.1.0/24` again.

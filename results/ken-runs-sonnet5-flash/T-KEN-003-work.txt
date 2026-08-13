@@ -1,0 +1,150 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 328
+drwxr-xr-x  2 root root   4096 Aug 13 23:18 .
+drwxr-xr-x 27 1000 1000   4096 Aug 13 23:19 ..
+-rw-r--r--  1 root root    126 Aug 13 23:18 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 315596 Aug 13 23:18 performers.json
+-rw-r--r--  1 root root    197 Aug 13 23:18 stashdb_mock.py
+
+✱ Glob "*.py" 1 match
+✱ Glob "*.json" 1 match
+→ Read CONTEXT_ONLY.md
+→ Read stashdb_mock.py
+→ Read performers.json [limit=60]
+
+$ python3 - <<'EOF'
+import json, re, sys
+sys.path.insert(0, '/root/ken-tasks/T-KEN-003')
+data = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+ps = data['performers']
+print("total:", len(ps))
+
+hosts = {}
+for p in ps:
+    img = p.get('image')
+    if img:
+        m = re.match(r'^http://([^:/]+):9999/performer/(\d+)/image$', img)
+        if m:
+            hosts.setdefault(m.group(1), []).append((p['id'], p.get('stashdb_id')))
+        else:
+            print("NONMATCH", p['id'], img)
+    else:
+        print("NO IMG", p['id'])
+
+for h, recs in hosts.items():
+    ids = [r[0] for r in recs]
+    n_stash = sum(1 for r in recs if r[1] is not None)
+    print(f"host={h} count={len(recs)} min_id={min(ids)} max_id={max(ids)} with_stashdb={n_stash}")
+
+# broken set 198.51.100.64: check contiguity and stashdb split
+broken = sorted(hosts.get('198.51.100.64', []), key=lambda r: r[0])
+ids = [r[0] for r in broken]
+print("broken ids contiguous 0..:", ids == list(range(len(ids))))
+print("stashdb-null ids:", [r[0] for r in broken if r[1] is None][:5], "... count:", sum(1 for r in broken if r[1] is None))
+print("stashdb-set ids:", [r[0] for r in broken if r[1] is not None][:5], "... count:", sum(1 for r in broken if r[1] is not None))
+
+# path id vs record id consistency on broken set
+bad_path = [r[0] for r in broken if f"/performer/{r[0]}/image" not in p['image'] or True]
+# simpler: check each broken record's image path id matches record id
+mismatch = [p['id'] for p in ps if p['image'] and '198.51.100.64' in p['image'] and f"/performer/{p['id']}/image" not in p['image']]
+print("path/id mismatches on broken host:", mismatch)
+EOF
+total: 2700
+host=198.51.100.64 count=179 min_id=0 max_id=178 with_stashdb=40
+host=198.51.100.69 count=2521 min_id=179 max_id=2699 with_stashdb=0
+broken ids contiguous 0..: True
+stashdb-null ids: [40, 41, 42, 43, 44] ... count: 139
+stashdb-set ids: [0, 1, 2, 3, 4] ... count: 40
+path/id mismatches on broken host: []
+
+Let me verify the plan's claims against the actual data before making any changes.
+$ python3 - <<'EOF'
+import json, sys
+sys.path.insert(0, '/root/ken-tasks/T-KEN-003')
+from stashdb_mock import get_fallback_image
+
+path = '/root/ken-tasks/T-KEN-003/performers.json'
+data = json.load(open(path))
+changed = 0
+for p in data['performers']:
+    img = p.get('image') or ''
+    if '198.51.100.64' in img:
+        if p.get('stashdb_id') is not None:
+            p['image'] = get_fallback_image(p['stashdb_id'])
+        else:
+            p['image'] = img.replace('198.51.100.64', '198.51.100.69')
+        changed += 1
+json.dump(data, open(path, 'w'), indent=2)
+print("changed:", changed)
+EOF
+changed: 179
+
+Plan verified exactly. Now applying the fix.
+Now running the verification suite.
+$ python3 - <<'EOF'
+import json, re
+data = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+ps = data['performers']
+print("total:", len(ps))
+
+assert not any('198.51.100.64' in (p.get('image') or '') for p in ps), "broken host still present"
+
+good = bad = stashdb = 0
+for p in ps:
+    img = p.get('image')
+    if re.match(r'^http://198\.51\.100\.69:9999/performer/\d+/image$', img):
+        good += 1
+    elif re.match(r'^https://stashdb\.org/images/.+\.jpg$', img):
+        stashdb += 1
+    else:
+        bad += 1
+        print("UNEXPECTED URL", p['id'], img)
+
+print("good-host URLs:", good)
+print("stashdb URLs:", stashdb)
+print("unexpected:", bad)
+
+# verify stashdb fallback correctness
+for p in ps:
+    if (p.get('image') or '').startswith('https://stashdb.org/images/'):
+        assert p['image'] == f"https://stashdb.org/images/{p['stashdb_id']}.jpg", (p['id'], p['image'])
+
+# verify count of changed records: exactly the 179 formerly-broken
+assert good == 2521 and stashdb == 40 and bad == 0
+print("ALL CHECKS PASSED")
+EOF
+total: 2700
+good-host URLs: 2660
+stashdb URLs: 40
+unexpected: 0
+Traceback (most recent call last):
+  File "<stdin>", line 29, in <module>
+AssertionError
+
+$ python3 - <<'EOF'
+import json, re
+data = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+ps = data['performers']
+assert len(ps) == 2700
+assert not any('198.51.100.64' in (p.get('image') or '') for p in ps)
+assert sum(1 for p in ps if re.match(r'^http://198\.51\.100\.69:9999/performer/\d+/image$', p['image'])) == 2660
+assert sum(1 for p in ps if re.match(r'^https://stashdb\.org/images/.+\.jpg$', p['image'])) == 40
+for p in ps:
+    if (p.get('image') or '').startswith('https://stashdb.org/images/'):
+        assert p['image'] == f"https://stashdb.org/images/{p['stashdb_id']}.jpg"
+    else:
+        assert re.match(r'^http://198\.51\.100\.69:9999/performer/\d+/image$', p['image'])
+        assert f"/performer/{p['id']}/image" in p['image']
+print("ALL CHECKS PASSED")
+EOF
+ALL CHECKS PASSED
+
+The assertion had wrong math — 2660 = 2521 original + 139 repointed. Correcting and confirming.
+Fixed. All 179 broken performer images in `performers.json` are repaired:
+
+- **40 performers** (ids 0–39) had a `stashdb_id` → now use the StashDB fallback (`https://stashdb.org/images/<id>.jpg` via `get_fallback_image`).
+- **139 performers** (ids 40–178) had `stashdb_id: null` → repointed from dead host `198.51.100.64` to working `198.51.100.69` (same path/port).
+- All 2521 already-working entries untouched; verified no remaining `.64` references, all URLs match the expected format, and count of changed records == 179.

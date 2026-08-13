@@ -1,0 +1,30 @@
+
+> build · deepseek-v4-flash
+
+→ Read usenet_config.json
+→ Read backbone_lookup_mock.json
+
+← Edit usenet_config.json
+Index: /root/ken-tasks/T-KEN-020/usenet_config.json
+===================================================================
+--- /root/ken-tasks/T-KEN-020/usenet_config.json
++++ /root/ken-tasks/T-KEN-020/usenet_config.json
+@@ -3,8 +3,8 @@
+     "provider": "Eweka",
+     "backbone": "Omicron"
+   },
+   "backup": {
+-    "provider": "Newshosting",
+-    "backbone": "Omicron"
++    "provider": "UsenetExpress",
++    "backbone": "Highwinds"
+   }
+ }
+\ No newline at end of file
+
+
+Verified against the lookup table: both providers are Omicron-backed — the finding is correct. Applying the fix.
+→ Read usenet_config.json
+Verified — config now has distinct backbones: `Eweka`→`Omicron`, `UsenetExpress`→`Highwinds`, both matching `backbone_lookup_mock.json`.
+
+**Report:** We were cooked. Root cause: `Eweka` and `Newshosting` are both retail brands reselling the same `Omicron` backbone, so the "backup" was fake redundancy — one backbone outage took out both legs. Fix: backup is now `UsenetExpress` (Highwinds), so a single backbone outage no longer kills failover. `UsenetServer` was rejected as an alternative since it's also Omicron-backed.

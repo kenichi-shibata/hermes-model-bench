@@ -1,0 +1,139 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 32
+drwxr-xr-x  2 root root  4096 Aug 13 23:18 .
+drwxr-xr-x 27 1000 1000  4096 Aug 13 23:19 ..
+-rw-r--r--  1 root root    89 Aug 13 23:18 CONTEXT_ONLY.md
+-rw-r--r--  1 root root   653 Aug 13 23:18 bot.py
+-rw-r--r--  1 root root 14651 Aug 13 23:18 follow_log.json
+
+→ Read bot.py
+→ Read CONTEXT_ONLY.md
+→ Read follow_log.json
+
+$ python3 -c "import json; d=json.load(open('follow_log.json')); print(len(d), sum(1 for e in d if not e['legit']), sum(1 for e in d if e['legit']))"
+162 142 20
+
+Plan verified: 142 `legit: false` entries (perf_0..139 + codey_steele + cherry_kiss) and 20 `legit: true`. Now implementing.
+← Edit bot.py
+Index: /root/ken-tasks/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks/T-KEN-010/bot.py
++++ /root/ken-tasks/T-KEN-010/bot.py
+@@ -1,14 +1,41 @@
+ """Discord bot track/follow handlers."""
+ 
++import json
++
++
+ def track_studio_or_performer(entity_id, entity_type):
+-    """BUG: bundles a follow action with tracking, which should be
+-    separate. Fix: remove the follow_discord() call from here."""
++    """Track a studio or performer. Tracking does not follow on Discord."""
+     db.add_track(entity_id, entity_type)
+-    db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here
+     return {"tracked": True}
+ 
+ 
++def remediate_bad_follows(log_path="follow_log.json"):
++    """Unfollow every entry the track-button bug followed and mark them in
++    the log as removed. Returns a summary dict."""
++    with open(log_path) as f:
++        log = json.load(f)
++
++    db._follows = []
++    for entry in log:
++        if not entry.get("removed"):
++            db.follow_discord(entry["entity_id"], "performer")
++
++    for entry in log:
++        if not entry.get("legit") and not entry.get("removed"):
++            db.unfollow_discord(entry["entity_id"], "performer")
++            entry["removed"] = True
++
++    with open(log_path, "w") as f:
++        json.dump(log, f, indent=2)
++        f.write("\n")
++
++    return {
++        "unfollowed": [e["entity_id"] for e in log if e.get("removed")],
++        "kept": [e["entity_id"] for e in log if e.get("legit")],
++    }
++
++
+ class db:
+     _tracks = []
+     _follows = []
+ 
+
+
+← Edit bot.py
+Index: /root/ken-tasks/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks/T-KEN-010/bot.py
++++ /root/ken-tasks/T-KEN-010/bot.py
+@@ -45,4 +45,8 @@
+ 
+ @staticmethod
+ def follow_discord(entity_id, entity_type):
+     db._follows.append((entity_id, entity_type))
++
++@staticmethod
++def unfollow_discord(entity_id, entity_type):
++    db._follows = [f for f in db._follows if f != (entity_id, entity_type)]
+
+
+→ Read bot.py
+
+← Write cleanup_follows.py
+Wrote file successfully.
+
+Now the cleanup script, then run it:
+$ python3 cleanup_follows.py
+Unfollowed 142 bogus follows
+Kept 20 legit follows
+codey_steele still followed: False
+cherry_kiss still followed: False
+remaining follows: [('legit_perf_0', 'performer'), ('legit_perf_1', 'performer'), ('legit_perf_10', 'performer'), ('legit_perf_11', 'performer'), ('legit_perf_12', 'performer'), ('legit_perf_13', 'performer'), ('legit_perf_14', 'performer'), ('legit_perf_15', 'performer'), ('legit_perf_16', 'performer'), ('legit_perf_17', 'performer'), ('legit_perf_18', 'performer'), ('legit_perf_19', 'performer'), ('legit_perf_2', 'performer'), ('legit_perf_3', 'performer'), ('legit_perf_4', 'performer'), ('legit_perf_5', 'performer'), ('legit_perf_6', 'performer'), ('legit_perf_7', 'performer'), ('legit_perf_8', 'performer'), ('legit_perf_9', 'performer')]
+
+Now the sanity-check verification:
+$ python3 -c "
+import json, bot
+
+bot.db._follows = []
+bot.db._tracks = []
+r = bot.track_studio_or_performer('new_thing', 'studio')
+assert r == {'tracked': True}, r
+assert ('new_thing', 'studio') not in bot.db._follows, 'track must NOT follow'
+assert ('new_thing', 'studio') in bot.db._tracks, 'track must still add_track'
+print('PASS: track_studio_or_performer no longer follows')
+
+d = json.load(open('follow_log.json'))
+removed = [e for e in d if e.get('removed')]
+kept = [e for e in d if not e.get('removed')]
+assert len(removed) == 142, len(removed)
+assert len(kept) == 20, len(kept)
+assert all(e['legit'] for e in kept)
+assert all(not e['legit'] for e in removed)
+assert all(e['source'] == 'track_button_bug' for e in removed)
+assert all(e['source'] == 'manual_follow' for e in kept)
+ids = [e['entity_id'] for e in kept]
+assert 'codey_steele' not in ids and 'cherry_kiss' not in ids
+assert 'legit_perf_0' in ids and 'legit_perf_19' in ids
+print('PASS: log has 142 removed + 20 legit, codey_steele/cherry_kiss gone')
+"
+PASS: track_studio_or_performer no longer follows
+PASS: log has 142 removed + 20 legit, codey_steele/cherry_kiss gone
+
+→ Read follow_log.json [offset=1, limit=15]
+→ Read follow_log.json [offset=935, limit=20]
+Done. You had a bug, not a recursion: `track_studio_or_performer` in `bot.py:7` bundled a `db.follow_discord()` call into every "track" click — that's how you silently followed 142 things you never intended, Codey Steele and Cherry Kiss included. Fixed and cleaned up:
+
+- **bot.py** — removed the stray follow call and the now-resolved `BUG:` comments; tracking only calls `db.add_track` now (bot.py:6).
+- **bot.py** — added `db.unfollow_discord(entity_id, entity_type)` (bot.py:50) and a `remediate_bad_follows()` routine that drives the log (bot.py:12).
+- **cleanup_follows.py** — ran remediation: unfollowed all 142 `legit: false` entries, left the 20 legit manual follows untouched.
+- **follow_log.json** — the 142 bogus entries (perf_0..139, codey_steele, cherry_kiss) are now marked `"removed": true`; the 20 `legit_perf_*` entries kept.
+
+Verified: fixed track no longer appends to `_follows`; after cleanup `db._follows` contains exactly the 20 legit entries; `codey_steele` and `cherry_kiss` are gone from both `_follows` and the log.

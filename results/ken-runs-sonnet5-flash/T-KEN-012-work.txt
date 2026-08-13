@@ -1,0 +1,36 @@
+
+> build · deepseek-v4-flash
+
+→ Read service_x_logs.txt
+→ Read host_vmstat_mock.json
+
+$ ls -la /root/ken-tasks/T-KEN-012
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 23:18 .
+drwxr-xr-x 27 1000 1000 4096 Aug 13 23:19 ..
+-rw-r--r--  1 root root  107 Aug 13 23:18 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  178 Aug 13 23:18 host_vmstat_mock.json
+-rw-r--r--  1 root root  118 Aug 13 23:18 service_x_logs.txt
+
+→ Read CONTEXT_ONLY.md
+Diagnosis verified against the actual files — the plan is accurate. There's no code to change here; this is an infra/ops issue. Report to the user:
+
+## Finding: Service X is fine — the host is the bottleneck
+
+**Service X's own logs** (`service_x_logs.txt:1-2`): only 2 requests, handled in **45ms and 52ms**, no errors, no timeout. No evidence of an internal defect.
+
+**Host stats** (`host_vmstat_mock.json`):
+- `swap_used 8200MB` vs `swap_total 8192MB` — **swap fully exhausted**, host is thrashing
+- `unrelated_batch_job.py`: **6400MB RAM, 95% CPU** — a noisy-neighbor with nothing to do with Service X
+- Service X itself uses only **120MB**
+
+## What's happening
+An unrelated batch job is saturating CPU/memory on the shared host and driving swap to its limit. Service X's internal request timers stay fast, but its responses are delayed *outside* the process — scheduling starvation, page faults, swap I/O. Classic **host resource contention**, not an app bug.
+
+## Recommended action (ops, not code)
+1. **Do not touch Service X code** — nothing in its logs supports a fix there.
+2. **Relocate or throttle `unrelated_batch_job.py`**: move to a separate host / off-peak window, or bound it with cgroup/K8s `resources.limits` so it can't starve co-located services.
+3. **Add swap headroom** and alert at ~80% swap used so this is caught before it hits users.
+4. **Monitor per-process CPU/mem at the host level** — Service X's own metrics look healthy despite the real problem, so app-level logs alone won't catch this class of issue.
+
+No files in this directory were modified (it contains only log/stat artifacts).
