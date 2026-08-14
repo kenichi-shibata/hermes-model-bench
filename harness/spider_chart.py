@@ -31,17 +31,22 @@ import numpy as np
 DIMENSIONS = ["correctness", "token_efficiency", "cost_efficiency", "reusability"]
 
 
-def load_scores(path: Path) -> dict[str, dict[str, float]]:
+def load_scores(path: Path, dimensions: list[str] | None = None) -> dict[str, dict[str, float]]:
     """Returns {arm_name: {dimension: mean_score}}. Accepts either a flat
     list of per-task run records (aggregates by arm, averaging only over
     tasks that actually ran - never imputing a score for a missing task)
-    or an already-aggregated dict."""
+    or an already-aggregated dict. `dimensions` defaults to the module-level
+    DIMENSIONS (the 4 real scoring.py dimensions); pass a custom list when
+    plotting a differently-shaped input (e.g. a multi-task suite aggregate
+    with its own dimension names) rather than silently remapping unrelated
+    axes onto DIMENSIONS labels."""
+    dims = dimensions or DIMENSIONS
     data = json.loads(path.read_text())
 
     if isinstance(data, dict):
         # Already aggregated - just validate shape.
         for arm, scores in data.items():
-            missing = [d for d in DIMENSIONS if d not in scores]
+            missing = [d for d in dims if d not in scores]
             if missing:
                 raise ValueError(f"Arm {arm!r} is missing dimensions {missing} - fix the input, don't guess")
         return data
@@ -55,18 +60,19 @@ def load_scores(path: Path) -> dict[str, dict[str, float]]:
     for arm, score_dicts in by_arm.items():
         aggregated[arm] = {
             dim: sum(s[dim] for s in score_dicts) / len(score_dicts)
-            for dim in DIMENSIONS
+            for dim in dims
         }
     return aggregated
 
 
-def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path: Path) -> None:
+def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path: Path, dimensions: list[str] | None = None) -> None:
     """Styled to match the reference 'Helpfulness' hexagon look Ken shared
     2026-08-13: light gradient background, dark-navy line(s) with a soft
     fill, clean hexagonal grid, bold title above, minimal axis labels with
     no legend box clutter for a single arm (legend only added when
     multiple arms are actually being compared, off to the side)."""
-    n = len(DIMENSIONS)
+    dims = dimensions or DIMENSIONS
+    n = len(dims)
     angles = np.linspace(0, 2 * np.pi, n, endpoint=False).tolist()
     angles += angles[:1]  # close the loop
 
@@ -83,7 +89,7 @@ def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path
     palette = ["#1b2a4a", "#c0783c", "#4a7a5a", "#8a3b5a", "#3b6b8a", "#a0762c"]
 
     for i, (arm, scores) in enumerate(scores_by_arm.items()):
-        values = [scores[dim] for dim in DIMENSIONS]
+        values = [scores[dim] for dim in dims]
         values += values[:1]
         color = palette[i % len(palette)]
         ax.plot(angles, values, linewidth=2.5, color=color, label=arm, solid_capstyle="round")
@@ -94,7 +100,7 @@ def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path
     ax.set_theta_direction(-1)
     ax.set_xticks(angles[:-1])
     ax.set_xticklabels(
-        [d.replace("_", " ").title() for d in DIMENSIONS],
+        [d.replace("_", " ").title() for d in dims],
         fontsize=15, color="#333333", fontweight="medium",
     )
     ax.tick_params(axis="x", pad=18)
@@ -120,7 +126,10 @@ def main() -> None:
     parser.add_argument("--task", help="Restrict to a single task_id before aggregating (only meaningful for flat-list input)")
     parser.add_argument("--out", required=True, help="Output PNG path")
     parser.add_argument("--title", default=None, help="Chart title (default: derived from input filename/task)")
+    parser.add_argument("--dimensions", default=None, help="Comma-separated custom dimension names (default: the 4 scoring.py dimensions)")
     args = parser.parse_args()
+
+    dims = args.dimensions.split(",") if args.dimensions else None
 
     path = Path(args.results_file)
     raw = json.loads(path.read_text())
@@ -130,12 +139,12 @@ def main() -> None:
         if not raw:
             raise SystemExit(f"No records found for task_id={args.task!r} in {path}")
         Path("/tmp/_filtered_for_spider.json").write_text(json.dumps(raw))
-        scores_by_arm = load_scores(Path("/tmp/_filtered_for_spider.json"))
+        scores_by_arm = load_scores(Path("/tmp/_filtered_for_spider.json"), dims)
     else:
-        scores_by_arm = load_scores(path)
+        scores_by_arm = load_scores(path, dims)
 
     title = args.title or (f"{args.task} — per-arm dimension scores" if args.task else "Aggregate — per-arm dimension scores")
-    plot_spider(scores_by_arm, title, Path(args.out))
+    plot_spider(scores_by_arm, title, Path(args.out), dims)
 
 
 if __name__ == "__main__":

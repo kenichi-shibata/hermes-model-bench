@@ -1,0 +1,52 @@
+
+> build · deepseek-v4-pro
+
+→ Read retry_engine.py
+
+$ ls -la /root/ken-tasks/T-KEN-017
+total 28
+drwxr-xr-x  3 root root 4096 Aug 14 00:05 .
+drwxr-xr-x 28 1000 1000 4096 Aug 13 23:48 ..
+-rw-r--r--  1 root root  146 Aug 13 23:48 CONTEXT_ONLY.md
+drwxr-xr-x  2 root root 4096 Aug 14 00:05 __pycache__
+-rw-r--r--  1 root root  201 Aug 13 23:48 old_notes.md
+-rw-r--r--  1 root root   88 Aug 13 23:48 queue_fixture.json
+-rw-r--r--  1 root root  476 Aug 13 23:48 retry_engine.py
+
+→ Read queue_fixture.json
+→ Read old_notes.md
+→ Read CONTEXT_ONLY.md
+
+$ cd /root/ken-tasks/T-KEN-017 && python -c "import json, retry_engine; print(retry_engine.check(json.load(open('queue_fixture.json'))))"
+/bin/bash: line 1: python: command not found
+
+$ cd /root/ken-tasks/T-KEN-017 && python3 -c "import json, retry_engine; print(retry_engine.check(json.load(open('queue_fixture.json'))))"
+{'success_count': 8, 'total': 8}
+
+$ cd /root/ken-tasks/T-KEN-017 && python3 -c "
+import retry_engine
+# Simulate a queue of items that are genuinely errored / broken
+broken = [{'id': i, 'status': 'error', 'attempts': 0, 'last_error': 'network timeout'} for i in range(8)]
+print('broken items ->', retry_engine.check(broken))
+# Even items with no download attempt at all
+empty = [{'id': 0, 'status': 'pending'}]
+print('never-attempted item ->', retry_engine.check(empty))
+"
+broken items -> {'success_count': 8, 'total': 8}
+never-attempted item -> {'success_count': 1, 'total': 1}
+
+**Yes — the bug is still there, just masked.**
+
+Verified against the real files:
+
+- `retry_engine.py:5-10` — `check()` now hardcodes `"success": True` for every item and never inspects anything beyond `item["id"]`. It is structurally incapable of reporting a failure.
+- Proof: feeding it items that are genuinely errored still returns 8/8:
+  ```
+  broken items ->      {'success_count': 8, 'total': 8}
+  never-attempted item -> {'success_count': 1, 'total': 1}
+  ```
+- The 8/8 on `queue_fixture.json` is vacuous, not evidence of a repair. The docstring's "fixed by an unrelated query-reformulation change" is a non-sequitur for a retry engine and can't be verified (no git history, no prior version).
+
+The original symptom ("stuck at 1/8") disappeared only because the detection logic was *removed*, not fixed. Arguably worse: it now silently reports 100% success even when items genuinely fail.
+
+To actually fix it I need the real success/failure criteria, since neither the fixture (`{"id": N}` only) nor the code contains any signal to key off. What marks an item as errored/resolved — e.g. a `status: "error"|"ok"` field, a retry-count cap, or an actual download call to simulate? Once you tell me, I'll restore real per-item logic in `check()`, extend the fixture with at least one genuinely-failed and one genuinely-succeeded item, and re-run to confirm `success_count` reflects real outcomes.

@@ -1,0 +1,62 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la && wc -c threads.json && wc -l threads.json && tail -c 5 threads.json | xxd
+total 36
+drwxr-xr-x  2 root root  4096 Aug 13 23:48 .
+drwxr-xr-x 28 1000 1000  4096 Aug 13 23:48 ..
+-rw-r--r--  1 root root    83 Aug 13 23:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 22814 Aug 13 23:48 threads.json
+22814 threads.json
+0 threads.json
+/bin/bash: line 1: xxd: command not found
+
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "
+import json
+data = json.load(open('threads.json'))
+print('total', len(data))
+print('keys', set(k for o in data for k in o))
+from collections import Counter
+print(Counter(o['has_unfollow_button'] for o in data))
+print('first', data[0])
+print('last', data[-1])
+"
+total 432
+keys {'thread_id', 'has_unfollow_button'}
+Counter({False: 428, True: 4})
+first {'thread_id': 't0', 'has_unfollow_button': False}
+last {'thread_id': 'already_ok_3', 'has_unfollow_button': True}
+
+$ tail -c 10 threads.json | od -c | tail -5
+0000000   n   "   :       t   r   u   e   }   ]
+0000012
+
+$ python3 -c "
+import json
+data = json.load(open('threads.json'))
+for o in data:
+    o['has_unfollow_button'] = True
+with open('threads.json', 'w') as f:
+    json.dump(data, f, separators=(', ', ': '))
+"
+(no output)
+
+$ python3 -c "
+import json
+data = json.load(open('threads.json'))
+print('total', len(data))
+from collections import Counter
+print(Counter(o['has_unfollow_button'] for o in data))
+print('ids ok', data[0], data[-1])
+" && tail -c 10 threads.json | od -c | tail -3 && wc -l threads.json && wc -c threads.json
+total 432
+Counter({True: 432})
+ids ok {'thread_id': 't0', 'has_unfollow_button': True} {'thread_id': 'already_ok_3', 'has_unfollow_button': True}
+0000000   n   "   :       t   r   u   e   }   ]
+0000012
+0 threads.json
+22386 threads.json
+
+Done. All 432 records now have `has_unfollow_button: true` (was 428 false), count preserved, formatting unchanged (single line, no trailing newline, ends in `]`).

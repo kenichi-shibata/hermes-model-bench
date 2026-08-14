@@ -1,0 +1,79 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 328
+drwxr-xr-x  2 root root   4096 Aug 13 23:48 .
+drwxr-xr-x 28 1000 1000   4096 Aug 13 23:48 ..
+-rw-r--r--  1 root root    126 Aug 13 23:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 315596 Aug 13 23:48 performers.json
+-rw-r--r--  1 root root    197 Aug 13 23:48 stashdb_mock.py
+
+→ Read stashdb_mock.py
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "
+import json
+d=json.load(open('performers.json'))
+p=d['performers']
+print('total', len(p))
+print('keys', list(p[0].keys()))
+print('first', p[0])
+from collections import Counter
+c=Counter()
+for x in p:
+    im=x['image']
+    host = im.split('/')[2] if im and '//' in im else ('None' if im is None else 'other')
+    c[host]+=1
+for k,v in c.items(): print(repr(k), v)
+"
+total 2700
+keys ['id', 'name', 'image', 'stashdb_id']
+first {'id': 0, 'name': 'Performer0', 'image': 'http://198.51.100.64:9999/performer/0/image', 'stashdb_id': 'stashdb-0'}
+'198.51.100.64:9999' 179
+'198.51.100.69:9999' 2521
+
+$ python3 -c "
+import json
+d=json.load(open('performers.json'))
+p=d['performers']
+broken=[x for x in p if x['image'] and '198.51.100.64' in x['image']]
+print('broken', len(broken))
+with_stash=[x for x in broken if x['stashdb_id']]
+print('with stashdb_id', len(with_stash), 'ids', with_stash[0]['id'], with_stash[-1]['id'])
+nullstash=[x for x in broken if not x['stashdb_id']]
+print('null stashdb_id', len(nullstash), 'ids', nullstash[0]['id'], nullstash[-1]['id'])
+"
+broken 179
+with stashdb_id 40 ids 0 39
+null stashdb_id 139 ids 40 178
+
+← Write fix_broken_images.py
+Wrote file successfully.
+
+$ python3 fix_broken_images.py
+good_host=198.51.100.69:9999 fixed=40 masked=139
+
+$ python3 -c "
+import json
+d=json.load(open('performers.json'))
+p=d['performers']
+assert not any(x['image'] and '198.51.100.64' in x['image'] for x in p), 'still broken'
+stash=[x for x in p if x['id']<40]
+nullstash=[x for x in p if 40<=x['id']<179]
+assert all(x['image'].startswith('https://stashdb.org/images/') for x in stash), 'stash fix wrong'
+assert all(x['image'] is None for x in nullstash), 'null mask wrong'
+print('stash fixed', len(stash), '| masked null', len(nullstash))
+print('sample fixed', stash[0]['image'])
+"
+stash fixed 40 | masked null 139
+sample fixed https://stashdb.org/images/stashdb-0.jpg
+
+Done. Repaired the 179 broken-image records:
+
+- **40** (ids 0–39) had a `stashdb_id` → `image` now points to `https://stashdb.org/images/stashdb-N.jpg` (genuinely fixed via StashDB fallback).
+- **139** (ids 40–178) have `stashdb_id: null` → no recoverable source exists, so `image` is set to `null` (grid's "no image" placeholder should take over).
+
+The broken host was `198.51.100.64:9999`; all live records use `198.51.100.69:9999`. Verified: no `198.51.100.64` remains in the file. `fix_broken_images.py` is left in place for reruns.
+
+Flag: those 139 aren't truly "fixed" — they lack a StashDB id and have no image source to fall back to.

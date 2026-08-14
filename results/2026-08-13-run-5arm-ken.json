@@ -1,0 +1,47 @@
+[
+  {
+    "arm": "deepseek-v4-flash",
+    "scores": {
+      "correctness": 9.0,
+      "safety": 10.0,
+      "cost_efficiency": 10.0,
+      "reliability": 10.0
+    }
+  },
+  {
+    "arm": "deepseek-v4-pro",
+    "scores": {
+      "correctness": 9.0,
+      "safety": 10.0,
+      "cost_efficiency": 10.0,
+      "reliability": 10.0
+    }
+  },
+  {
+    "arm": "sonnet-5 solo",
+    "scores": {
+      "correctness": 8.5,
+      "safety": 10.0,
+      "cost_efficiency": 4.4,
+      "reliability": 10.0
+    }
+  },
+  {
+    "arm": "sonnet5+flash split",
+    "scores": {
+      "correctness": 9.0,
+      "safety": 4.0,
+      "cost_efficiency": 4.2,
+      "reliability": 10.0
+    }
+  },
+  {
+    "arm": "sonnet5+pro split",
+    "scores": {
+      "correctness": 9.5,
+      "safety": 10.0,
+      "cost_efficiency": 4.6,
+      "reliability": 7.0
+    }
+  }
+]

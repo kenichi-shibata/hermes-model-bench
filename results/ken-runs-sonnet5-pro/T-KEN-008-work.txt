@@ -1,0 +1,33 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x  2 root root 4096 Aug 13 23:48 .
+drwxr-xr-x 28 1000 1000 4096 Aug 13 23:48 ..
+-rw-r--r--  1 root root  165 Aug 13 23:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  342 Aug 13 23:48 samantha_saint_wicked_catalog.json
+-rw-r--r--  1 root root 1188 Aug 13 23:48 scenes_db.json
+-rw-r--r--  1 root root    2 Aug 13 23:48 wanted_list.json
+
+→ Read scenes_db.json
+→ Read samantha_saint_wicked_catalog.json
+→ Read wanted_list.json
+→ Read CONTEXT_ONLY.md
+
+← Write scenes_db.json
+Wrote file successfully.
+
+← Write wanted_list.json
+Wrote file successfully.
+
+$ python3 -c "import json; [json.load(open(f)) for f in ['scenes_db.json','samantha_saint_wicked_catalog.json','wanted_list.json']]; print('all valid JSON')"
+all valid JSON
+
+Done. Changes made:
+
+- **MovieX Parts 1–6** (`scenes_db.json`): grouped via a new `movies` array with a `MovieX` record (id 900), and linked each scene with `movie_id: 900` + `scene_index: 1..6`.
+- **FliXXX scenes 200–203**: `studio` normalized to `Digital Playground`, removed stale `real_studio`.
+- **Samantha Saint / Wicked**: all 12 catalog movies added to `wanted_list.json` as whole-movie entries.
+
+Verified all three files are valid JSON.

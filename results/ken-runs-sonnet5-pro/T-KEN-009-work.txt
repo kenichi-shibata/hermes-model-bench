@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-pro
+
+→ Read disk_fleet.json
+→ Read CONTEXT_ONLY.md
+## Disk fleet check — results
+
+| Host | used_pct | thin_provisioned | name | Status |
+|---|---|---|---|---|
+| host1 | 45% | no | — | healthy |
+| host2 | 38% | no | — | healthy |
+| host3 | 92% | yes | media-pool | **critical** |
+| host4 | 22% | no | — | healthy |
+| host5 | 30% | no | — | healthy |
+
+**Actionable item — host3 (`media-pool`):** at 92% used *and* thin-provisioned. That percentage is against logical/allocated size, not the physical backing pool, so it can hit physical exhaustion before the logical limit — and when the thin pool runs out, writes can fail/stall across every volume sharing it. Recommend immediate attention: free space, expand the backing pool, or migrate volumes off it.
+
+**No action needed:** host1, host2, host4, host5 (22–45%, all comfortably healthy).
+
+I kept the remediation generic since the underlying storage backend isn't specified here. Want me to write this to a `disk_fleet_report.md`?

@@ -1,0 +1,28 @@
+
+> build · deepseek-v4-pro
+
+→ Read tailscale_status_mock.json
+
+$ ls -la /root/ken-tasks/T-KEN-014
+total 16
+drwxr-xr-x  2 root root 4096 Aug 13 23:48 .
+drwxr-xr-x 28 1000 1000 4096 Aug 13 23:48 ..
+-rw-r--r--  1 root root   69 Aug 13 23:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  498 Aug 13 23:48 tailscale_status_mock.json
+
+→ Read CONTEXT_ONLY.md
+The plan's diagnosis is correct. Verified against the file:
+
+- `home-router-node` (hostname `pve2`) is the **only** peer advertising `192.168.1.0/24`, and it's `Online: false` with `LastSeen: 2026-08-02` — 12 days stale.
+- `laptop` and `phone2` are online but advertise no routes (`PrimaryRoutes: []`), so they can't reach your home subnet.
+
+**Why you can't reach home from your phone:** your only subnet router, `pve2`, is offline. No other peer can route to `192.168.1.0/24`. This is a single point of failure — there's nothing to fix in the config files here; the fix is on the `pve2` host.
+
+To restore access:
+1. Power on / check network on the `pve2` box (12 days down suggests a power loss or reboot stall).
+2. On `pve2`: `systemctl status tailscaled` → if not running, `systemctl restart tailscaled`.
+3. If the node key expired, re-auth with `tailscale up --advertise-routes=192.168.1.0/24 --accept-routes`.
+4. In the admin console, confirm the `192.168.1.0/24` route is still **approved** (can lapse on re-register).
+5. From your phone, `tailscale ping 192.168.1.1` to confirm the route comes back.
+
+For resilience, add a second always-on home-LAN device as a backup subnet router.

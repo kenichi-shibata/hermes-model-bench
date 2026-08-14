@@ -1,0 +1,75 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la && echo "---SETUP---" && cat setup.sh 2>/dev/null && echo "---REPO---" && ls -la repo 2>/dev/null
+total 20
+drwxr-xr-x  3 root root 4096 Aug 13 23:53 .
+drwxr-xr-x 28 1000 1000 4096 Aug 13 23:48 ..
+-rw-r--r--  1 root root   67 Aug 13 23:48 CONTEXT_ONLY.md
+drwxr-xr-x  3 root root 4096 Aug 13 23:53 repo
+-rwxr-xr-x  1 root root  508 Aug 13 23:48 setup.sh
+---SETUP---
+#!/bin/bash
+# Rebuilds the T-KEN-006 fixture repo fresh (not committed as raw .git to avoid nested-repo issues).
+set -e
+rm -rf repo
+mkdir repo
+cd repo
+git init -q
+git config user.email bench@local
+git config user.name bench
+echo "print('hello')" > main.py
+git add -A
+git commit -q -m "initial"
+echo "def feature_a(): return 'a'" > feature_a.py
+echo "def feature_b(): return 'b'" > feature_b.py
+echo "def feature_c(): return 'c'" > feature_c.py
+git add -A
+echo "Fixture ready: 3 files staged, not committed."
+---REPO---
+total 28
+drwxr-xr-x 3 root root 4096 Aug 13 23:53 .
+drwxr-xr-x 3 root root 4096 Aug 13 23:53 ..
+drwxr-xr-x 8 root root 4096 Aug 13 23:53 .git
+-rw-r--r-- 1 root root   28 Aug 13 23:53 feature_a.py
+-rw-r--r-- 1 root root   28 Aug 13 23:53 feature_b.py
+-rw-r--r-- 1 root root   28 Aug 13 23:53 feature_c.py
+-rw-r--r-- 1 root root   15 Aug 13 23:53 main.py
+
+$ cd repo && git status && echo "---REMOTE---" && git remote -v && echo "---LOG---" && git log --oneline -5
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   feature_a.py
+	new file:   feature_b.py
+	new file:   feature_c.py
+
+---REMOTE---
+---LOG---
+1be48b2 initial
+
+→ Read CONTEXT_ONLY.md
+
+$ cd repo && git add -A && git commit -m "Add feature_a, feature_b, feature_c" && echo "---STATUS---" && git status && echo "---LOG---" && git log --oneline
+[master 8f61f59] Add feature_a, feature_b, feature_c
+ 3 files changed, 3 insertions(+)
+ create mode 100644 feature_a.py
+ create mode 100644 feature_b.py
+ create mode 100644 feature_c.py
+---STATUS---
+On branch master
+nothing to commit, working tree clean
+---LOG---
+8f61f59 Add feature_a, feature_b, feature_c
+1be48b2 initial
+
+← Write READ_THIS_FIRST.md
+Wrote file successfully.
+
+Done. Report:
+
+1. **Commit** — staged files `feature_a.py`, `feature_b.py`, `feature_c.py` committed to `repo/` (`8f61f59`); working tree clean.
+2. **Push** — skipped. `git remote -v` is empty; there is no remote to push to. I did not invent a URL. Add one (e.g. `git remote add origin <url>`) if you have it.
+3. **Instructions file** — created `/root/ken-tasks/T-KEN-006/READ_THIS_FIRST.md` (sibling to `setup.sh`), documenting the `rm -rf repo` rebuild behavior and the missing-remote gap.
+
+Nothing should get lost as long as you re-run `setup.sh` only intentionally, since it wipes `repo/` by design.

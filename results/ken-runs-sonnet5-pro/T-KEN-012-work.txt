@@ -1,0 +1,44 @@
+
+> build · deepseek-v4-pro
+
+→ Read service_x_logs.txt
+→ Read host_vmstat_mock.json
+
+$ ls -la /root/ken-tasks/T-KEN-012
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 23:48 .
+drwxr-xr-x 28 1000 1000 4096 Aug 13 23:48 ..
+-rw-r--r--  1 root root  107 Aug 13 23:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  178 Aug 13 23:48 host_vmstat_mock.json
+-rw-r--r--  1 root root  118 Aug 13 23:48 service_x_logs.txt
+
+→ Read CONTEXT_ONLY.md
+
+← Write RCA.md
+Wrote file successfully.
+
+The plan's findings check out against the actual files. Diagnosis confirmed.
+
+## Conclusion: service_x isn't the problem — the host is
+
+**service_x's own logs are healthy** (`service_x_logs.txt`): two requests handled in 45ms and 52ms. No evidence of slowness in its own code.
+
+**The real issue is host-level contention** (`host_vmstat_mock.json`):
+- Swap is fully exhausted: `swap_used_mb: 8200` > `swap_total_mb: 8192` — the host is thrashing.
+- The top process is `unrelated_batch_job.py`, burning **95% CPU** and **6400 MB RAM** — not service_x.
+- service_x itself only uses 120 MB.
+
+This is a classic noisy-neighbor case: the batch job saturates CPU/RAM and exhausts swap, degrading scheduling and latency for *every* process on the box. External callers perceive "service_x is slow" via end-to-end latency (network/queueing/thrashing) even though its internal handler timing is fine.
+
+## Recommended remediation (host/ops level, not service_x)
+- Throttle/reschedule `unrelated_batch_job.py` (nice values, cgroup CPU/memory limits, or move to a different host/time window).
+- Add per-process memory limits so one job can't exhaust shared swap.
+- Increase swap/host memory headroom and alert on swap-used ratio.
+
+## Suggested follow-up
+- Monitor service_x's *external* (client-observed) latency separately from its internal handler logs to confirm callers are seeing scheduling/swap thrashing rather than app-logic delays.
+
+Want me to persist this as an `RCA.md` in the directory? I'll leave the two evidence files untouched.
+Diagnosis confirmed and written to `RCA.md`. The evidence files are untouched.
+
+**Bottom line:** service_x isn't slow (45–52ms handlers). The host is thrashing on exhausted swap, driven by `unrelated_batch_job.py` (95% CPU, 6.4GB RAM). Fix at the host/ops layer, not in service_x.

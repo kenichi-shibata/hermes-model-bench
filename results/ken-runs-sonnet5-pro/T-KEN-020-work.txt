@@ -1,0 +1,51 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-020
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 23:48 .
+drwxr-xr-x 28 1000 1000 4096 Aug 13 23:48 ..
+-rw-r--r--  1 root root  149 Aug 13 23:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  141 Aug 13 23:48 backbone_lookup_mock.json
+-rw-r--r--  1 root root  149 Aug 13 23:48 usenet_config.json
+
+→ Read usenet_config.json
+→ Read backbone_lookup_mock.json
+→ Read CONTEXT_ONLY.md
+
+← Edit usenet_config.json
+Index: /root/ken-tasks/T-KEN-020/usenet_config.json
+===================================================================
+--- /root/ken-tasks/T-KEN-020/usenet_config.json
++++ /root/ken-tasks/T-KEN-020/usenet_config.json
+@@ -3,8 +3,8 @@
+     "provider": "Eweka",
+     "backbone": "Omicron"
+   },
+   "backup": {
+-    "provider": "Newshosting",
+-    "backbone": "Omicron"
++    "provider": "UsenetExpress",
++    "backbone": "Highwinds"
+   }
+ }
+\ No newline at end of file
+
+
+$ python3 -c "
+import json
+cfg = json.load(open('usenet_config.json'))
+lk = json.load(open('backbone_lookup_mock.json'))
+p, b = cfg['primary']['provider'], cfg['backup']['provider']
+assert lk[p] == cfg['primary']['backbone'], 'primary mismatch'
+assert lk[b] == cfg['backup']['backbone'], 'backup mismatch'
+assert lk[p] != lk[b], 'still same backbone!'
+print('OK: primary', p, '->', lk[p], '| backup', b, '->', lk[b])
+"
+OK: primary Eweka -> Omicron | backup UsenetExpress -> Highwinds
+
+Verified the plan against the real files, made the fix, and validated it.
+
+**Finding:** Not redundant. Both `Eweka` (primary) and `Newshosting` (backup) map to the `Omicron` backbone, so an Omicron outage takes down both.
+
+**Fix:** Changed backup to `UsenetExpress` → `Highwinds`. Validation against `backbone_lookup_mock.json` confirms `Omicron !== Highwinds`.

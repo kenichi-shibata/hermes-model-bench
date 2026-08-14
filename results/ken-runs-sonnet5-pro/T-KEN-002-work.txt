@@ -1,0 +1,34 @@
+
+> build · deepseek-v4-pro
+
+→ Read dedupe.py
+→ Read mirror_groups.json
+I'll verify the plan against the actual files first.
+
+← Edit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -7,12 +7,10 @@
+     return max(pool, key=lambda c: c["size_gb"])
+ 
+ 
+ def suggest_keep(candidates):
+-    """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    """DISPLAY-ONLY ranking shown on the review page."""
++    return pick_canonical(candidates)
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+
+Plan is accurate. Fixing `suggest_keep`:
+$ python3 -c "import json, dedupe; db = json.load(open('mirror_groups.json')); r = dedupe.scan_mirror_group('group_42', db); print(r); assert r['suggested_keep'] == r['canonical_would_be'] == 'scenes:101', r"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+
+Fixed. `suggest_keep` now delegates to `pick_canonical`, so both agree on `scenes:101` (the playable copy). Verified against `mirror_groups.json`.

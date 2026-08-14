@@ -1,0 +1,54 @@
+
+> build · deepseek-v4-pro
+
+→ Read api.py
+→ Read scenes.json
+
+← Edit api.py
+Index: /root/ken-tasks/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-005/api.py
++++ /root/ken-tasks/T-KEN-005/api.py
+@@ -1,12 +1,8 @@
+ """Scene homepage sections."""
+ 
+ def _scene_out(scene, translate=False):
+-    """Builds a scene card payload.
+-    BUG: translate defaults to False, and _hydrate_code() below never
+-    passes translate=True, so performer names never get romanized on
+-    the resume/continue-watching section even though _home_trending
+-    correctly passes translate=True."""
++    """Builds a scene card payload."""
+     out = {"id": scene["id"], "title": scene["title"], "performers": []}
+     for p in scene["performers"]:
+         name_en = p.get("name_en")
+         if translate and not name_en:
+
+
+← Edit api.py
+Index: /root/ken-tasks/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-005/api.py
++++ /root/ken-tasks/T-KEN-005/api.py
+@@ -15,10 +15,10 @@
+     return [_scene_out(s, translate=True) for s in scenes]
+ 
+ 
+ def _hydrate_code(scene):
+-    """Used by the resume/continue-watching section. BUG: forgot translate=True."""
+-    return _scene_out(scene)  # missing translate=True
++    """Used by the resume/continue-watching section."""
++    return _scene_out(scene, translate=True)
+ 
+ 
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+
+
+$ python3 -c "import json, api; s=json.load(open('scenes.json')); print(api._home_trending(s['trending'])); print([api._hydrate_code(x) for x in s['resume']])"
+[{'id': 1, 'title': 'Trending Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+[{'id': 2, 'title': 'Resume Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+
+Done. Fixed the root cause in `api.py:24` — `_hydrate_code` now calls `_scene_out(scene, translate=True)`, so resume/continue-watching cards get romanized performer names (`name_en`) just like trending. Verified both sections now return `Nanao Ayatsuki` for `彩月七緒`.
+
+The visual "blue translation label" is frontend styling, and there's no frontend file in this directory to change — that part lives in whatever card component renders `name_en`, which isn't here.

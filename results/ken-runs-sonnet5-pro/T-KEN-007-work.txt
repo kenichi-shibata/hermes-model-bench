@@ -1,0 +1,16 @@
+
+> build · deepseek-v4-pro
+
+→ Read service_logs.txt
+→ Read upstream_status_mock.json
+→ Read CONTEXT_ONLY.md
+Confirmed the plan matches the actual files. Diagnosis:
+
+**Yes, the alert is broken.**
+
+- `upstream_status_mock.json`: `payments-api` is in `major_outage`, started `09:55:00Z`, "Active incident, provider-side, no ETA" — no resolution.
+- `service_logs.txt`: healthy 10:00/10:01/10:02 → one `WARN ... 503` at 10:03:01 → next cycle (10:04:01) declares `service healthy (own health check green)`.
+
+The health/alert logic is dependency-blind: it fired a single WARN and then cleared itself to `healthy` one minute later based only on its own internal check, even though the dependency outage never ended. The alert under-reports severity and will not stay active or re-escalate for a sustained outage, masking an ongoing customer-facing incident as "all green."
+
+**Fix (if the real health-check code lives elsewhere):** overall alert status must combine the local health check *and* last-known upstream dependency state — don't clear to `healthy` while a tracked dependency reports `major_outage`; keep the alert active/escalating until upstream reports resolved. Nothing here to patch — this directory contains only the two data files, so the deliverable is this diagnosis.
