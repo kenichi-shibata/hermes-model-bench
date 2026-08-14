@@ -1,0 +1,1 @@
+Files: performer_catalog.json (real catalog, 22 scenes across 3 studios), wanted_list.json (empty).

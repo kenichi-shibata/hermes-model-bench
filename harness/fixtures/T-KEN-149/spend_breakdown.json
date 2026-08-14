@@ -1,0 +1,5 @@
+{
+  "total_cost": 10.0,
+  "repeated_subtask_cost": 8.0,
+  "repeated_subtask_cacheable": true
+}

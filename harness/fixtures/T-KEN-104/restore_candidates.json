@@ -1,0 +1,14 @@
+[
+  {
+    "day": "today",
+    "valid": false
+  },
+  {
+    "day": "yesterday",
+    "valid": false
+  },
+  {
+    "day": "2 days ago",
+    "valid": true
+  }
+]

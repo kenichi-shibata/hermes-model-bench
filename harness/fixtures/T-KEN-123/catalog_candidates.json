@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "performer": "X",
+    "studio": "Z"
+  },
+  {
+    "id": 2,
+    "performer": "X",
+    "studio": "Y"
+  },
+  {
+    "id": 3,
+    "performer": "W",
+    "studio": "Y"
+  }
+]

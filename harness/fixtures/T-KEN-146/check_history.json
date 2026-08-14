@@ -1,0 +1,162 @@
+[
+  {
+    "trigger": 0,
+    "was_real_issue": false
+  },
+  {
+    "trigger": 1,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 2,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 3,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 4,
+    "was_real_issue": false
+  },
+  {
+    "trigger": 5,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 6,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 7,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 8,
+    "was_real_issue": false
+  },
+  {
+    "trigger": 9,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 10,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 11,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 12,
+    "was_real_issue": false
+  },
+  {
+    "trigger": 13,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 14,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 15,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 16,
+    "was_real_issue": false
+  },
+  {
+    "trigger": 17,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 18,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 19,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 20,
+    "was_real_issue": false
+  },
+  {
+    "trigger": 21,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 22,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 23,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 24,
+    "was_real_issue": false
+  },
+  {
+    "trigger": 25,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 26,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 27,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 28,
+    "was_real_issue": false
+  },
+  {
+    "trigger": 29,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 30,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 31,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 32,
+    "was_real_issue": false
+  },
+  {
+    "trigger": 33,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 34,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 35,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 36,
+    "was_real_issue": false
+  },
+  {
+    "trigger": 37,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 38,
+    "was_real_issue": true
+  },
+  {
+    "trigger": 39,
+    "was_real_issue": true
+  }
+]

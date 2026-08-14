@@ -1,0 +1,1 @@
+Files: repo_status.json (real git status-style state).

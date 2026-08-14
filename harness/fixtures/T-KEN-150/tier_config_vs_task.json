@@ -1,0 +1,4 @@
+{
+  "routing_rule": "always_expensive_tier",
+  "task_complexity_considered": false
+}

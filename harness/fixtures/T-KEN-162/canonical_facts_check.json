@@ -1,0 +1,62 @@
+[
+  {
+    "slot": "slot_0",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_1",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_2",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_3",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_4",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_5",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_6",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_7",
+    "value": "\u00e2\u0080\u0099corrupted\u00e2\u0080\u0099"
+  },
+  {
+    "slot": "slot_8",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_9",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_10",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_11",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_12",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_13",
+    "value": "clean value"
+  },
+  {
+    "slot": "slot_14",
+    "value": "clean value"
+  }
+]

@@ -1,0 +1,5 @@
+{
+  "outage_duration_min": 5,
+  "was_real_outage": true,
+  "affected_requests": 340
+}

@@ -1,0 +1,4 @@
+{
+  "check_name": "duplicate_charge_guard",
+  "purpose": "prevents double billing"
+}

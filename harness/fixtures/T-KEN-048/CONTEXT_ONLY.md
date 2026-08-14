@@ -1,0 +1,1 @@
+Files: node_capacity.json (2 candidate Proxmox nodes with real specs).

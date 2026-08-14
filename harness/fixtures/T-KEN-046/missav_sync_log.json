@@ -1,0 +1,12 @@
+[
+  {
+    "run_id": 1,
+    "status": "completed",
+    "duration_min": 8
+  },
+  {
+    "run_id": 2,
+    "status": "started",
+    "started_at": "2026-08-13T00:00:00"
+  }
+]

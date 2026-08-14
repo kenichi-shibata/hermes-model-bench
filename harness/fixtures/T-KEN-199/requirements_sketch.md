@@ -1,0 +1,1 @@
+need something that watches the wanted list and auto-flags anything stuck over 48h. nothing exists for this yet.

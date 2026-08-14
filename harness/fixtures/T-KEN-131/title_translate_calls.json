@@ -1,0 +1,42 @@
+[
+  {
+    "site": "call_0",
+    "skip_translate": true
+  },
+  {
+    "site": "call_1",
+    "skip_translate": true
+  },
+  {
+    "site": "call_2",
+    "skip_translate": true
+  },
+  {
+    "site": "call_3",
+    "skip_translate": false
+  },
+  {
+    "site": "call_4",
+    "skip_translate": false
+  },
+  {
+    "site": "call_5",
+    "skip_translate": false
+  },
+  {
+    "site": "call_6",
+    "skip_translate": false
+  },
+  {
+    "site": "call_7",
+    "skip_translate": false
+  },
+  {
+    "site": "call_8",
+    "skip_translate": false
+  },
+  {
+    "site": "call_9",
+    "skip_translate": false
+  }
+]

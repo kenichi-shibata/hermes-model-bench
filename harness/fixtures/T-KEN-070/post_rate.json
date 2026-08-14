@@ -1,0 +1,74 @@
+[
+  {
+    "t": 0,
+    "burst": true
+  },
+  {
+    "t": 1,
+    "burst": true
+  },
+  {
+    "t": 2,
+    "burst": true
+  },
+  {
+    "t": 3,
+    "burst": true
+  },
+  {
+    "t": 4,
+    "burst": true
+  },
+  {
+    "t": 5,
+    "burst": true
+  },
+  {
+    "t": 6,
+    "burst": true
+  },
+  {
+    "t": 7,
+    "burst": true
+  },
+  {
+    "t": 8,
+    "burst": true
+  },
+  {
+    "t": 9,
+    "burst": true
+  },
+  {
+    "t": 10,
+    "burst": true
+  },
+  {
+    "t": 11,
+    "burst": true
+  },
+  {
+    "t": 12,
+    "burst": true
+  },
+  {
+    "t": 13,
+    "burst": true
+  },
+  {
+    "t": 14,
+    "burst": true
+  },
+  {
+    "t": 15,
+    "burst": false
+  },
+  {
+    "t": 16,
+    "burst": false
+  },
+  {
+    "t": 17,
+    "burst": false
+  }
+]

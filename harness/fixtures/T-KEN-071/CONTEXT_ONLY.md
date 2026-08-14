@@ -1,0 +1,1 @@
+Files: follow_targets.json (real follow list, includes some bug-caused entries mixed with a specific one the user wants removed).

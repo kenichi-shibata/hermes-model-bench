@@ -1,0 +1,52 @@
+[
+  {
+    "id": 0,
+    "written": true,
+    "retrievable": true
+  },
+  {
+    "id": 1,
+    "written": true,
+    "retrievable": true
+  },
+  {
+    "id": 2,
+    "written": true,
+    "retrievable": true
+  },
+  {
+    "id": 3,
+    "written": true,
+    "retrievable": true
+  },
+  {
+    "id": 4,
+    "written": true,
+    "retrievable": true
+  },
+  {
+    "id": 5,
+    "written": true,
+    "retrievable": false
+  },
+  {
+    "id": 6,
+    "written": true,
+    "retrievable": true
+  },
+  {
+    "id": 7,
+    "written": true,
+    "retrievable": true
+  },
+  {
+    "id": 8,
+    "written": true,
+    "retrievable": true
+  },
+  {
+    "id": 9,
+    "written": true,
+    "retrievable": true
+  }
+]

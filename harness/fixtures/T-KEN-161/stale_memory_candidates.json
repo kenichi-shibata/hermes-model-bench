@@ -1,0 +1,102 @@
+[
+  {
+    "id": 0,
+    "flagged_stale": true,
+    "actually_superseded": true
+  },
+  {
+    "id": 1,
+    "flagged_stale": true,
+    "actually_superseded": true
+  },
+  {
+    "id": 2,
+    "flagged_stale": true,
+    "actually_superseded": true
+  },
+  {
+    "id": 3,
+    "flagged_stale": true,
+    "actually_superseded": false
+  },
+  {
+    "id": 4,
+    "flagged_stale": true,
+    "actually_superseded": false
+  },
+  {
+    "id": 5,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 6,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 7,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 8,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 9,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 10,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 11,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 12,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 13,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 14,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 15,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 16,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 17,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 18,
+    "flagged_stale": false,
+    "actually_superseded": false
+  },
+  {
+    "id": 19,
+    "flagged_stale": false,
+    "actually_superseded": false
+  }
+]

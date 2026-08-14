@@ -1,0 +1,1 @@
+Files: network_symptoms.json (real ping/traceroute-style samples).

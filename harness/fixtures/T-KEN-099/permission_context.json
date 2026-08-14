@@ -1,0 +1,5 @@
+{
+  "action": "bulk_delete",
+  "affected_records": 40,
+  "reversible": false
+}

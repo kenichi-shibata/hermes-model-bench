@@ -1,0 +1,1 @@
+Files: requirements_sketch.md (a terse, underspecified real ask), existing_related_code.py (adjacent code to build on top of).

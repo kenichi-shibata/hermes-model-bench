@@ -1,0 +1,1 @@
+Files: performer_bio_sync.py, performers_bios.json (half missing bio text).

@@ -1,0 +1,1 @@
+Files: studio_page_api.py (returns studio detail), studio_hierarchy.json (parent/child studio relationships).

@@ -1,0 +1,11 @@
+{
+  "host1": {
+    "used_pct": 45,
+    "thin": false
+  },
+  "host2": {
+    "used_pct": 60,
+    "thin": true,
+    "pool_data": null
+  }
+}

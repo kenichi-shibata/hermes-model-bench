@@ -1,0 +1,6 @@
+{
+  "tripped_at": "10:00:00",
+  "cooldown_sec": 900,
+  "self_resolved_at": "10:05:00",
+  "watchdog_checked_at": "10:20:00"
+}

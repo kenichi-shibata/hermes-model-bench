@@ -1,0 +1,1 @@
+This PR fixes the race condition in increment().

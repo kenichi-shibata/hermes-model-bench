@@ -1,0 +1,6 @@
+{
+  "week_start_count": 500,
+  "week_end_count": 700,
+  "distinct_new_facts": 50,
+  "likely_duplicates": 150
+}

@@ -1,0 +1,5 @@
+{
+  "dns_ok": true,
+  "tcp_connect_ok": true,
+  "app_health_check": "timeout"
+}

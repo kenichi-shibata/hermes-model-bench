@@ -1,0 +1,3 @@
+Uploading backup.tar.gz...
+BrokenPipeError: [Errno 32] Broken pipe
+Upload failed at 45% complete

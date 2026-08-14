@@ -1,0 +1,1 @@
+Files: vm_spec.json (VM's configured cores), workload_profile.json (real CPU usage pattern of what it's running).

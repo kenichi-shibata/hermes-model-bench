@@ -1,0 +1,1 @@
+60% of failures are ConnectionError/timeout (transient); 40% are 404 (permanent, retry won't help)

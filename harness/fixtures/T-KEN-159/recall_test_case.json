@@ -1,0 +1,4 @@
+{
+  "exact_phrase_recall": false,
+  "paraphrase_recall": true
+}

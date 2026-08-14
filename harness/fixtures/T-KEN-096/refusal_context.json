@@ -1,0 +1,10 @@
+{
+  "a": {
+    "data": "x"
+  },
+  "b": {
+    "data": "x"
+  },
+  "refused": true,
+  "reason": "generic_merge_guard"
+}

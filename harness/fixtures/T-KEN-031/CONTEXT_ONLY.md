@@ -1,0 +1,1 @@
+Files: similar_performers.py, performer_vectors.json (embedding-style similarity data, some performers missing vectors).

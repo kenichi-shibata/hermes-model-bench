@@ -1,0 +1,9 @@
+{
+  "parent1": {
+    "name": "MegaStudio",
+    "child_studios": [
+      "child_a",
+      "child_b"
+    ]
+  }
+}

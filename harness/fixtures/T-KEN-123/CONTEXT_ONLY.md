@@ -1,0 +1,1 @@
+Files: recent_chat_context.json (a vague prior reference), catalog_candidates.json (3 similar-titled candidates).

@@ -1,0 +1,4 @@
+{
+  "task_type": "single_field_lookup",
+  "requires_reasoning": false
+}

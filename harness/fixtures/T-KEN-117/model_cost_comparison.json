@@ -1,0 +1,6 @@
+{
+  "cheap_per_call": 0.002,
+  "cheap_retries_needed": 3,
+  "expensive_per_call": 0.08,
+  "expensive_retries_needed": 1
+}

@@ -1,0 +1,7 @@
+{
+  "home_router_peer": {
+    "online": false,
+    "last_seen_days_ago": 8,
+    "advertises": "192.168.1.0/24"
+  }
+}

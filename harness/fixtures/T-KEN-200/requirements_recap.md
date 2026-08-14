@@ -1,0 +1,1 @@
+watch for new items and alert on them. current version full-table-scans every second and is unusably slow at scale.

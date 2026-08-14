@@ -1,0 +1,5 @@
+{
+  "port": 9999,
+  "process_a": "service_x (bound)",
+  "process_b": "service_y (failed to bind)"
+}

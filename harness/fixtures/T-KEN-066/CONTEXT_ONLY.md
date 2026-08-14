@@ -1,0 +1,1 @@
+Files: bot_process_status.json (real process state).

@@ -1,0 +1,1 @@
+Files: post_rate.json (real posting frequency over the last hour).

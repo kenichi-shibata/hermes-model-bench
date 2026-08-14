@@ -1,0 +1,20 @@
+{
+  "svc_0": {
+    "latency_ms": 40
+  },
+  "svc_1": {
+    "latency_ms": 40
+  },
+  "svc_2": {
+    "latency_ms": 40
+  },
+  "svc_3": {
+    "latency_ms": 300
+  },
+  "svc_4": {
+    "latency_ms": 40
+  },
+  "svc_5": {
+    "latency_ms": 40
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "http_status": 200,
+  "body": "internal error occurred",
+  "check_examines": "status_code_only"
+}

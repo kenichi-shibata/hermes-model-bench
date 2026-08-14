@@ -1,0 +1,5 @@
+{
+  "concurrent_writers": 5,
+  "shared_resource": "shared.log",
+  "has_lock": false
+}

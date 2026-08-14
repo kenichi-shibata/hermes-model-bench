@@ -1,0 +1,1 @@
+Files: cover_image_resolver.py, scenes_covers.json (some scenes missing cover_url).

@@ -1,0 +1,23 @@
+{
+  "svc_0": {
+    "error_rate": 0.001
+  },
+  "svc_1": {
+    "error_rate": 0.001
+  },
+  "svc_2": {
+    "error_rate": 0.001
+  },
+  "svc_3": {
+    "error_rate": 0.12
+  },
+  "svc_4": {
+    "error_rate": 0.001
+  },
+  "svc_5": {
+    "error_rate": 0.001
+  },
+  "svc_6": {
+    "error_rate": 0.001
+  }
+}

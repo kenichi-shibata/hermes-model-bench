@@ -1,0 +1,5 @@
+{
+  "blocking_rule": "deny 0.0.0.0/0 except allowlist",
+  "traffic_source_in_allowlist": false,
+  "rule_added": "last week, unrelated hardening pass"
+}

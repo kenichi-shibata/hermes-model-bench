@@ -1,0 +1,1 @@
+Files: card_builder.py, scenes_translation.json (some performers missing name_en).

@@ -1,0 +1,7 @@
+[
+  {
+    "name": "log_rotate.sh",
+    "cpu_pct": 100,
+    "running_for_hours": 6
+  }
+]

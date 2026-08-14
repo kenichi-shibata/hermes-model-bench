@@ -1,0 +1,10 @@
+{
+  "before": {
+    "pass": 18,
+    "cost": 3.0
+  },
+  "after": {
+    "pass": 18,
+    "cost": 0.3
+  }
+}

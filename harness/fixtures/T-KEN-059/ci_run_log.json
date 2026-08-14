@@ -1,0 +1,15 @@
+[
+  {
+    "run": 1,
+    "status": "pass"
+  },
+  {
+    "run": 2,
+    "status": "pass"
+  },
+  {
+    "run": 3,
+    "status": "fail",
+    "is_head": true
+  }
+]

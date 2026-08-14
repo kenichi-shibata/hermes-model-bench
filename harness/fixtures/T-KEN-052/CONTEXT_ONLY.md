@@ -1,0 +1,1 @@
+Files: container_boot_log.txt (real LXC boot failure log).

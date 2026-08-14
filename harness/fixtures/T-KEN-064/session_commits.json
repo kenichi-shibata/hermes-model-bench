@@ -1,0 +1,10 @@
+[
+  {
+    "sha": "a1b2c3d",
+    "message": "fix: dead-host image fallback for 40 performers"
+  },
+  {
+    "sha": "e4f5g6h",
+    "message": "feat: add backup retry with exponential backoff"
+  }
+]

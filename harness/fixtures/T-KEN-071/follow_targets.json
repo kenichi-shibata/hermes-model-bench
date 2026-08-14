@@ -1,0 +1,14 @@
+[
+  {
+    "id": "target_performer",
+    "reason": "manual"
+  },
+  {
+    "id": "perf_0",
+    "reason": "track_button_bug"
+  },
+  {
+    "id": "perf_1",
+    "reason": "track_button_bug"
+  }
+]

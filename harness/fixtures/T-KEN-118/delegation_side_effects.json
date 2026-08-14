@@ -1,0 +1,6 @@
+{
+  "task": "fix bug X",
+  "unexpected_artifacts": [
+    "new branch: subagent-experiment"
+  ]
+}

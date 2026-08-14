@@ -1,0 +1,6 @@
+{
+  "solo_cost": 3.0,
+  "solo_safety_failures": 1,
+  "split_cost": 2.5,
+  "split_safety_failures": 0
+}

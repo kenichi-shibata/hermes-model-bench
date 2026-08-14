@@ -1,0 +1,1 @@
+Files: studio_catalog_page1.json, studio_catalog_page2.json (a studio's catalog split across 2 pages), wanted_list.json (currently empty).

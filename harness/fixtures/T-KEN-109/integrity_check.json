@@ -1,0 +1,8 @@
+{
+  "gzip_valid": true,
+  "schema_valid": false,
+  "malformed_tables": [
+    "users",
+    "sessions"
+  ]
+}

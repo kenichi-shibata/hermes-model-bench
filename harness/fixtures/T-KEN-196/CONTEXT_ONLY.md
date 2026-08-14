@@ -1,0 +1,1 @@
+Files: fragile_function.py (no retry logic at all, real failure log showing transient errors).

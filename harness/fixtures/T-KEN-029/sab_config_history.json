@@ -1,0 +1,13 @@
+[
+  {
+    "date": "2026-08-10",
+    "connections": 20,
+    "source": "manual"
+  },
+  {
+    "date": "2026-08-11",
+    "connections": 5,
+    "source": "nightly-sync",
+    "reason": null
+  }
+]

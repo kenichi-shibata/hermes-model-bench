@@ -1,0 +1,22 @@
+[
+  {
+    "name": "old-feature-1",
+    "days_stale": 90,
+    "merged": true
+  },
+  {
+    "name": "old-feature-2",
+    "days_stale": 75,
+    "merged": true
+  },
+  {
+    "name": "old-feature-3",
+    "days_stale": 60,
+    "merged": true
+  },
+  {
+    "name": "orphan-feature",
+    "days_stale": 80,
+    "merged": false
+  }
+]

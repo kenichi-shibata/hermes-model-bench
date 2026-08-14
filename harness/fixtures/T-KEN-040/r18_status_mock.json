@@ -1,0 +1,6 @@
+{
+  "breaker_open": true,
+  "consecutive_fails": 6,
+  "cooldown_remaining_sec": 300,
+  "reason": "cloudflare_block"
+}

@@ -1,0 +1,10 @@
+{
+  "dir_a": {
+    "has_remote": true,
+    "changes": 2
+  },
+  "dir_b": {
+    "has_remote": false,
+    "changes": 1
+  }
+}

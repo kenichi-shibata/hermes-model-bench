@@ -1,0 +1,1 @@
+Files: destructive_operation.py (no undo/rollback capability exists).
