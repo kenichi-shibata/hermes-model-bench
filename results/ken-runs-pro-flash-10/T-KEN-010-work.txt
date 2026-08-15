@@ -1,0 +1,74 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead bot.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead follow_log.json
+[0m
+[0m← [0mEdit bot.py
+Index: /root/ken-tasks-pro-flash/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-010/bot.py
++++ /root/ken-tasks-pro-flash/T-KEN-010/bot.py
+@@ -1,11 +1,8 @@
+ """Discord bot track/follow handlers."""
+ 
+ def track_studio_or_performer(entity_id, entity_type):
+-    """BUG: bundles a follow action with tracking, which should be
+-    separate. Fix: remove the follow_discord() call from here."""
+     db.add_track(entity_id, entity_type)
+-    db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here
+     return {"tracked": True}
+ 
+ 
+ class db:
+
+[0m
+[0m← [0mEdit follow_log.json
+Index: /root/ken-tasks-pro-flash/T-KEN-010/follow_log.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-010/follow_log.json
++++ /root/ken-tasks-pro-flash/T-KEN-010/follow_log.json
+@@ -797,16 +797,6 @@
+   {
+     "entity_id": "legit_perf_19",
+     "source": "manual_follow",
+     "legit": true
+-  },
+-  {
+-    "entity_id": "codey_steele",
+-    "source": "track_button_bug",
+-    "legit": false
+-  },
+-  {
+-    "entity_id": "cherry_kiss",
+-    "source": "track_button_bug",
+-    "legit": false
+   }
+ ]
+\ No newline at end of file
+
+[0m
+The plan matches the files. Executing the fix.
+[0m$ [0mpython3 -m json.tool /root/ken-tasks-pro-flash/T-KEN-010/follow_log.json > /dev/null && echo "JSON VALID" && python3 -c "import json; d=json.load(open('/root/ken-tasks-pro-flash/T-KEN-010/follow_log.json')); print('entries:', len(d)); print('last:', d[-1]); print('codey present:', any(x['entity_id']=='codey_steele' for x in d)); print('cherry present:', any(x['entity_id']=='cherry_kiss' for x in d))"
+JSON VALID
+entries: 160
+last: {'entity_id': 'legit_perf_19', 'source': 'manual_follow', 'legit': True}
+codey present: False
+cherry present: False
+[0m
+[0m$ [0mpython3 -c "
+import bot
+bot.track_studio_or_performer('x', 'performer')
+print('tracks:', bot.db._tracks)
+print('follows:', bot.db._follows)
+"
+tracks: [('x', 'performer')]
+follows: []
+[0m
+Now verifying both files are valid.
+Done. Fixed and verified:
+
+1. **Bug fixed** (`bot.py:3-6`): removed `db.follow_discord()` from `track_studio_or_performer()` — tracking is now tracking-only. Verified: `db._tracks` gets the entity, `db._follows` stays empty. `db.follow_discord()` remains defined for real manual follows.
+2. **Removed from follow log** (`follow_log.json`): deleted `codey_steele` and `cherry_kiss` (the `track_button_bug`/`legit: false` entries), fixed the trailing comma. File now valid JSON, 160 entries, ending with `legit_perf_19`.
+3. **Note:** the `perf_0`…`perf_139` entries (140 of them) were also created by this same bug (`source: track_button_bug`, `legit: false`). I left them since you only mentioned the two named performers — say the word and I'll strip those too, keeping the `legit_perf_*` ones.

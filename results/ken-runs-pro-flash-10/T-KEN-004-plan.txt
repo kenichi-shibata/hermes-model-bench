@@ -1,0 +1,51 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 16
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 20:47 ..
+-rw-r--r--  1 root root   72 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  331 Aug 13 21:42 node_facts.json
+[0m
+[0m→ [0mRead node_facts.json
+[0m→ [0mRead CONTEXT_ONLY.md
+## Findings
+
+The directory contains only two files:
+- `node_facts.json` — resource/risk facts for two candidate nodes
+- `CONTEXT_ONLY.md` — a one-line orientation note
+
+There is **no code, script, inventory, SSH config, Proxmox/LXC tooling, or credentials** anywhere in this sandbox. So "spin up a new LXC" cannot be executed from these files alone — that is the core problem.
+
+## Real problem
+
+1. **RAM is the binding constraint.** Both nodes are nearly out of free RAM (`node_A`: 674 MB, `node_B`: 478 MB). They have reclaimable cache (8.5 GB / 4.5 GB), so memory must be reclaimed or the container sized small.
+2. **`node_B` is a production risk.** It runs `trading-stack` (a financial system). Spinning up a throwaway test container there is unsafe.
+3. **The task is under-specified** ("for testing" — no OS template, RAM/disk size, or idempotent CTID given).
+4. **No execution path exists in-repo.** The WORK model will need external access (Proxmox host via `pct` or SSH) that is not present in this directory.
+
+## Plan (for the WORK model)
+
+**Decision: use `node_A`.** It does not run the financial system, has more reclaimable cache (8.5 GB) and effectively equal thin-pool space (200 vs 202 GB). Disk is not a differentiator.
+
+**Concrete steps:**
+
+1. **Confirm access/tooling to `node_A`** (ssh to the Proxmox node, or `pct` on the host). This is the prerequisite — if unreachable, stop and report the blocker rather than guessing.
+2. **Pick a safe CTID and specs** — propose `CTID=9001`, `hostname=test-<something>`, `--memory 512 --swap 512 --cores 1`. Keep RAM modest since free RAM is low.
+3. **Reclaim cache only if needed** (do NOT blindly `echo 3 > drop_caches`; the 674 MB free + swap is usually enough for a 512 MB container). If a larger container is required, `sync` then drop caches to reclaim up to ~8.5 GB.
+4. **Ensure template exists**, else download it, e.g. a Debian/Ubuntu LXC template.
+5. **Create the container:**
+   ```
+   pct create 9001 <template> \
+     --storage <thinpool> --memory 512 --swap 512 --cores 1 \
+     --hostname test-ken004 --net0 name=eth0,bridge=vmbr0,ip=dhcp
+   pct start 9001
+   pct status 9001
+   ```
+   (bridge/ip flags to be confirmed against the node's actual network config.)
+6. **Verify** the container boots (`pct exec 9001 -- uptime` / `ping`), then report the CTID and hostname.
+
+**Files to edit:** none exist to edit. Do not modify `node_facts.json` or `CONTEXT_ONLY.md`. If a record is wanted, the WORK model may create a new `result.md` noting the chosen node (`node_A`), CTID, and verification output — but only if the executor actually has node access; otherwise the deliverable is a report that the task is blocked on missing node/tooling access.
+
+**Key risk to flag:** `node_B` runs `trading-stack` — do not use it for testing.

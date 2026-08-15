@@ -1,0 +1,215 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead wanted_list.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+@@ -1,9 +1,9 @@
+ [
+   {
+     "id": 100,
+     "title": "MovieX Part 1",
+-    "movie_id": null,
++    "movie_id": 900,
+     "studio": "Wicked"
+   },
+   {
+     "id": 101,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+@@ -7,9 +7,9 @@
+ },
+ {
+   "id": 101,
+   "title": "MovieX Part 2",
+-  "movie_id": null,
++  "movie_id": 900,
+   "studio": "Wicked"
+ },
+ {
+   "id": 102,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+@@ -13,9 +13,9 @@
+ },
+ {
+   "id": 102,
+   "title": "MovieX Part 3",
+-  "movie_id": null,
++  "movie_id": 900,
+   "studio": "Wicked"
+ },
+ {
+   "id": 103,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+@@ -19,9 +19,9 @@
+ },
+ {
+   "id": 103,
+   "title": "MovieX Part 4",
+-  "movie_id": null,
++  "movie_id": 900,
+   "studio": "Wicked"
+ },
+ {
+   "id": 104,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+@@ -25,9 +25,9 @@
+ },
+ {
+   "id": 104,
+   "title": "MovieX Part 5",
+-  "movie_id": null,
++  "movie_id": 900,
+   "studio": "Wicked"
+ },
+ {
+   "id": 105,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+@@ -31,9 +31,9 @@
+ },
+ {
+   "id": 105,
+   "title": "MovieX Part 6",
+-  "movie_id": null,
++  "movie_id": 900,
+   "studio": "Wicked"
+ },
+ {
+   "id": 200,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+@@ -38,10 +38,9 @@
+ {
+   "id": 200,
+   "title": "Misattributed Scene 1",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 201,
+   "title": "Misattributed Scene 2",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+@@ -44,10 +44,9 @@
+ {
+   "id": 201,
+   "title": "Misattributed Scene 2",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 202,
+   "title": "Misattributed Scene 3",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+@@ -50,10 +50,9 @@
+ {
+   "id": 202,
+   "title": "Misattributed Scene 3",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 203,
+   "title": "Misattributed Scene 4",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-flash/T-KEN-008/scenes_db.json
+@@ -56,8 +56,7 @@
+   {
+     "id": 203,
+     "title": "Misattributed Scene 4",
+     "movie_id": null,
+-    "studio": "FliXXX",
+-    "real_studio": "Digital Playground"
++    "studio": "Digital Playground"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+Plan verified against real files — matches. Executing now.
+[0m← [0mWrite movies_db.json
+Wrote file successfully.
+[0m
+[0m← [0mWrite wanted_list.json
+Wrote file successfully.
+[0m
+Now create `movies_db.json` and populate `wanted_list.json`.
+Verify all three files are valid JSON and correct.
+[0m$ [0mpython3 -c "import json; d=json.load(open('scenes_db.json')); print('scenes ok'); print('movie_id 900 on:', [s['id'] for s in d if s['movie_id']==900]); print('Digital Playground:', [s['id'] for s in d if s['studio']=='Digital Playground']); print('any real_studio left:', [s['id'] for s in d if 'real_studio' in s]); print('any FliXXX left:', [s['id'] for s in d if s['studio']=='FliXXX'])"; python3 -c "import json; json.load(open('movies_db.json')); json.load(open('wanted_list.json')); print('movies_db + wanted_list ok')"
+scenes ok
+movie_id 900 on: [100, 101, 102, 103, 104, 105]
+Digital Playground: [200, 201, 202, 203]
+any real_studio left: []
+any FliXXX left: []
+movies_db + wanted_list ok
+[0m
+All done and verified.
+
+- **`scenes_db.json`** — ids 100–105 now link to `movie_id: 900`; ids 200–203 normalized to `studio: "Digital Playground"`, `real_studio` removed, no `FliXXX` left.
+- **`movies_db.json`** (new) — one Movie record `MovieX` (id 900) referencing scene_ids 100–105.
+- **`wanted_list.json`** — queue populated with MovieX + 12 Samantha Saint/Wicked movies.
+
+Note: scenes in Stash link to a Movie via `movie_id`; Groups are for studios. The 6 MovieX parts are now a single movie. To stop future flip-flopping, add a `FliXXX → Digital Playground` studio alias in Stash (studio-level, outside these files).

@@ -1,0 +1,40 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dedupe.py
+[0m→ [0mRead mirror_groups.json
+[0m✱ [0mGrep "suggest_keep"[90m in . · 2 matches[0m
+[0m
+[0m$ [0mpython3 -c "import json, dedupe; db=json.load(open('mirror_groups.json')); print(dedupe.scan_mirror_group('group_42', db))"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+[0m
+[0m← [0mEdit dedupe.py
+Index: /root/ken-tasks-pro-flash/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-002/dedupe.py
++++ /root/ken-tasks-pro-flash/T-KEN-002/dedupe.py
+@@ -7,12 +7,10 @@
+     return max(pool, key=lambda c: c["size_gb"])
+ 
+ 
+ def suggest_keep(candidates):
+-    """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    """DISPLAY-ONLY ranking shown on the review page."""
++    return pick_canonical(candidates)
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+[0m
+Bug confirmed. Applying the fix: `suggest_keep` delegates to `pick_canonical`.
+[0m$ [0mpython3 -c "import json, dedupe; db=json.load(open('mirror_groups.json')); print(dedupe.scan_mirror_group('group_42', db)); print('suggest_keep ->', dedupe.suggest_keep(db['group_42'])); print('pick_canonical ->', dedupe.pick_canonical(db['group_42']))"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+suggest_keep -> {'id': 'scenes:101', 'playable': True, 'size_gb': 1.8}
+pick_canonical -> {'id': 'scenes:101', 'playable': True, 'size_gb': 1.8}
+[0m
+Fixed. `suggest_keep` now delegates to `pick_canonical` (dedupe.py:10-12), so `suggested_keep` and `canonical_would_be` both return the playable `scenes:101` instead of the dead 5.2 GB file. No other callers depend on the old size-only behavior, and `mirror_groups.json` is unchanged input data.

@@ -1,0 +1,54 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks-pro-flash/T-KEN-010
+total 32
+drwxr-xr-x  2 root root  4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root  4096 Aug 15 20:47 ..
+-rw-r--r--  1 root root    89 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root   653 Aug 13 21:43 bot.py
+-rw-r--r--  1 root root 14651 Aug 13 21:43 follow_log.json
+[0m
+[0m→ [0mRead follow_log.json
+[0m→ [0mRead bot.py
+[0m→ [0mRead CONTEXT_ONLY.md
+## Findings
+
+**Real problem: yes, there's a bug — an accidental "track causes follow" side effect.**
+
+In `bot.py:3-8`, `track_studio_or_performer()` calls both `db.add_track()` AND `db.follow_discord()`:
+
+```python
+def track_studio_or_performer(entity_id, entity_type):
+    db.add_track(entity_id, entity_type)
+    db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here
+    return {"tracked": True}
+```
+
+So every "track" silently performs a "follow" on Discord. That's the "recursive follow" behavior you suspected — tracking an entity auto-follows it. It's not literally recursive, but it bundles a follow into the track path.
+
+**Evidence in `follow_log.json`:** `codey_steele` (lines 802-806) and `cherry_kiss` (lines 807-810) both have `"source": "track_button_bug"` and `"legit": false`, meaning they were followed by this bug, not by you manually. (Real manual follows are the `legit_perf_*` entries with `"source": "manual_follow"`, `"legit": true`.)
+
+So you did NOT actually follow codey_steele or cherry_kiss — the bug did it.
+
+## Concrete plan for the WORK model
+
+**1. Fix the bug in `bot.py`**
+- Edit `bot.py:7`: remove the line `db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here`.
+- Leave `track_studio_or_performer` as tracking-only:
+  ```python
+  def track_studio_or_performer(entity_id, entity_type):
+      db.add_track(entity_id, entity_type)
+      return {"tracked": True}
+  ```
+- `db.follow_discord()` can remain defined (it's legitimately used elsewhere for manual follows), but it is now no longer triggered by tracking.
+
+**2. Remove the two unintended follows from `follow_log.json`**
+- Delete the two objects for `codey_steele` and `cherry_kiss` (the block from the `{` on line 802 through line 810).
+- Fix the now-dangling trailing comma: change `legit_perf_19`'s closing `},` on line 801 to `}` so the JSON stays valid, ending with `]`.
+- Result: file ends after `legit_perf_19`, with `codey_steele` and `cherry_kiss` gone (equivalent to unfollowing them on Discord, since they were `legit: false`).
+
+**3. Note for the user (decision needed, not auto-doing)**
+- The `perf_0` … `perf_139` entries (lines 2-700) are also `"source": "track_button_bug"` / `"legit": false` — i.e. they were auto-followed by the same bug, not manually. You only asked about `codey_steele` and `cherry_kiss`, so the plan removes just those two. If you want all bug-induced follows cleaned up too, those `perf_*` entries should also be removed (keep the `legit_perf_*` ones).
+
+Note: the sandbox has no real Discord connection (`db` here is an in-memory stub), so "removing on Discord" is represented by removing those `legit: false` entries from `follow_log.json`.

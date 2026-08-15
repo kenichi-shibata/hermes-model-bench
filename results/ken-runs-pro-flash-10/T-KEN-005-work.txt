@@ -1,0 +1,91 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead api.py
+[0m→ [0mRead scenes.json
+[0m
+[0m← [0mEdit api.py
+Index: /root/ken-tasks-pro-flash/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-005/api.py
++++ /root/ken-tasks-pro-flash/T-KEN-005/api.py
+@@ -1,13 +1,14 @@
+ """Scene homepage sections."""
+ 
+ def _scene_out(scene, translate=False):
+-    """Builds a scene card payload.
+-    BUG: translate defaults to False, and _hydrate_code() below never
+-    passes translate=True, so performer names never get romanized on
+-    the resume/continue-watching section even though _home_trending
+-    correctly passes translate=True."""
+-    out = {"id": scene["id"], "title": scene["title"], "performers": []}
++    """Builds a scene card payload."""
++    out = {
++        "id": scene["id"],
++        "title": scene["title"],
++        "title_en": scene.get("title_en") or translate_title(scene["title"]),
++        "performers": [],
++    }
+     for p in scene["performers"]:
+         name_en = p.get("name_en")
+         if translate and not name_en:
+             name_en = romanize(p["name_jp"])
+
+[0m
+Plan verified against files. Implementing fixes now.
+[0m← [0mEdit api.py
+Index: /root/ken-tasks-pro-flash/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-005/api.py
++++ /root/ken-tasks-pro-flash/T-KEN-005/api.py
+@@ -20,10 +20,10 @@
+     return [_scene_out(s, translate=True) for s in scenes]
+ 
+ 
+ def _hydrate_code(scene):
+-    """Used by the resume/continue-watching section. BUG: forgot translate=True."""
+-    return _scene_out(scene)  # missing translate=True
++    """Used by the resume/continue-watching section."""
++    return _scene_out(scene, translate=True)
+ 
+ 
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+
+[0m
+[0m← [0mEdit api.py
+Index: /root/ken-tasks-pro-flash/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks-pro-flash/T-KEN-005/api.py
++++ /root/ken-tasks-pro-flash/T-KEN-005/api.py
+@@ -28,4 +28,9 @@
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+     _MAP = {"\u5f69\u6708\u4e03\u7dd2": "Nanao Ayatsuki"}
+     return _MAP.get(name_jp, "Romanized-" + name_jp)
++
++
++def translate_title(title):
++    """Mocked LLM title translation - returns original for untranslated fixtures."""
++    return title
+
+[0m
+[0m→ [0mRead api.py
+[0m
+[0m$ [0mpython3 -c "
+import json, api
+data = json.load(open('scenes.json'))
+print('trending:', api._home_trending(data['trending']))
+print('resume:  ', api._hydrate_code(data['resume'][0]))
+"
+trending: [{'id': 1, 'title': 'Trending Scene', 'title_en': 'Trending Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+resume:   {'id': 2, 'title': 'Resume Scene', 'title_en': 'Resume Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}
+[0m
+Done. Both sections now emit non-null `name_en` and `title_en`.
+
+- `api.py:8` — `_scene_out()` now outputs `title_en` (from `scene.title_en` or `translate_title()`).
+- `api.py:25` — `_hydrate_code()` passes `translate=True`, so resume performer names romanize.
+- `api.py:34` — added `translate_title()` (fixture titles are already English, so it passes through).
+
+Smoke check confirms both trending and resume cards carry `name_en: 'Nanao Ayatsuki'` and `title_en`.

@@ -1,0 +1,39 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 20:47 ..
+-rw-r--r--  1 root root  101 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  262 Aug 13 21:43 service_logs.txt
+-rw-r--r--  1 root root  135 Aug 13 21:43 upstream_status_mock.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead service_logs.txt
+[0m→ [0mRead upstream_status_mock.json
+## Diagnosis: The alert IS broken
+
+**Evidence (timeline correlation):**
+
+| Time | Source | Event |
+|------|--------|-------|
+| 09:55:00Z | `upstream_status_mock.json` | `payments-api` enters `major_outage` (active incident, no ETA) |
+| 10:00–10:02 | `service_logs.txt` | service reports `healthy` (3×) — outage already underway |
+| 10:03:01 | `service_logs.txt` | `WARN upstream dependency (payments-api) returned 503` — outage observed |
+| 10:04:01 | `service_logs.txt` | `INFO service healthy (own health check green)` — masks the failure |
+
+**Real problem:** A critical upstream dependency (`payments-api`) has been in `major_outage` since before the first log entry, and the service even logged a 503 warning at 10:03 — yet **no alert was ever raised**. The service's health/alerting logic only reflects its *own* process health ("own health check green") and does not aggregate or propagate the dependency's outage state, so the 503 WARN was never escalated to an alert and the outage went silent.
+
+## Concrete plan for the WORK model
+
+1. **Confirm the alert's expected trigger.** The alert should fire when `payments-api.status == "major_outage"` (or on repeated 503s), not on own-process liveness alone. The two data files confirm the trigger condition was met but no alert was produced.
+
+2. **No source files exist to edit.** The sandbox contains only `service_logs.txt` and `upstream_status_mock.json` (data, not code/config). The broken logic lives in the actual service (health-check + alerting), which is **not present in this directory**, so there is nothing here to patch directly.
+
+3. **Fix steps (for the real service, once the code is available):**
+   - **Health check:** change `health_check()` to aggregate dependency status from the upstream status endpoint (`/status` → `payments-api.status`) rather than returning green on own-process liveness alone. Return non-2xx/degraded when any critical dependency is `major_outage`.
+   - **Alert rule:** add/repair the rule that maps `payments-api` 503/`major_outage` → CRITICAL alert (e.g., threshold `>=1` 503 within a window, or dependency status != `operational`), instead of the current WARN-only path that never escalates.
+   - **Verify:** replay the mock data against the fixed logic; assert an alert fires for the 09:55Z outage, and that the 10:04 entry reports degraded (not "healthy") while the outage persists.
+
+4. **Deliverable from this sandbox:** report the finding above (alert broken — dependency outage not surfaced). If the intended "fix" target is these two files themselves, state explicitly that they are read-only data fixtures and ask for the service source/config to apply steps 3.

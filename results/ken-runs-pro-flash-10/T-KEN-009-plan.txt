@@ -1,0 +1,33 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks-pro-flash/T-KEN-009
+total 16
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 20:47 ..
+-rw-r--r--  1 root root   65 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  367 Aug 13 21:43 disk_fleet.json
+[0m
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead disk_fleet.json
+## Plan
+
+**What the real problem is:** Nothing is broken in this directory; this is a pure "check and report" task with no code to edit. The only actionable finding is in `disk_fleet.json`: **`host3` (name `"media-pool"`) is at 92% used** — the only host near capacity. It is also the only `thin_provisioned` host, so its reported usage is a logical/allocated figure that may not reflect physical disk and could run out suddenly.
+
+**Hosts at a glance:**
+| host | used_pct | thin | notes |
+|------|----------|------|-------|
+| host1 | 45 | no | OK |
+| host2 | 38 | no | OK |
+| host3 | 92 | yes | **"media-pool" — high, thin-provisioned** |
+| host4 | 22 | no | OK |
+| host5 | 30 | no | OK |
+
+**Concrete steps for WORK model (report-only, no file edits):**
+1. Open `/root/ken-tasks-pro-flash/T-KEN-009/disk_fleet.json` (already inspected).
+2. Report the one actionable finding: flag `host3` (media-pool) at 92% as needing attention, ideally with a threshold check (e.g., flag any `used_pct >= 90`).
+3. Recommend monitoring/freeing space on `host3`; note thin-provisioning means it may hit physical limits before `used_pct` hits 100.
+4. State that hosts 1, 2, 4, 5 are healthy (all ≤ 45%).
+
+No code, scripts, or file modifications are required — the deliverable is the summary above.

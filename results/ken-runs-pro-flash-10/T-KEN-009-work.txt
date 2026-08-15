@@ -1,0 +1,23 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead disk_fleet.json
+[0m→ [0mRead CONTEXT_ONLY.md
+Verified against the file — plan is accurate. Report below.
+
+## Disk fleet check — `disk_fleet.json`
+
+**Actionable finding:** `host3` ("media-pool") at **92% used** — the only host over a 90% threshold. ⚠️
+
+- **Thin-provisioned:** `used_pct` is logical/allocated, not physical — it can hit physical limits before reporting 100%, so it may fail suddenly. Needs attention.
+- **Recommendation:** monitor closely and free space on `host3`; consider physical capacity check since it's thin-provisioned.
+
+**Healthy hosts** (all ≤ 45%, non-thin):
+| host | used_pct |
+|------|----------|
+| host1 | 45 |
+| host2 | 38 |
+| host4 | 22 |
+| host5 | 30 |
+
+No code or file modifications required — this was report-only.

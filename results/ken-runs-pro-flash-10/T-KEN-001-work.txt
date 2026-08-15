@@ -1,0 +1,25 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead gh_repo_list_mock.json
+[0m
+[0m$ [0mfor d in /root/ken-tasks-pro-flash/T-KEN-001/delegation_live/deleg_fake*; do echo "=== $(basename $d) ==="; cat "$d/manifest.json"; echo; done
+=== deleg_fake0 ===
+{"status": "completed", "created_at": "2026-08-10T10:00:00", "goal": "fake task 0"}
+=== deleg_fake1 ===
+{"status": "capped", "created_at": "2026-08-10T10:00:00", "goal": "fake task 1"}
+=== deleg_fake2 ===
+{"status": "completed", "created_at": "2026-08-11T10:00:00", "goal": "fake task 2"}
+=== deleg_fake3 ===
+{"status": "capped", "created_at": "2026-08-12T10:00:00", "goal": "fake task 3"}
+=== deleg_fake4 ===
+{"status": "capped", "created_at": "2026-08-12T10:00:00", "goal": "fake task 4"}
+[0m
+Verified against the actual files. Findings confirmed:
+
+**Delegation trend: getting worse, not better.** Per-day capped rate: Aug 10 → 1/2 capped, Aug 11 → 0/1 capped, Aug 12 → 2/2 capped. Most recent day is 100% capped, 0 completions (2 completed vs 3 capped overall).
+
+**New repo: No.** `gh_repo_list_mock.json` only has the 2 pre-existing repos (Jul 1, Jun 15), and no `.git` exists anywhere in the sandbox.
+
+No code changes needed — this was a read-only report.

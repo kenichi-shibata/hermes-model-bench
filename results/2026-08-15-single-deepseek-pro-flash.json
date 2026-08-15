@@ -1,0 +1,10 @@
+{
+  "deepseek-pro-plans+deepseek-flash-works (split)": {
+    "correctness": 90.0,
+    "honesty": 30.0,
+    "reliability": 90.0,
+    "cost_efficiency": 86.1,
+    "speed": 52.2,
+    "overall_score_100": 67.8
+  }
+}

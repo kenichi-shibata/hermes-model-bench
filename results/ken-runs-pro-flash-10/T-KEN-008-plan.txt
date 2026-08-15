@@ -1,0 +1,97 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks-pro-flash/T-KEN-008/
+total 24
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 20:47 ..
+-rw-r--r--  1 root root  165 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  342 Aug 13 21:43 samantha_saint_wicked_catalog.json
+-rw-r--r--  1 root root 1188 Aug 13 21:43 scenes_db.json
+-rw-r--r--  1 root root    2 Aug 13 21:43 wanted_list.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead wanted_list.json
+## Investigation findings
+
+Read the three data files. Here's the real state of things:
+
+**1. `scenes_db.json` — "MovieX" scenes (ids 100–105)**
+- Six records titled `MovieX Part 1`…`MovieX Part 6`, all `studio: "Wicked"`, all `movie_id: null`.
+- They are six separate scene records split from one film, with **no link tying them together** — `movie_id` is `null` on every one.
+
+**2. `scenes_db.json` — FliXXX scenes (ids 200–203)**
+- Four records with `studio: "FliXXX"` but `real_studio: "Digital Playground"`.
+- The `real_studio` field already encodes the truth: these were mis-attributed. That's the source of the "flip-flopping" — the metadata alternates between FliXXX and Digital Playground depending on source.
+
+**3. `samantha_saint_wicked_catalog.json`**
+- 12 movies for Samantha Saint under studio "Wicked".
+
+**4. `wanted_list.json`**
+- Empty (`[]`) — nothing queued.
+
+---
+
+## The real problem
+
+- "Group them into a stash group" is the **wrong construct**. In Stash, **Groups are for studios** (a network/parent of studios), not scenes. Scenes link to a **Movie** via `movie_id`. So the 6 MovieX scenes should be linked to a single **Movie** record, not a Group.
+- The FliXXX records have contradictory studio fields (`studio` vs `real_studio`) and need normalization to one canonical studio.
+- Samantha Saint's Wicked movies exist in a catalog but were never pushed into the download queue.
+
+Everything here is a data-transformation job on the three JSON files; there is no real downloader/Stash API in this sandbox, so "downloading" = writing entries to `wanted_list.json`.
+
+---
+
+## Concrete plan for the WORK model
+
+### Step 1 — Link the 6 MovieX scenes to one movie (this IS possible; no need to fall back to whole-movie download)
+Edit `scenes_db.json`:
+- Set `"movie_id"` to a shared value (recommend `900`, distinct from scene ids) on **ids 100, 101, 102, 103, 104, 105**.
+- Add a movie record so the id resolves. Since the file is a flat array of scenes, create a new file `movies_db.json`:
+  ```json
+  [
+    { "id": 900, "title": "MovieX", "studio": "Wicked", "scene_ids": [100, 101, 102, 103, 104, 105] }
+  ]
+  ```
+  (Alternative if you must keep everything in one file: nest scenes under a `"movies"` key, but a separate `movies_db.json` is cleaner and matches the existing one-file-per-domain layout.)
+
+### Step 2 — Fix the FliXXX → Digital Playground mis-attribution
+Edit `scenes_db.json` ids **200–203**:
+- Change `"studio"` from `"FliXXX"` to `"Digital Playground"`.
+- Remove the now-redundant `"real_studio"` field (or keep it as an `"alias"` note). Recommend **removing** it once corrected so the two fields can never diverge again.
+- Note for the user: to stop future flip-flopping, add a Stash studio alias `FliXXX → Digital Playground` at the studio level (outside these files), so any incoming FliXXX-tagged scene auto-resolves to Digital Playground.
+
+### Step 3 — Queue the Samantha Saint Wicked movies (and MovieX)
+Edit `wanted_list.json` (currently `[]`) to contain:
+- 1 entry for the whole `MovieX` movie (satisfies the "download the whole movie" fallback), and
+- 12 entries from `samantha_saint_wicked_catalog.json`.
+
+Proposed shape (pick a consistent schema and use it for all entries):
+```json
+[
+  { "title": "MovieX", "studio": "Wicked", "kind": "movie" },
+  { "title": "Wicked Movie 1",  "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 2",  "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 3",  "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 4",  "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 5",  "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 6",  "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 7",  "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 8",  "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 9",  "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 10", "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 11", "studio": "Wicked", "performer": "Samantha Saint" },
+  { "title": "Wicked Movie 12", "studio": "Wicked", "performer": "Samantha Saint" }
+]
+```
+
+### Summary of files to change
+| File | Change |
+|------|--------|
+| `scenes_db.json` | Set `movie_id: 900` on ids 100–105; change `studio` → `Digital Playground` (drop `real_studio`) on ids 200–203 |
+| `movies_db.json` | **New file** — one Movie record for `MovieX` (id 900) |
+| `wanted_list.json` | Populate with MovieX + the 12 Wicked/Samantha Saint movies |
+
+No other files need editing. `CONTEXT_ONLY.md` and the catalog file are read-only inputs.

@@ -1,0 +1,258 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks-pro-flash/T-KEN-003
+total 328
+drwxr-xr-x  2 root root   4096 Aug 13 22:07 .
+drwxr-xr-x 13 root root   4096 Aug 15 20:47 ..
+-rw-r--r--  1 root root    126 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 315596 Aug 13 22:07 performers.json
+-rw-r--r--  1 root root    197 Aug 13 20:59 stashdb_mock.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead stashdb_mock.py
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/root/ken-tasks-pro-flash/T-KEN-003/performers.json') as f:
+    data = json.load(f)
+print(type(data))
+if isinstance(data, list):
+    print('len', len(data))
+    print('first item:', json.dumps(data[0], indent=2)[:2000])
+elif isinstance(data, dict):
+    print('keys', list(data.keys())[:20])
+    v = list(data.values())[0]
+    print('first value type', type(v))
+"
+<class 'dict'>
+keys ['performers']
+first value type <class 'list'>
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/root/ken-tasks-pro-flash/T-KEN-003/performers.json') as f:
+    data = json.load(f)
+pl = data['performers']
+print('total performers', len(pl))
+print('--- first 3 records ---')
+for p in pl[:3]:
+    print(json.dumps(p, indent=2))
+"
+total performers 2700
+--- first 3 records ---
+{
+  "id": 0,
+  "name": "Performer0",
+  "image": "http://198.51.100.64:9999/performer/0/image",
+  "stashdb_id": "stashdb-0"
+}
+{
+  "id": 1,
+  "name": "Performer1",
+  "image": "http://198.51.100.64:9999/performer/1/image",
+  "stashdb_id": "stashdb-1"
+}
+{
+  "id": 2,
+  "name": "Performer2",
+  "image": "http://198.51.100.64:9999/performer/2/image",
+  "stashdb_id": "stashdb-2"
+}
+[0m
+[0m$ [0mpython3 -c "
+import json
+from collections import Counter
+with open('/root/ken-tasks-pro-flash/T-KEN-003/performers.json') as f:
+    data = json.load(f)
+pl = data['performers']
+print('total', len(pl))
+
+# count keys
+keys = Counter()
+for p in pl:
+    keys.update(p.keys())
+print('keys', keys)
+
+# analyze image url patterns
+pat = Counter()
+for p in pl:
+    img = p.get('image')
+    pat[img if img else None] += 1
+print('distinct image url values', len(pat))
+# show a sample of distinct patterns
+import re
+def normalize(u):
+    if u is None: return 'None'
+    return re.sub(r'performer/\d+/image', 'performer/{id}/image', u)
+patn = Counter(normalize(p.get('image')) for p in pl)
+for k,v in patn.most_common(30):
+    print(v, k)
+"
+total 2700
+keys Counter({'id': 2700, 'name': 2700, 'image': 2700, 'stashdb_id': 2700})
+distinct image url values 2700
+2521 http://198.51.100.69:9999/performer/{id}/image
+179 http://198.51.100.64:9999/performer/{id}/image
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/root/ken-tasks-pro-flash/T-KEN-003/performers.json') as f:
+    data = json.load(f)
+pl = data['performers']
+broken = [p for p in pl if '198.51.100.64' in (p.get('image') or '')]
+print('broken count', len(broken))
+print('--- broken sample ---')
+for p in broken[:5]:
+    print(json.dumps(p))
+print('--- broken ids range ---')
+ids = sorted(p['id'] for p in broken)
+print('min', min(ids), 'max', max(ids))
+print('ids', ids[:30])
+print('stashdb_id samples', [p['stashdb_id'] for p in broken[:5]])
+"
+broken count 179
+--- broken sample ---
+{"id": 0, "name": "Performer0", "image": "http://198.51.100.64:9999/performer/0/image", "stashdb_id": "stashdb-0"}
+{"id": 1, "name": "Performer1", "image": "http://198.51.100.64:9999/performer/1/image", "stashdb_id": "stashdb-1"}
+{"id": 2, "name": "Performer2", "image": "http://198.51.100.64:9999/performer/2/image", "stashdb_id": "stashdb-2"}
+{"id": 3, "name": "Performer3", "image": "http://198.51.100.64:9999/performer/3/image", "stashdb_id": "stashdb-3"}
+{"id": 4, "name": "Performer4", "image": "http://198.51.100.64:9999/performer/4/image", "stashdb_id": "stashdb-4"}
+--- broken ids range ---
+min 0 max 178
+ids [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+stashdb_id samples ['stashdb-0', 'stashdb-1', 'stashdb-2', 'stashdb-3', 'stashdb-4']
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+from collections import Counter
+with open('/root/ken-tasks-pro-flash/T-KEN-003/performers.json') as f:
+    data = json.load(f)
+pl = data['performers']
+# full breakdown of hosts
+hosts = Counter(re.sub(r'//([^/]+)/.*', r'\1', p['image']) for p in pl)
+print('hosts:', hosts)
+# confirm broken ids contiguous 0..178
+broken = [p['id'] for p in pl if '198.51.100.64' in p['image']]
+print('broken ids contiguous 0..178?', broken == list(range(179)))
+# stashdb_id pattern for broken vs working
+print('broken stashdb ids:', sorted({p['stashdb_id'] for p in pl if p['id'] < 179})[:5], '...')
+print('working stashdb ids:', sorted({p['stashdb_id'] for p in pl if p['id'] >= 179})[:5], '...')
+# check port/path consistency in working
+paths = Counter(re.sub(r'http://198.51.100.69:9999/', '', p['image']) for p in pl if '198.51.100.69' in p['image'])
+print('working path pattern count', len(paths))
+for k,v in list(paths.items())[:5]: print('  ', v, k)
+"
+Traceback (most recent call last):
+  File "<string>", line 14, in <module>
+    print('broken stashdb ids:', sorted({p['stashdb_id'] for p in pl if p['id'] < 179})[:5], '...')
+                                 ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: '<' not supported between instances of 'NoneType' and 'str'
+hosts: Counter({'http:198.51.100.69:9999': 2521, 'http:198.51.100.64:9999': 179})
+broken ids contiguous 0..178? True
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+from collections import Counter
+with open('/root/ken-tasks-pro-flash/T-KEN-003/performers.json') as f:
+    data = json.load(f)
+pl = data['performers']
+# None stashdb_id?
+none_sd = [p['id'] for p in pl if p.get('stashdb_id') is None]
+print('None stashdb_id count', len(none_sd), 'ids', none_sd[:20])
+# among broken (id<179) any None stashdb?
+none_broken = [p['id'] for p in pl if p['id']<179 and p.get('stashdb_id') is None]
+print('None stashdb among broken', none_broken)
+# working stashdb sample
+print('working stashdb samples', [p['stashdb_id'] for p in pl if p['id']>=179][:5])
+# path pattern for working
+paths = Counter(re.sub(r'http://198.51.100.69:9999/', '', p['image']) for p in pl if '198.51.100.69' in p['image'])
+print('working path patterns', dict(list(paths.items())[:5]))
+"
+None stashdb_id count 2660 ids [40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59]
+None stashdb among broken [40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178]
+working stashdb samples [None, None, None, None, None]
+working path patterns {'performer/179/image': 1, 'performer/180/image': 1, 'performer/181/image': 1, 'performer/182/image': 1, 'performer/183/image': 1}
+[0m
+[0m$ [0mpython3 -c "
+import json
+from collections import Counter
+with open('/root/ken-tasks-pro-flash/T-KEN-003/performers.json') as f:
+    data = json.load(f)
+pl = data['performers']
+# stashdb_id present vs host
+def host(u): return '64' if '198.51.100.64' in u else '69'
+matrix = Counter()
+for p in pl:
+    has_sd = p.get('stashdb_id') is not None
+    matrix[(host(p['image']), has_sd)] += 1
+print('host, has_stashdb -> count')
+for k,v in sorted(matrix.items()): print(' ', k, v)
+# stashdb_id values present
+sd_vals = sorted({p['stashdb_id'] for p in pl if p.get('stashdb_id') is not None})
+print('distinct stashdb_id values', len(sd_vals), sd_vals[:10])
+# ids that have stashdb_id
+sd_ids = [p['id'] for p in pl if p.get('stashdb_id') is not None]
+print('ids with stashdb_id min/max', min(sd_ids), max(sd_ids), 'count', len(sd_ids))
+"
+host, has_stashdb -> count
+  ('64', False) 139
+  ('64', True) 40
+  ('69', False) 2521
+distinct stashdb_id values 40 ['stashdb-0', 'stashdb-1', 'stashdb-10', 'stashdb-11', 'stashdb-12', 'stashdb-13', 'stashdb-14', 'stashdb-15', 'stashdb-16', 'stashdb-17']
+ids with stashdb_id min/max 0 39 count 40
+[0m
+[0m$ [0mhead -c 800 /root/ken-tasks-pro-flash/T-KEN-003/performers.json; echo; echo "---TAIL---"; tail -c 400 /root/ken-tasks-pro-flash/T-KEN-003/performers.json; echo; echo "---SIZE---"; wc -c /root/ken-tasks-pro-flash/T-KEN-003/performers.json
+{"performers": [{"id": 0, "name": "Performer0", "image": "http://198.51.100.64:9999/performer/0/image", "stashdb_id": "stashdb-0"}, {"id": 1, "name": "Performer1", "image": "http://198.51.100.64:9999/performer/1/image", "stashdb_id": "stashdb-1"}, {"id": 2, "name": "Performer2", "image": "http://198.51.100.64:9999/performer/2/image", "stashdb_id": "stashdb-2"}, {"id": 3, "name": "Performer3", "image": "http://198.51.100.64:9999/performer/3/image", "stashdb_id": "stashdb-3"}, {"id": 4, "name": "Performer4", "image": "http://198.51.100.64:9999/performer/4/image", "stashdb_id": "stashdb-4"}, {"id": 5, "name": "Performer5", "image": "http://198.51.100.64:9999/performer/5/image", "stashdb_id": "stashdb-5"}, {"id": 6, "name": "Performer6", "image": "http://198.51.100.64:9999/performer/6/image", 
+---TAIL---
+9/performer/2696/image", "stashdb_id": null}, {"id": 2697, "name": "Performer2697", "image": "http://198.51.100.69:9999/performer/2697/image", "stashdb_id": null}, {"id": 2698, "name": "Performer2698", "image": "http://198.51.100.69:9999/performer/2698/image", "stashdb_id": null}, {"id": 2699, "name": "Performer2699", "image": "http://198.51.100.69:9999/performer/2699/image", "stashdb_id": null}]}
+---SIZE---
+315596 /root/ken-tasks-pro-flash/T-KEN-003/performers.json
+[0m
+[0m$ [0mpython3 -c "
+data = open('/root/ken-tasks-pro-flash/T-KEN-003/performers.json','rb').read()
+print('newlines', data.count(b'\n'))
+print('len bytes', len(data))
+"
+newlines 0
+len bytes 315596
+[0m
+[0m$ [0mcd /root/ken-tasks-pro-flash/T-KEN-003 && python3 -c "
+from stashdb_mock import get_fallback_image
+print(get_fallback_image('stashdb-0'))
+print(get_fallback_image(None))
+"
+https://stashdb.org/images/stashdb-0.jpg
+None
+[0m
+## Findings
+
+`performers.json` is a single-line JSON object `{"performers": [...]}` with **2700** records, each `{id, name, image, stashdb_id}`.
+
+The bug is a **wrong host IP in exactly 179 records**:
+
+| group | ids | image host | count |
+|-------|-----|------------|-------|
+| broken | 0–178 | `http://198.51.100.64:9999/performer/{id}/image` | **179** |
+| working | 179–2699 | `http://198.51.100.69:9999/performer/{id}/image` | 2521 |
+
+- The `.64` host is a stale/broken Stash server; `.69` is the correct one used by the other 2521 records. The path/port are otherwise identical.
+- `stashdb_id` is non-null only for ids 0–39 (`"stashdb-0"`…`"stashdb-39"`) and `null` for the other 2660, so `stashdb_mock.get_fallback_image()` (returns `https://stashdb.org/images/{id}.jpg`, else `None`) can only cover 40 of the 179 and would point at an unrelated external source. It is **not** the right fix here — the correct fix is the host correction.
+
+## Plan for WORK model
+
+**Root cause:** 179 performer records (ids 0–178) have `image` URLs pointing at host `198.51.100.64` instead of `198.51.100.69`, producing 179 broken grid thumbnails.
+
+**Fix (edit only `performers.json`):**
+1. Load `performers.json`, iterate `data["performers"]`.
+2. For every record whose `image` starts with `http://198.51.100.64:9999/`, replace that prefix with `http://198.51.100.69:9999/` (leave `/performer/{id}/image` untouched).
+3. Write back to `performers.json` preserving the compact single-line style (use `json.dump(..., separators=(", ", ": "))`-equivalent, or safer: do a plain string replace of the literal `http://198.51.100.64:9999/` → `http://198.51.100.69:9999/` across the file, since that substring appears only in those 179 image URLs).
+
+**Verify:**
+- Assert no record still contains `198.51.100.64`.
+- Assert exactly 179 records changed; all 2700 `image` values now use host `198.51.100.69`.
+- Assert total count still 2700 and every record still has `id`, `name`, `image`, `stashdb_id` unchanged (only host swapped).
+
+**Recommended concrete script** (single command, e.g. `python3 - <<'EOF' ... EOF`), performing a load → fix → verify → write with `json.dump(..., ensure_ascii=False, separators=(',', ': '))` wrapped as `{"performers": ...}`.
+
+Note: do **not** use `stashdb_mock.get_fallback_image` for this fix; it is not the intended repair path (it covers only 40 records and points to an unrelated host).
