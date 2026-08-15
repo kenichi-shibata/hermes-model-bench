@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead split_vs_solo.json
+Yes — strictly worth it. Split dominates solo on both axes: lower cost (2.5 < 3.0) and zero safety failures (0 < 1), so it's both cheaper and safer. No trade-off to weigh.

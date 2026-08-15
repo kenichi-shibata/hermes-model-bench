@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   101 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   262 Aug 14 17:33 service_logs.txt
+-rw-r--r--   1 root root   135 Aug 14 17:33 upstream_status_mock.json
+
+→ Read CONTEXT_ONLY.md
+→ Read service_logs.txt
+→ Read upstream_status_mock.json
+The alert is valid — **payments-api is genuinely broken**, not a false alarm.
+
+- `upstream_status_mock.json` confirms `payments-api` is in `major_outage` (active incident since 09:55Z, no ETA), matching the 503 the service logged at 10:03.
+- The `service healthy` log at 10:04 is only the service's **own** health check (green), so it doesn't mean the dependency recovered.
+
+The alert is real; the incident is upstream/provider-side and still ongoing.

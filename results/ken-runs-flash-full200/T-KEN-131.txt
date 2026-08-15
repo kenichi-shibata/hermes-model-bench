@@ -1,0 +1,46 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    34 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   589 Aug 15 00:37 title_translate_calls.json
+
+✱ Glob "**/*" 2 matches
+→ Read CONTEXT_ONLY.md
+→ Read title_translate_calls.json
+The file shows `skip_translate: true` on calls 0-2, which leaves those titles untranslated (in Japanese). Fixing them to `false`:
+
+← Edit title_translate_calls.json
+Index: /root/ken-tasks/T-KEN-131/title_translate_calls.json
+===================================================================
+--- /root/ken-tasks/T-KEN-131/title_translate_calls.json
++++ /root/ken-tasks/T-KEN-131/title_translate_calls.json
+@@ -1,16 +1,16 @@
+ [
+   {
+     "site": "call_0",
+-    "skip_translate": true
++    "skip_translate": false
+   },
+   {
+     "site": "call_1",
+-    "skip_translate": true
++    "skip_translate": false
+   },
+   {
+     "site": "call_2",
+-    "skip_translate": true
++    "skip_translate": false
+   },
+   {
+     "site": "call_3",
+     "skip_translate": false
+
+
+$ python3 -c "import json; d=json.load(open('title_translate_calls.json')); print(len(d), 'entries; all skip_translate false:', all(not x['skip_translate'] for x in d))"
+10 entries; all skip_translate false: True
+
+Fixed. Set `skip_translate` to `false` on calls 0-2 (title_translate_calls.json:4,8,12) so all 10 titles are now translated instead of staying in Japanese.

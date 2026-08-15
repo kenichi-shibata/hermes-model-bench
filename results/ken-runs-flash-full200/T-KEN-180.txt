@@ -1,0 +1,24 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    32 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    91 Aug 15 00:38 accessibility_audit.json
+
+✱ Glob "**/*" 2 matches
+→ Read CONTEXT_ONLY.md
+→ Read accessibility_audit.json
+
+$ python3 -c "import json; d=json.load(open('accessibility_audit.json')); print('valid json:', d)"
+valid json: {'images_missing_alt': 2, 'buttons_missing_label': 1, 'total_elements_checked': 40}
+
+The audit is valid. Summary of accessibility findings:
+
+- **2 images missing alt text** (WCAG 1.1.1 Non-text Content violation)
+- **1 button missing label** (WCAG 4.1.2 Name, Role, Value / 3.3.2 violation)
+- **40 elements total checked**
+
+Fixes needed: add descriptive `alt` attributes to the 2 images, and add an accessible name to the button (e.g., `aria-label`, visible text, or `<label>`).

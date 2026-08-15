@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read latency_breakdown.json
+Networking. Network round-trip is 198ms vs 2ms compute.

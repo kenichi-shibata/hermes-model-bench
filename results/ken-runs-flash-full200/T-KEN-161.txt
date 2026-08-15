@@ -1,0 +1,19 @@
+
+> build · deepseek-v4-flash
+
+→ Read stale_memory_candidates.json
+
+$ python3 -c "
+import json
+data = json.load(open('stale_memory_candidates.json'))
+should_go = [d['id'] for d in data if d['actually_superseded']]
+false_pos = [d['id'] for d in data if d['flagged_stale'] and not d['actually_superseded']]
+print('should be gone:', should_go)
+print('flagged but keep (false positives):', false_pos)
+"
+should be gone: [0, 1, 2]
+flagged but keep (false positives): [3, 4]
+
+Memories **0, 1, 2** are actually superseded (`actually_superseded: true`) and should be removed.
+
+Memories **3, 4** were flagged stale but are actually **not** superseded — false positives, keep them. The rest (5–19) are clean.

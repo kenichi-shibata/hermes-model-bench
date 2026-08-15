@@ -1,0 +1,33 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root   129 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   188 Aug 15 00:37 follow_targets.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead follow_targets.json
+[0m
+[0m← [0mEdit follow_targets.json
+Index: /root/ken-tasks/T-KEN-071/follow_targets.json
+===================================================================
+--- /root/ken-tasks/T-KEN-071/follow_targets.json
++++ /root/ken-tasks/T-KEN-071/follow_targets.json
+@@ -1,10 +1,6 @@
+ [
+   {
+-    "id": "target_performer",
+-    "reason": "manual"
+-  },
+-  {
+     "id": "perf_0",
+     "reason": "track_button_bug"
+   },
+   {
+
+[0m
+Removing the manually-added follow target, keeping the bug-caused entries.
+Done. Removed the `target_performer` entry (reason `manual`) from `follow_targets.json`; the two `track_button_bug` entries are untouched.

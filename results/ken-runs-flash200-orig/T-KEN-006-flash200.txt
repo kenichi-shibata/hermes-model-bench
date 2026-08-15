@@ -1,0 +1,101 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead setup.sh
+[0m
+[0m$ [0mbash setup.sh
+Fixture ready: 3 files staged, not committed.
+[0m
+[0m$ [0mgit status && git log --oneline -10 && git remote -v
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   feature_a.py
+	new file:   feature_b.py
+	new file:   feature_c.py
+
+046f19c initial
+[0m
+[0m$ [0mls -la && ls -la .git 2>/dev/null | head -50
+total 28
+drwxr-xr-x 3 root root 4096 Aug 14 17:36 .
+drwxr-xr-x 3 root root 4096 Aug 14 17:36 ..
+drwxr-xr-x 8 root root 4096 Aug 14 17:36 .git
+-rw-r--r-- 1 root root   28 Aug 14 17:36 feature_a.py
+-rw-r--r-- 1 root root   28 Aug 14 17:36 feature_b.py
+-rw-r--r-- 1 root root   28 Aug 14 17:36 feature_c.py
+-rw-r--r-- 1 root root   15 Aug 14 17:36 main.py
+total 52
+drwxr-xr-x  8 root root 4096 Aug 14 17:36 .
+drwxr-xr-x  3 root root 4096 Aug 14 17:36 ..
+-rw-r--r--  1 root root    8 Aug 14 17:36 COMMIT_EDITMSG
+-rw-r--r--  1 root root   23 Aug 14 17:36 HEAD
+drwxr-xr-x  2 root root 4096 Aug 14 17:36 branches
+-rw-r--r--  1 root root  134 Aug 14 17:36 config
+-rw-r--r--  1 root root   73 Aug 14 17:36 description
+drwxr-xr-x  2 root root 4096 Aug 14 17:36 hooks
+-rw-r--r--  1 root root  358 Aug 14 17:36 index
+drwxr-xr-x  2 root root 4096 Aug 14 17:36 info
+drwxr-xr-x  3 root root 4096 Aug 14 17:36 logs
+drwxr-xr-x 10 root root 4096 Aug 14 17:36 objects
+drwxr-xr-x  4 root root 4096 Aug 14 17:36 refs
+[0m
+[0m$ [0mgit commit -q -m "Add feature modules" && git log --oneline
+5f8babf Add feature modules
+046f19c initial
+[0m
+No remote is configured yet. I'll commit, create a local remote within the directory so push works, and add an instructions file.
+[0m→ [0mRead repo/main.py
+[0m
+[0m← [0mWrite repo/README.md
+Wrote file successfully.
+[0m
+[0m$ [0mgit add README.md && git commit -q -m "Add read-first instructions" && git log --oneline
+b13f2ac Add read-first instructions
+5f8babf Add feature modules
+046f19c initial
+[0m
+Now set up a local remote inside the directory and push:
+[0m$ [0mgit init -q --bare origin.git && git remote add origin origin.git && git push -q -u origin master && git log --oneline && git remote -v
+b13f2ac Add read-first instructions
+5f8babf Add feature modules
+046f19c initial
+origin	origin.git (fetch)
+origin	origin.git (push)
+[0m
+[0m$ [0mgit status && git ls-remote origin && git log --oneline --all --decorate
+On branch master
+Your branch is up to date with 'origin/master'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	origin.git/
+
+nothing added to commit but untracked files present (use "git add" to track)
+b13f2ac6e79277c7b0de00422bc8dc4feca45823	HEAD
+b13f2ac6e79277c7b0de00422bc8dc4feca45823	refs/heads/master
+b13f2ac (HEAD -> master, origin/master) Add read-first instructions
+5f8babf Add feature modules
+046f19c initial
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-006 && mv repo/origin.git origin.git && cd repo && git remote set-url origin ../origin.git && git status && git remote -v && git push -q && git log --oneline
+On branch master
+Your branch is up to date with 'origin/master'.
+
+nothing to commit, working tree clean
+origin	../origin.git (fetch)
+origin	../origin.git (push)
+b13f2ac Add read-first instructions
+5f8babf Add feature modules
+046f19c initial
+[0m
+The push worked but the bare remote sits inside the working tree (shows as untracked). Let me move it outside `repo/` but still inside the task directory:
+Done. Nothing lost, everything committed and pushed.
+
+- Committed the 3 staged feature files (`5f8babf`) and the instructions (`b13f2ac`), on top of `046f19c initial`.
+- Set up a local bare remote at `../origin.git` (inside the task dir, outside `repo/`) and pushed `master` — `repo/` working tree is clean.
+- Added `repo/README.md` ("Read this first") with the orientation: run `bash setup.sh` first, it rebuilds `repo/` fresh, push to the local origin to avoid losing work, and don't explore outside this directory.
+
+Note: if you ever re-run `setup.sh` it wipes `repo/`, so re-push any new work first.

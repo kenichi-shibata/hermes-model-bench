@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read click_analytics.json
+No. The click doesn't actually register — the server recorded `0` clicks while the client console logged `40`. Client-side logging is happening, but nothing reaches the server.

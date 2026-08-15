@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read alert_context.json
+**Noise.** The alert tripped at 10:00:00, self-resolved at 10:05:00 (only 5 min later), well within the 900s (15 min) cooldown, and never re-tripped by the 10:20:00 watchdog check — a classic transient/self-healing spike, not a sustained incident.

@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read token_usage_log.json
+Token usage: 92,000 cache-read tokens, 8,000 fresh input tokens.

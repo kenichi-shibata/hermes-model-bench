@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead network_symptoms.json
+VLAN `10.0.2.0/24` is the problem — 50% packet loss (network_symptoms.json:6). `10.0.1.0/24` is clean at 0% loss.

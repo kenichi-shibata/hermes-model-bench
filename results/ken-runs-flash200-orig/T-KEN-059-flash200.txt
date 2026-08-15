@@ -1,0 +1,7 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead ci_run_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+No. CI is not passing — the latest (head) run #3 has `"status": "fail"` (`ci_run_log.json:12`).

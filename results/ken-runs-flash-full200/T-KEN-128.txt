@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read grab_result.json
+No — the API returned `success: true`, but `actual_queue_contains_item: false`, so the item never made it into the queue. The grab reported success but didn't actually work.

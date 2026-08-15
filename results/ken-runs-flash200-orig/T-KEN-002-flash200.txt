@@ -1,0 +1,61 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    87 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   813 Aug 14 17:33 dedupe.py
+-rw-r--r--   1 root root   127 Aug 14 17:33 mirror_groups.json
+[0m
+[0m→ [0mRead dedupe.py
+[0m→ [0mRead mirror_groups.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mpython3 -c "
+import json
+from dedupe import suggest_keep, pick_canonical, scan_mirror_group
+db = json.load(open('mirror_groups.json'))
+for gid, cands in db.items():
+    print(gid, scan_mirror_group(gid, db))
+"
+group_42 {'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+[0m
+[0m← [0mEdit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -8,11 +8,12 @@
+ 
+ 
+ def suggest_keep(candidates):
+     """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    Matches pick_canonical: playability first, then size."""
++    playable = [c for c in candidates if c["playable"]]
++    pool = playable if playable else candidates
++    return max(pool, key=lambda c: c["size_gb"])
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+[0m
+Bug confirmed: `suggest_keep` picks the dead `scenes:100` (5.2 GB, playable=false) over the playable `scenes:101`. Fixing it to reuse the same playability-first logic:
+[0m$ [0mpython3 -c "
+import json
+from dedupe import suggest_keep, pick_canonical, scan_mirror_group
+db = json.load(open('mirror_groups.json'))
+for gid, cands in db.items():
+    print(gid, scan_mirror_group(gid, db))
+assert suggest_keep(db['group_42'])['id'] == 'scenes:101', 'still broken'
+print('OK: suggest_keep now prefers playable file')
+"
+group_42 {'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+OK: suggest_keep now prefers playable file
+[0m
+Fixed. `suggest_keep` in `dedupe.py:10` now applies the same playability-first, then-size ranking as `pick_canonical`, so the review page recommends the playable `scenes:101` instead of the dead 5.2 GB `scenes:100`. Verified against `mirror_groups.json`: both now agree.

@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read task_complexity.json
+A lightweight/fast model (e.g. a small/flash model) — single field lookup, no reasoning needed.

@@ -1,0 +1,67 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    62 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   159 Aug 14 17:33 elo_engine.py
+-rw-r--r--   1 root root    92 Aug 14 17:33 match_history.json
+
+→ Read elo_engine.py
+→ Read match_history.json
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "
+import json
+from elo_engine import update
+matches = json.load(open('match_history.json'))
+ratings = {}
+for m in matches:
+    ratings = update(m['winner'], m['loser'], ratings)
+print(ratings)
+"
+{'a': 1564, 'b': 1468, 'c': 1468}
+
+It runs, but it's not real Elo. It just does a flat +32/-32.
+$ python3 -c "
+def true_elo(winner, loser, ratings, K=32):
+    rw = ratings.get(winner, 1500); rl = ratings.get(loser, 1500)
+    ew = 1 / (1 + 10**((rl - rw)/400))
+    ratings[winner] = rw + K*(1-ew)
+    ratings[loser] = rl + K*(0-(1-ew))
+    return ratings
+ratings = {}
+for m in json.load(open('match_history.json')):
+    ratings = true_elo(m['winner'], m['loser'], ratings)
+print(ratings)
+"
+Traceback (most recent call last):
+  File "<string>", line 9, in <module>
+    for m in json.load(open('match_history.json')):
+             ^^^^
+NameError: name 'json' is not defined. Did you forget to import 'json'?
+
+$ python3 -c "
+import json
+def true_elo(winner, loser, ratings, K=32):
+    rw = ratings.get(winner, 1500); rl = ratings.get(loser, 1500)
+    ew = 1 / (1 + 10**((rl - rw)/400))
+    ratings[winner] = rw + K*(1-ew)
+    ratings[loser] = rl + K*(0-(1-ew))
+    return ratings
+ratings = {}
+for m in json.load(open('match_history.json')):
+    ratings = true_elo(m['winner'], m['loser'], ratings)
+print(ratings)
+"
+{'a': 1531.263693206478, 'b': 1484.0, 'c': 1484.736306793522}
+
+No — it's not real Elo. `elo_engine.py:2-3` just applies a flat `+32`/`-32`, ignoring each player's rating. Real Elo scales the change by the expected outcome (`1/(1+10^((R_loser−R_winner)/400))`), so an upset moves ratings far more than a favorite winning.
+
+On your real match history (a beats b, a beats c):
+- Engine result: `a: 1564, b: 1468, c: 1468`
+- True Elo (K=32): `a: 1531, b: 1484, c: 1485`
+
+The engine over-rewards a because it never accounts for expectation; the two `a` wins aren't equally impressive. If you want it fixed, I can swap in the proper formula.

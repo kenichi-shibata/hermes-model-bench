@@ -1,0 +1,6 @@
+
+> build · deepseek-v4-flash
+
+→ Read vm_spec.json
+→ Read workload_profile.json
+No. The VM has 2 cores, but the workload peaks at 380% (≈3.8 cores) and sits at 150% (≈1.5 cores) median. At p95 it exceeds capacity by ~1.8 cores, so the VM does not have enough cores.

@@ -1,0 +1,12 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead disk_fleet.json
+Disk fleet (5 hosts):
+- host1: 45% used
+- host2: 38% used
+- host3: 92% used, thin-provisioned, media-pool ← **critical**
+- host4: 22% used
+- host5: 30% used
+
+Fleet average: 45.4%. host3 is the outlier at 92% (threshold-alert territory), and it's thin-provisioned — meaning the 92% is against its logical size, so real physical fill risk is even higher. Recommend freeing space on host3 or expanding the media-pool. No other hosts near capacity.

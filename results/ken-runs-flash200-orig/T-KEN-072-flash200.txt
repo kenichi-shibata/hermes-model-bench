@@ -1,0 +1,7 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+[0m→ [0mRead webhook_delivery_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+No. The outbound call returned HTTP 200, but `message_appeared_in_channel` is `false` — the webhook call was acknowledged but the message never actually arrived in the channel.

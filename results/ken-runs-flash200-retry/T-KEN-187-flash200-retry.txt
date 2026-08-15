@@ -1,0 +1,46 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead pr_diff_5.py
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    20 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   137 Aug 15 00:38 pr_diff_5.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit pr_diff_5.py
+Index: /root/ken-tasks/T-KEN-187/pr_diff_5.py
+===================================================================
+--- /root/ken-tasks/T-KEN-187/pr_diff_5.py
++++ /root/ken-tasks/T-KEN-187/pr_diff_5.py
+@@ -1,4 +1,14 @@
+ def parse(s):
+     if not s: raise ValueError('empty')
+     return s.upper()
+-# test_parse_success exists, test_parse_empty_raises does not
++
++def test_parse_success():
++    assert parse('abc') == 'ABC'
++
++def test_parse_empty_raises():
++    try:
++        parse('')
++    except ValueError:
++        pass
++    else:
++        raise AssertionError('expected ValueError')
+
+[0m
+[0m$ [0mpython3 -c "
+import pr_diff_5 as m
+m.test_parse_success()
+m.test_parse_empty_raises()
+print('ok')
+"
+ok
+[0m
+Missing test identified: `test_parse_empty_raises` (the `ValueError` branch for empty input). Added it (plus `test_parse_success`, which also wasn't actually in the file) and verified both pass.

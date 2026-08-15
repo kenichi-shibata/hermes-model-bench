@@ -1,0 +1,18 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    34 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   121 Aug 15 00:37 model_cost_comparison.json
+
+→ Read model_cost_comparison.json
+→ Read CONTEXT_ONLY.md
+**Yes — the cheap model is dramatically cheaper.**
+
+- Cheap: $0.002/call × 3 retries = **$0.006** per task
+- Expensive: $0.08/call × 1 retry = **$0.08** per task
+
+Even with 3x the retries, the cheap model costs ~92% less ($0.074 saved per task). The model choice is saving money.

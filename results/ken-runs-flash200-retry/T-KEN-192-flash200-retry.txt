@@ -1,0 +1,41 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead existing_data_model.py
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit existing_data_model.py
+Index: /root/ken-tasks/T-KEN-192/existing_data_model.py
+===================================================================
+--- /root/ken-tasks/T-KEN-192/existing_data_model.py
++++ /root/ken-tasks/T-KEN-192/existing_data_model.py
+@@ -1,5 +1,16 @@
++import csv
++
++
+ class Scene:
+     def __init__(self, id, title, performers):
+         self.id = id
+         self.title = title
+         self.performers = performers  # a list, needs flattening for CSV
++
++
++def export_to_csv(scenes, filepath):
++    with open(filepath, "w", newline="") as f:
++        writer = csv.writer(f)
++        writer.writerow(["id", "title", "performers"])
++        for scene in scenes:
++            writer.writerow([scene.id, scene.title, ", ".join(scene.performers)])
+
+[0m
+[0m$ [0mpython3 -c "
+from existing_data_model import Scene, export_to_csv
+export_to_csv([Scene(1, 'A', ['x','y']), Scene(2, 'B', [])], 'out.csv')
+print(open('out.csv').read())
+"
+id,title,performers
+1,A,"x, y"
+2,B,
+[0m
+Added `export_to_csv(scenes, filepath)` to `existing_data_model.py:10`. It writes headers (`id`, `title`, `performers`) and joins each scene's performer list with `, ` into a single CSV column. Verified it works.

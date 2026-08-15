@@ -1,0 +1,30 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    26 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   779 Aug 15 00:37 romanize_test.json
+
+→ Read CONTEXT_ONLY.md
+→ Read romanize_test.json
+
+$ python3 -c "
+import json
+data = json.load(open('romanize_test.json'))
+print('total cases:', len(data))
+passed = sum(1 for d in data if d['actual'] == d['expected'])
+failed = [d for d in data if d['actual'] != d['expected']]
+print('passed:', passed)
+print('failed:', len(failed))
+for d in failed:
+    print(d)
+"
+total cases: 10
+passed: 9
+failed: 1
+{'input': 'name9', 'expected': 'Name9', 'actual': None}
+
+Romanization is **not fully working**. 9/10 cases pass, but `name9` returned `actual: null` instead of `Name9` (romanize_test.json:50), so the romanization fails on the last input.

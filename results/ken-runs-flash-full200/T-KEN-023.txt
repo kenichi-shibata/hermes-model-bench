@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   129 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    35 Aug 14 17:33 scenes_status_field.json
+-rw-r--r--   1 root root    36 Aug 14 17:33 wanted_status_field.json
+
+→ Read CONTEXT_ONLY.md
+→ Read scenes_status_field.json
+→ Read wanted_status_field.json
+No — it's basically done, the field just lags.
+
+- **scenes (truth):** 3 searching / 47 found (94% complete, only 3 left)
+- **wanted (lagging):** 40 searching / 10 found — stale, still shows most items as open
+
+Same total (50/50). The real backlog is moving to completion (47 of 50 found); the wanted field just hasn't caught up.

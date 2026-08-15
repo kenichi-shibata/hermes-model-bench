@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read dns_query_results.json
+DNS is **not** resolving correctly. The resolved IP (`10.0.0.5`) doesn't match the actual service IP (`10.0.0.9`) — the record is stale (last updated 2 days ago). It needs to be updated to point to `10.0.0.9`.

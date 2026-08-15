@@ -1,0 +1,19 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    45 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   182 Aug 15 00:38 downstream_callers.json
+-rw-r--r--   1 root root    63 Aug 15 00:38 pr_diff_6.py
+
+→ Read CONTEXT_ONLY.md
+→ Read pr_diff_6.py
+→ Read downstream_callers.json
+**Yes — `a.py` breaks.**
+
+The change in `pr_diff_6.py` makes `verbose` a *required* parameter (`def process(data, verbose)`). `b.py` and `c.py` pass two args so they're fine, but `a.py` calls `process(x)` with one arg, which now raises `TypeError: process() missing 1 required positional argument: 'verbose'`.
+
+Fix: give it a default (`def process(data, verbose=False)`) or update `a.py`'s call.

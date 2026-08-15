@@ -1,0 +1,24 @@
+
+> build · deepseek-v4-flash
+
+→ Read .
+→ Read CONTEXT_ONLY.md
+→ Read resume_section.py
+→ Read resume_scenes.json
+The bug is in `resume_section.py:2`: it sorts by `added_at` instead of `last_watched_at`. A "resume" section should put the most recently watched scene first, not the most recently added.
+
+← Edit resume_section.py
+Index: /root/ken-tasks/T-KEN-041/resume_section.py
+===================================================================
+--- /root/ken-tasks/T-KEN-041/resume_section.py
++++ /root/ken-tasks/T-KEN-041/resume_section.py
+@@ -1,2 +1,2 @@
+ def get_resume(scenes):
+-    return sorted(scenes, key=lambda s: s['added_at'], reverse=True)
++    return sorted(scenes, key=lambda s: s['last_watched_at'], reverse=True)
+
+
+$ python3 -c "import json; from resume_section import get_resume; d=json.load(open('resume_scenes.json')); print([s['id'] for s in get_resume(d)])"
+[1, 2]
+
+Fixed. `get_resume` now sorts by `last_watched_at` descending, so scene 1 (last watched 2026-08-13) correctly appears before scene 2.

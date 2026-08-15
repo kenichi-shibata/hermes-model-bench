@@ -1,0 +1,22 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead integrity_check.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-109
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    28 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   106 Aug 15 00:37 integrity_check.json
+[0m
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Integrity check FAILED.
+
+Per `integrity_check.json`:
+- `gzip_valid`: true — archive is well-formed
+- `schema_valid`: false — schema is invalid
+- `malformed_tables`: `users`, `sessions`
+
+The last backup needs restoration/repair of those two tables before it can be trusted.

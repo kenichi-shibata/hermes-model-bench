@@ -1,0 +1,142 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la /root/ken-tasks/T-KEN-197
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    95 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    58 Aug 15 00:38 point_in_time_snapshots.json
+
+→ Read CONTEXT_ONLY.md
+→ Read point_in_time_snapshots.json
+
+$ which python3 node deno 2>/dev/null; python3 --version 2>/dev/null; node --version 2>/dev/null
+/usr/bin/python3
+/usr/bin/node
+Python 3.13.5
+v20.19.2
+
+← Write track.py
+Wrote file successfully.
+
+Now let me test it on a temp copy before touching the real file.
+$ cp /root/ken-tasks/T-KEN-197/point_in_time_snapshots.json /tmp/opencode/test_snap.json && cd /root/ken-tasks/T-KEN-197 && python3 track.py --file /tmp/opencode/test_snap.json record && echo "---" && python3 track.py --file /tmp/opencode/test_snap.json status
+recorded snapshot at 2026-08-15T01:44:20+00:00 (1 total)
+---
+current:
+{
+  "metric": 42
+}
+
+latest snapshot: 2026-08-15T01:44:20+00:00
+{
+  "metric": 42
+}
+
+diff (current vs latest snapshot):
+  (no changes)
+
+$ cd /root/ken-tasks/T-KEN-197 && cat > /tmp/opencode/set_metric.py <<'EOF'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p))
+d["current"]["metric"] = 47
+d["current"]["extra"] = {"a": 1, "b": 2}
+json.dump(d, open(p, "w"), indent=2)
+EOF
+python3 /tmp/opencode/set_metric.py /tmp/opencode/test_snap.json && python3 track.py --file /tmp/opencode/test_snap.json status && echo "===" && python3 track.py --file /tmp/opencode/test_snap.json history && echo "===" && python3 track.py --file /tmp/opencode/test_snap.json diff
+current:
+{
+  "metric": 47,
+  "extra": {
+    "a": 1,
+    "b": 2
+  }
+}
+
+latest snapshot: 2026-08-15T01:44:20+00:00
+{
+  "metric": 42
+}
+
+diff (current vs latest snapshot):
+  added:
+    + extra
+  changed:
+    ~ metric
+===
+1. 2026-08-15T01:44:20+00:00 {"metric": 42}
+===
+error: index -1 out of range (history has 1 entries)
+
+← Edit track.py
+Index: /root/ken-tasks/T-KEN-197/track.py
+===================================================================
+--- /root/ken-tasks/T-KEN-197/track.py
++++ /root/ken-tasks/T-KEN-197/track.py
+@@ -131,9 +131,9 @@
+ if not history:
+     print("error: no history to diff against", file=sys.stderr)
+     sys.exit(1)
+ idx = args.index if args.index is not None else -1
+-idx = idx if idx >= 0 else len(history) + idx
++idx = idx if idx >= 0 else len(history) + idx + 1
+ if idx < 1 or idx > len(history):
+     print(
+         f"error: index {args.index} out of range (history has {len(history)} entries)",
+         file=sys.stderr,
+
+
+Found a bug in negative-index handling. Fixing:
+$ cd /root/ken-tasks/T-KEN-197 && python3 track.py --file /tmp/opencode/test_snap.json diff && echo "===" && python3 track.py --file /tmp/opencode/test_snap.json record && echo "===" && python3 track.py --file /tmp/opencode/test_snap.json history && echo "===" && python3 track.py --file /tmp/opencode/test_snap.json diff 1 && echo "===" && python3 track.py --file /tmp/opencode/test_snap.json diff 2
+diff (current vs history #1 at 2026-08-15T01:44:20+00:00):
+  added:
+    + extra
+  changed:
+    ~ metric
+===
+recorded snapshot at 2026-08-15T01:44:30+00:00 (2 total)
+===
+1. 2026-08-15T01:44:20+00:00 {"metric": 42}
+2. 2026-08-15T01:44:30+00:00 {"metric": 47, "extra": {"a": 1, "b": 2}}
+===
+diff (current vs history #1 at 2026-08-15T01:44:20+00:00):
+  added:
+    + extra
+  changed:
+    ~ metric
+===
+diff (current vs history #2 at 2026-08-15T01:44:30+00:00):
+  (no changes)
+
+All commands work. Now let me seed the real file with its first recorded snapshot (the actual current state) and verify:
+$ cd /root/ken-tasks/T-KEN-197 && python3 track.py record && python3 track.py status
+recorded snapshot at 2026-08-15T01:44:33+00:00 (1 total)
+current:
+{
+  "metric": 42
+}
+
+latest snapshot: 2026-08-15T01:44:33+00:00
+{
+  "metric": 42
+}
+
+diff (current vs latest snapshot):
+  (no changes)
+
+→ Read point_in_time_snapshots.json
+
+$ rm -rf /tmp/opencode/test_snap.json /tmp/opencode/set_metric.py
+(no output)
+
+Built `track.py` to turn the current-moment snapshot into time-tracked history. It reads/writes `point_in_time_snapshots.json`, populating the `history` field (already seeded with the first real record).
+
+Usage:
+- `python3 track.py record` — append current snapshot to history (UTC timestamped)
+- `python3 track.py status` — current + latest snapshot + their diff
+- `python3 track.py history` — list all snapshots
+- `python3 track.py diff [N]` — diff current vs entry N (negative = from end)
+
+It reports added/removed/changed fields, including nested ones. To track over time, run `record` on a schedule (e.g., a cron job calling `python3 /root/ken-tasks/T-KEN-197/track.py record`).

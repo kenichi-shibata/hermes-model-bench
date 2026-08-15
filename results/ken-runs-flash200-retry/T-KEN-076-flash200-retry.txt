@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead hash_compare.json
+Yes. Both `a` and `b` have the identical hash `abc`, so they're duplicates.

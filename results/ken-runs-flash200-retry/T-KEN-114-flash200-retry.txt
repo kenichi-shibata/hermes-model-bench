@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead spawn_error.json
+The spawn failed because the process hit its `max_concurrent_children` limit: it was capped at 5, and 5 children were already running when the new spawn was attempted.

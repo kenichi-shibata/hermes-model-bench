@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    31 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    79 Aug 15 00:38 connectivity_trace.json
+
+✱ Glob "connectivity_trace.json" 1 match
+→ Read connectivity_trace.json
+→ Read CONTEXT_ONLY.md
+The port accepts connections but the app never responds — the service is hung/blocked at the application layer, not a network problem.
+
+- `dns_ok: true` → hostname resolves
+- `tcp_connect_ok: true` → something is listening and accepting on the port
+- `app_health_check: "timeout"` → the HTTP/app layer never replies
+
+So a listener is bound (maybe a load balancer/proxy or a stuck process), but the backend health endpoint times out. Check for an overloaded/hung app process, a dead worker behind a proxy, or a health-check path the server never handles (e.g. wrong path, or it blocks waiting on a dependency like DB).

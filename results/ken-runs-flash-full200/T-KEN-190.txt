@@ -1,0 +1,10 @@
+
+> build · deepseek-v4-flash
+
+→ Read pr_diff_7.py
+Sketchy things in `pr_diff_7.py`:
+
+- **Hardcoded live secret key** (pr_diff_7.py:1) — `sk-live-...` committed to source; should be rotated and moved to env vars/secret manager.
+- **Undefined names** (pr_diff_7.py:3) — `requests` and `url` are referenced but never imported/defined, so this would crash at runtime.
+- **Bare except / no error handling** — `call_api` has no error handling, retry, or timeout.
+- **Credentials passed via auth header with no TLS/secret hygiene** — also no check that the key isn't committed (no `.gitignore`/lint guard visible).

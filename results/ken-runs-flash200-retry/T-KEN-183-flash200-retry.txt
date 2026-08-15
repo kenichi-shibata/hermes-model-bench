@@ -1,0 +1,15 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead pr_diff_1.py
+**Critical: SQL injection** — `pr_diff_1.py:2` builds the query via string interpolation of `username`. A value like `' OR '1'='1` breaks out of the quotes and executes arbitrary SQL.
+
+Fix with parameterized queries:
+
+```python
+def get_user(username):
+    query = "SELECT * FROM users WHERE name = %s"
+    return db.execute(query, (username,))
+```
+
+Additional notes: `db` is an undefined global here (assume it's injected elsewhere), and it selects `*` rather than limiting columns — fine for a stub, but the injection is a must-fix.

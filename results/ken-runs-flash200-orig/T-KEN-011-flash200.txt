@@ -1,0 +1,36 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   102 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   382 Aug 14 17:33 PerformerDetailPage.jsx
+-rw-r--r--   1 root root   312 Aug 14 17:33 PerformersGrid.jsx
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead PerformerDetailPage.jsx
+[0m→ [0mRead PerformersGrid.jsx
+[0m
+[0m← [0mWrite PerformersGrid.jsx
+Wrote file successfully.
+[0m
+[0m← [0mWrite PerformerDetailPage.jsx
+Wrote file successfully.
+[0m
+Two files to improve: a buggy detail page and a grid that claims "Load more" but never implements it. I'll fix both.
+Improvements made:
+
+**PerformersGrid.jsx**
+- **Fixed the real bug**: the old code sliced to 60 with no way to load more, despite claiming "Load more." Now implemented with `useState` + a real "Load more (N remaining)" button that increments by 60.
+- Added client-side search across name/genre/city/country/description.
+- Added sorting (name, rating, followers).
+- Cards are now `Link`s to each performer's detail page, showing genre, city, rating, and followers.
+- Empty state when nothing matches; result count; search resets pagination.
+
+**PerformerDetailPage.jsx**
+- **Fixed the bug**: hardcoded `<a href="/leaderboard">5-star</a>` is now a proper `Link` to `/performers/${performer.id}` showing the performer's actual rank (`#rank` or star rating).
+- Added not-found state, back-to-grid link, and a facts list (genre, location, rating, followers) plus bio.
+
+No new dependencies; both use existing `react-router-dom` and `react` only.

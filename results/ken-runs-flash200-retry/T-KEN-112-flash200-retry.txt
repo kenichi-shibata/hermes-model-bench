@@ -1,0 +1,11 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m✱ [0mGlob "subagent_runs.json"[90m 1 match[0m
+[0m→ [0mRead subagent_runs.json
+No — only 4 of 10 finished.
+
+- **Completed (4):** ids 6, 7, 8, 9
+- **Capped (6):** ids 0–5 — these hit a cap (token/time limit) and did **not** finish
+
+The subagents aren't reliably finishing; 60% were cut off before completion.

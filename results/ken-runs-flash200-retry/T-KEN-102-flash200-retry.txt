@@ -1,0 +1,7 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead backup_run_log.json
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+The backup did **not** actually run to completion. The log has a single entry with `"status": "started"` and no corresponding `completed` entry, so it only ever started (or was recorded as started) and never finished.

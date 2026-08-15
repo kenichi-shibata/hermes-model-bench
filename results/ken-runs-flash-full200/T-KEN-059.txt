@@ -1,0 +1,7 @@
+
+> build · deepseek-v4-flash
+
+→ Read .
+→ Read ci_run_log.json
+→ Read CONTEXT_ONLY.md
+No. CI is not passing — the latest (head) run #3 has `"status": "fail"` (`ci_run_log.json:12`).

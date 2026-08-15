@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read port_binding_conflict.json
+Yes — port `9999` is in conflict. `service_x` bound it successfully; `service_y` failed to bind because the port is already taken.

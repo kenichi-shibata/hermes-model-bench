@@ -1,0 +1,14 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead single_fact_retrieval.json
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    34 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    58 Aug 15 00:38 single_fact_retrieval.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Verified. `single_fact_retrieval.json` shows `alternate_query_hits: 1`, confirming the fact is retrievable (via the alternate query). The `obvious_query_hits: 0` means the primary phrasing failed, but the fact is still accessible — retrieval passes.

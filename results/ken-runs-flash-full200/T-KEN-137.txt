@@ -1,0 +1,18 @@
+
+> build · deepseek-v4-flash
+
+→ Read garbage_scan.json
+
+$ python3 -c "
+import json
+data = json.load(open('garbage_scan.json'))
+doubles = [d for d in data if '(EN)(EN)' in d['value']]
+print('total entries:', len(data))
+print('double-translation entries:', len(doubles))
+print('ids:', [d['id'] for d in doubles])
+"
+total entries: 50
+double-translation entries: 3
+ids: [5, 22, 41]
+
+3 double-translation entries found in `garbage_scan.json`: **id 5, 22, 41** — all with value `"x(EN)(EN)"` (translated twice). The other 47 entries are single-translation `"x(EN)"`.

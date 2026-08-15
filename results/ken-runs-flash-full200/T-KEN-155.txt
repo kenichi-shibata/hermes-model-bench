@@ -1,0 +1,10 @@
+
+> build · deepseek-v4-flash
+
+→ Read self_vs_delegate.json
+Based on `self_vs_delegate.json`:
+
+- **Delegate:** $0.05 hard cost.
+- **Self:** $0 hard cost, but flagged with a hidden opportunity cost (your time/attention).
+
+So delegating costs 5¢ vs. $0 directly — but the self option carries an unbounded hidden opportunity cost. Unless your time is genuinely worth nothing, delegation is the cheaper total cost.

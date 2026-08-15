@@ -1,0 +1,13 @@
+
+> build · deepseek-v4-flash
+
+✱ Glob "**/*" 2 matches
+→ Read CONTEXT_ONLY.md
+→ Read thread_creation_result.json
+No — the thread was **not** created.
+
+- `http_status` is `200`, but that's misleading: the response body contains an error.
+- `error_in_body: "rate_limited_soft"` — the request was soft rate-limited (server rejected it).
+- `thread_id: null` — no thread was created, so there's nothing to reference or use downstream.
+
+The call returned an error masked behind a 200 status, so any code treating HTTP 200 as success (or trusting a non-null thread_id) would break.

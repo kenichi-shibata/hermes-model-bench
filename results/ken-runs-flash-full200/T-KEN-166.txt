@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read cert_status.json
+Not expired — the cert still has 3 days remaining (`cert_status.json:2`), so it's valid until 3 days from now.

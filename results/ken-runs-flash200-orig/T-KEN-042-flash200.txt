@@ -1,0 +1,6 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead breaker_state.json
+[0m→ [0mRead breaker_logic.py
+Stuck open. The breaker tripped at `2026-08-13T00:00:00` with a 900s (15-min) cooldown, so it should have reset over a day ago. But `is_open()` in breaker_logic.py:1-3 just returns the `open` flag and never checks whether the cooldown expired — that BUG comment is the whole story. It's wedged open by a logic flaw, not actually open.

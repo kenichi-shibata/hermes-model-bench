@@ -1,0 +1,159 @@
+
+> build · deepseek-v4-flash
+
+→ Read .
+→ Read requirements_sketch.md
+→ Read existing_related_code.py
+→ Read CONTEXT_ONLY.md
+
+$ python3 --version && python3 -c "import sqlite3; print('sqlite3 ok')"
+Python 3.13.5
+sqlite3 ok
+
+← Write stale_watcher.py
+Wrote file successfully.
+
+The task: build a watcher that flags wanted-list items stuck over 48h — nothing exists yet. I'll build a dependency-free module on top of the existing `db.query` convention, with a testable core, a polling watcher loop, and a CLI.
+← Write test_stale_watcher.py
+Wrote file successfully.
+
+$ python3 -m unittest test_stale_watcher -v 2>&1
+test_dry_run_writes_nothing (test_stale_watcher.FlagStaleTest.test_dry_run_writes_nothing) ... ok
+test_flagging_is_idempotent_and_preserves_flagged_at (test_stale_watcher.FlagStaleTest.test_flagging_is_idempotent_and_preserves_flagged_at) ... ok
+test_moved_item_gets_unflagged (test_stale_watcher.FlagStaleTest.test_moved_item_gets_unflagged) ... ok
+test_stale_item_gets_flagged (test_stale_watcher.FlagStaleTest.test_stale_item_gets_flagged) ... ok
+test_active_item_over_48h_is_stale (test_stale_watcher.IsStaleTest.test_active_item_over_48h_is_stale) ... ERROR
+test_created_at_fallback (test_stale_watcher.IsStaleTest.test_created_at_fallback) ... ERROR
+test_missing_timestamp_not_stale (test_stale_watcher.IsStaleTest.test_missing_timestamp_not_stale) ... ok
+test_recently_updated_item_is_not_stale (test_stale_watcher.IsStaleTest.test_recently_updated_item_is_not_stale) ... ERROR
+test_terminal_status_never_stale (test_stale_watcher.IsStaleTest.test_terminal_status_never_stale) ... ok
+test_parse_accepts_z_suffix (test_stale_watcher.ParseTest.test_parse_accepts_z_suffix) ... ok
+test_watch_runs_n_times (test_stale_watcher.WatchTest.test_watch_runs_n_times) ... ok
+
+======================================================================
+ERROR: test_active_item_over_48h_is_stale (test_stale_watcher.IsStaleTest.test_active_item_over_48h_is_stale)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/ken-tasks/T-KEN-199/test_stale_watcher.py", line 34, in test_active_item_over_48h_is_stale
+    self.assertTrue(sw.is_stale(item, NOW))
+                    ~~~~~~~~~~~^^^^^^^^^^^
+  File "/root/ken-tasks/T-KEN-199/stale_watcher.py", line 84, in is_stale
+    age = (now - _parse(timestamp)).total_seconds()
+                 ~~~~~~^^^^^^^^^^^
+  File "/root/ken-tasks/T-KEN-199/stale_watcher.py", line 52, in _parse
+    if value.endswith("Z"):
+       ^^^^^^^^^^^^^^
+AttributeError: 'datetime.datetime' object has no attribute 'endswith'
+
+======================================================================
+ERROR: test_created_at_fallback (test_stale_watcher.IsStaleTest.test_created_at_fallback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/ken-tasks/T-KEN-199/test_stale_watcher.py", line 53, in test_created_at_fallback
+    self.assertTrue(sw.is_stale(item, NOW))
+                    ~~~~~~~~~~~^^^^^^^^^^^
+  File "/root/ken-tasks/T-KEN-199/stale_watcher.py", line 84, in is_stale
+    age = (now - _parse(timestamp)).total_seconds()
+                 ~~~~~~^^^^^^^^^^^
+  File "/root/ken-tasks/T-KEN-199/stale_watcher.py", line 52, in _parse
+    if value.endswith("Z"):
+       ^^^^^^^^^^^^^^
+AttributeError: 'datetime.datetime' object has no attribute 'endswith'
+
+======================================================================
+ERROR: test_recently_updated_item_is_not_stale (test_stale_watcher.IsStaleTest.test_recently_updated_item_is_not_stale)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/ken-tasks/T-KEN-199/test_stale_watcher.py", line 39, in test_recently_updated_item_is_not_stale
+    self.assertFalse(sw.is_stale(item, NOW))
+                     ~~~~~~~~~~~^^^^^^^^^^^
+  File "/root/ken-tasks/T-KEN-199/stale_watcher.py", line 84, in is_stale
+    age = (now - _parse(timestamp)).total_seconds()
+                 ~~~~~~^^^^^^^^^^^
+  File "/root/ken-tasks/T-KEN-199/stale_watcher.py", line 52, in _parse
+    if value.endswith("Z"):
+       ^^^^^^^^^^^^^^
+AttributeError: 'datetime.datetime' object has no attribute 'endswith'
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.012s
+
+FAILED (errors=3)
+[2026-08-15T01:46:01+00:00] 1 stale item(s) flagged
+[2026-08-15T01:46:01+00:00] 1 stale item(s) flagged
+
+← Edit stale_watcher.py
+Index: /root/ken-tasks/T-KEN-199/stale_watcher.py
+===================================================================
+--- /root/ken-tasks/T-KEN-199/stale_watcher.py
++++ /root/ken-tasks/T-KEN-199/stale_watcher.py
+@@ -46,10 +46,14 @@
+ def _iso(dt: datetime) -> str:
+     return dt.astimezone(timezone.utc).isoformat(timespec="seconds")
+ 
+ 
+-def _parse(value: str) -> datetime:
+-    """Parse ISO-8601 strings, tolerating both trailing 'Z' and '+00:00'."""
++def _parse(value: str | datetime) -> datetime:
++    """Normalize an ISO-8601 string (or an already-aware datetime) to UTC."""
++    if isinstance(value, datetime):
++        if value.tzinfo is None:
++            value = value.replace(tzinfo=timezone.utc)
++        return value
+     if value.endswith("Z"):
+         value = value[:-1] + "+00:00"
+     return datetime.fromisoformat(value)
+ 
+
+
+The unit tests pass `datetime` objects directly to `is_stale` while the DB stores strings. Making `_parse` handle both is reasonable defensive code.
+$ python3 -m unittest test_stale_watcher 2>&1 | tail -3
+OK
+[2026-08-15T01:46:06+00:00] 1 stale item(s) flagged
+[2026-08-15T01:46:06+00:00] 1 stale item(s) flagged
+
+All tests pass. Quick end-to-end smoke test via the CLI:
+$ python3 -c "
+import sqlite3, time
+from datetime import datetime, timedelta, timezone
+c = sqlite3.connect('/tmp/opencode/wanted.db')
+c.executescript('''
+CREATE TABLE wanted (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    created_at TEXT NOT NULL,
+    updated_at TEXT,
+    flagged INTEGER NOT NULL DEFAULT 0,
+    flagged_at TEXT
+);
+''')
+old = (datetime.now(timezone.utc) - timedelta(days=3)).isoformat(timespec='seconds')
+new = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat(timespec='seconds')
+c.execute('INSERT INTO wanted (name,status,created_at,updated_at) VALUES (?,?,?,?)', ('stuck','pending',old,old))
+c.execute('INSERT INTO wanted (name,status,created_at,updated_at) VALUES (?,?,?,?)', ('fresh','pending',old,new))
+c.commit(); c.close()
+" && python3 stale_watcher.py --db /tmp/opencode/wanted.db --once && python3 -c "
+import sqlite3
+c = sqlite3.connect('/tmp/opencode/wanted.db')
+for r in c.execute('SELECT name, flagged, flagged_at FROM wanted'):
+    print(r)
+"
+flagged 1 stale item(s)
+('stuck', 1, '2026-08-15T01:46:09+00:00')
+('fresh', 0, None)
+
+$ rm -f /tmp/opencode/wanted.db
+(no output)
+
+Built from scratch: `stale_watcher.py` + `test_stale_watcher.py` (stdlib-only, all 11 tests pass).
+
+What it does:
+- **Staleness rule**: any wanted item in an active status (`pending`/`waiting`/`in_progress`) whose `updated_at` (falls back to `created_at`) is >48h old is flagged. Terminal statuses are never stale.
+- **Auto-flag**: sets `flagged=1` + `flagged_at`, preserving the original flag time on re-scans (idempotent). Also auto-clears the flag when an item starts moving again.
+- **Watcher**: `watch()` polls on an interval; CLI has `--once`, `--dry-run`, `--interval`, `--db`. Uses the same `db.query('SELECT * FROM wanted')` convention as `existing_related_code.py`.
+- Testable via injected `now`; includes `CREATE TABLE IF NOT EXISTS wanted` so the schema self-provisions.
+
+Run: `python3 stale_watcher.py --once` (single pass) or `python3 stale_watcher.py --interval 300` (continual watch).
+
+Two assumptions worth confirming: the `wanted` table schema (added `flagged`/`flagged_at`/timestamps since none existed), and the list of "active" statuses.

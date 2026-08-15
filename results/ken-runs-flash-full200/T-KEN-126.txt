@@ -1,0 +1,15 @@
+
+> build · deepseek-v4-flash
+
+→ Read series_metadata.json
+✱ Glob "**/*" 2 matches
+→ Read CONTEXT_ONLY.md
+
+$ ls -la /root/ken-tasks/T-KEN-126/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    28 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   189 Aug 15 00:37 series_metadata.json
+
+Checked `series_metadata.json` for a sequel: none found. The series `S1` contains only "Movie One", "Totally Different Name", and "Another Name" — there is no sequel entry (e.g., "Movie Two"). If a sequel to "Movie One" is expected, it's missing from the file.

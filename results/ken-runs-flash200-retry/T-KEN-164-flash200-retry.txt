@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead memory_growth.json
+Memory is bloating. Week growth is 200 (500→700), but only 50 are distinct new facts; the remaining **150 (75%) are duplicates** of existing entries. Dedup the likely-duplicate pool.

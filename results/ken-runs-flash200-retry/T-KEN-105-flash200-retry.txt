@@ -1,0 +1,9 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead backup_error_log.txt
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+The backup failed with `BrokenPipeError: [Errno 32] Broken pipe` at backup_error_log.txt:2 while uploading at 45%.
+
+The client was still writing the backup stream but the receiving end closed the connection mid-transfer. This usually means the destination server/process terminated the connection (e.g., timeout, crash, quota, or network drop), causing the write to fail at 45%.

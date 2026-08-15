@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read retention_policy.json
+Retention looks fine. It's configured for 30 days (`configured_days`) and the oldest file is only 5 days old, which is well within the window — nothing is at risk of premature deletion.

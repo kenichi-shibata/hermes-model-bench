@@ -1,0 +1,21 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   142 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   123 Aug 14 17:33 host_wide_vmstat.json
+-rw-r--r--   1 root root    45 Aug 14 17:33 one_service_metrics.json
+
+→ Read host_wide_vmstat.json
+→ Read one_service_metrics.json
+→ Read CONTEXT_ONLY.md
+Host-wide memory pressure, not the service.
+
+- Swap is 95% full (7800/8192 MB) in `host_wide_vmstat.json:2-3` — the box is swapping heavily, which stalls everything.
+- An `unrelated_batch_job.py` is pegging 95% CPU (`host_wide_vmstat.json:4-5`), competing with everything else.
+- The service itself is healthy (`latency_ms: 45`, `error_rate: 0.001`), so its metrics won't show the problem.
+
+Fix: kill/reschedule the batch job and free swap / add memory, not investigate the service.

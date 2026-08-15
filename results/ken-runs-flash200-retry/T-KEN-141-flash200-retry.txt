@@ -1,0 +1,7 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead missed_incident.json
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+The check passed because `check_examines` is `"status_code_only"` — it only inspects `http_status`. The server returned HTTP 200, so the check considered it healthy, even though the `body` literally says `"internal error occurred"`. The monitor can't catch it unless it also checks the response body.

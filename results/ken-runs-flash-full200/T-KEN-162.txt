@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read canonical_facts_check.json
+Yes. `slot_7` at canonical_facts_check.json:32 is corrupted. Its value contains `\u00e2\u0080\u0099`, which are the mojibake UTF-8 bytes (E2 80 99) of the right single quotation mark `'` (U+2019), double-encoded instead of a clean value. All other slots are clean.

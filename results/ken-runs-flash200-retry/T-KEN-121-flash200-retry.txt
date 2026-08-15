@@ -1,0 +1,15 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    56 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   830 Aug 15 00:37 studio_scenes.json
+[0m
+[0m→ [0mRead studio_scenes.json
+[0m→ [0mRead CONTEXT_ONLY.md
+New stuff (released in the last 30 days): scenes **0, 1, 2, 3, 4, 5, 6** (ages 0, 5, 10, 15, 20, 25, 30 days old). Everything else (35+ days) is older.
+
+Want a different cutoff (e.g., only this week)?

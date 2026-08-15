@@ -1,0 +1,31 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   111 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    88 Aug 14 17:33 movie_grouping.py
+-rw-r--r--   1 root root   452 Aug 14 17:33 scenes_movie_parts.json
+
+→ Read movie_grouping.py
+→ Read scenes_movie_parts.json
+→ Read CONTEXT_ONLY.md
+
+← Write movie_grouping.py
+Wrote file successfully.
+
+The bug: `find_ungrouped` just lists scenes with `movie_id is None` — it never groups the six "BigMovie Part N" scenes into one movie. Let me add real grouping based on shared base title.
+$ python3 -c "
+import json
+import movie_grouping as mg
+scenes = json.load(open('scenes_movie_parts.json'))
+print('ungrouped:', [s['title'] for s in mg.find_ungrouped(scenes)])
+for m in mg.group_ungrouped(scenes):
+    print('movie:', m['title'], '->', [s['title'] for s in m['scenes']])
+"
+ungrouped: ['BigMovie Part 1', 'BigMovie Part 2', 'BigMovie Part 3', 'BigMovie Part 4', 'BigMovie Part 5', 'BigMovie Part 6']
+movie: BigMovie -> ['BigMovie Part 1', 'BigMovie Part 2', 'BigMovie Part 3', 'BigMovie Part 4', 'BigMovie Part 5', 'BigMovie Part 6']
+
+Fixed. `group_ungrouped()` (movie_grouping.py:13) now strips the trailing "Part N" suffix via `base_title()` and groups all six scenes into one movie: `BigMovie -> [Part 1..6]`.

@@ -1,0 +1,25 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-193
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    71 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    69 Aug 15 00:38 raw_metrics.json
+[0m
+[0m→ [0mRead raw_metrics.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mWrite index.html
+Wrote file successfully.
+[0m
+Data is minimal: 3 metrics. I'll build a self-contained dashboard HTML that loads the JSON and renders cards with CSS-based visuals.
+[0m$ [0mpython3 -m json.tool raw_metrics.json > /dev/null && echo "JSON valid"
+JSON valid
+[0m
+Dashboard built at `index.html`. Open it in a browser (served over HTTP so `fetch` works, e.g. `python3 -m http.server`) to view:
+
+- **Cards** for downloads today, errors today, and queue depth, with proportional CSS bars
+- **Error rate badge** (OK / Attention / Critical based on threshold)
+- **Queue health note**, auto-refresh every 30s, and graceful fallback if the JSON is missing

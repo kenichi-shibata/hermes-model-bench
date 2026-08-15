@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead page_analysis.json
+No — `was_real_outage: true`. It was a real 5-minute outage affecting 340 requests, so the page was justified.

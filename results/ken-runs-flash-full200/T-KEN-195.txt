@@ -1,0 +1,82 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    83 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   554 Aug 15 00:38 manual_check_history.json
+
+→ Read CONTEXT_ONLY.md
+→ Read manual_check_history.json
+
+$ ls -la; env | grep -i -E "queue|task|ken" ; which qstat squeue 2>/dev/null; echo "---"; ps aux | grep -i -E "queue|sqs|kafka|rabbit" | grep -v grep | head
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    83 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   554 Aug 15 00:38 manual_check_history.json
+PWD=/root/ken-tasks/T-KEN-195
+OLDPWD=/root/ken-tasks
+---
+
+✱ Glob "**/*" 2 matches
+
+← Write check_queue.py
+Wrote file successfully.
+
+Bare sandbox — no queue infrastructure defined, just the history file. I'll build a cron-friendly script that: (1) fetches queue size via a pluggable command, (2) detects if the queue is moving (size shrinking vs. last run, or empty), (3) logs each check in the same history format, and (4) exits 0/1 for monitoring.
+Now test it with a fake queue command to simulate real runs:
+$ chmod +x check_queue.py
+export QUEUE_CHECK_CMD='echo 5'
+./check_queue.py -v; echo "exit=$?"
+sleep 1
+export QUEUE_CHECK_CMD='echo 3'
+./check_queue.py -v; echo "exit=$?"
+export QUEUE_CHECK_CMD='echo 3'
+./check_queue.py -v; echo "exit=$?"
+export QUEUE_CHECK_CMD='echo 0'
+./check_queue.py -v; echo "exit=$?"
+export QUEUE_CHECK_CMD='not-a-real-command'
+./check_queue.py -v; echo "exit=$?"
+is queue moving: moving (baseline established (size=5))
+logged 1 check(s) in /root/ken-tasks/T-KEN-195/queue_check_history.json
+exit=0
+is queue moving: moving (size decreased 5 -> 3)
+logged 2 check(s) in /root/ken-tasks/T-KEN-195/queue_check_history.json
+exit=0
+is queue moving: not_moving (size stuck at 3)
+logged 3 check(s) in /root/ken-tasks/T-KEN-195/queue_check_history.json
+exit=1
+is queue moving: moving (queue empty)
+logged 4 check(s) in /root/ken-tasks/T-KEN-195/queue_check_history.json
+exit=0
+ERROR: queue check command failed: /bin/sh: 1: not-a-real-command: not found
+exit=2
+
+→ Read queue_check_history.json
+→ Read queue_state.json
+
+$ rm -f queue_check_history.json queue_state.json && ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 01:43 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    83 Aug 15 00:38 CONTEXT_ONLY.md
+-rwxr-xr-x   1 root root  3160 Aug 15 01:43 check_queue.py
+-rw-r--r--   1 root root   554 Aug 15 00:38 manual_check_history.json
+
+Works. Cleaning up my test artifacts so the deliverable starts fresh:
+Done — `check_queue.py` automates the "is queue moving" check.
+
+- **Pluggable source**: set `QUEUE_CHECK_CMD` to any command that prints the queue size (e.g. `squeue --noheader | wc -l`, an AWS SQS attribute query, `redis-cli llen ...`). Defaults to `squeue`.
+- **Detection**: moving = size decreased since last run or queue empty; stuck = size flat/growing. First run records a baseline.
+- **Logging**: appends each run to `queue_check_history.json` in the same format as the manual history (with `status`/`queue_size` added).
+- **Exit codes** for monitoring/cron: `0` moving, `1` not moving, `2` error.
+
+Schedule it (no need to ask anymore):
+```
+# daily at 09:00
+0 9 * * * cd /root/ken-tasks/T-KEN-195 && QUEUE_CHECK_CMD='<your size command>' ./check_queue.py
+```
+Use `-v` for a human-readable line; drop it for silent cron runs.

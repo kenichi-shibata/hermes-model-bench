@@ -1,0 +1,13 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    30 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    71 Aug 15 00:37 backup_file_stats.json
+
+→ Read backup_file_stats.json
+→ Read CONTEXT_ONLY.md
+The backup is **empty/bad**. `size_bytes: 12` vs expected `normal_size_mb: 90` (90 MB). Only 12 bytes were backed up — essentially nothing was captured.

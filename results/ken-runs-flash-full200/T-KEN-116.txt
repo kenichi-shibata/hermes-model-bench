@@ -1,0 +1,13 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    32 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    85 Aug 15 00:37 resource_contention.json
+
+→ Read resource_contention.json
+→ Read CONTEXT_ONLY.md
+Yes — 5 writers on one `shared.log` with `has_lock: false` is a classic race condition. Writes will interleave and corrupt the file. Fix: serialize with a lock (e.g. `flock`, a lock file, or a queue) so only one writer appends at a time.

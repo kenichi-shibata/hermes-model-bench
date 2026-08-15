@@ -1,0 +1,153 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 32
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   165 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   342 Aug 14 17:33 samantha_saint_wicked_catalog.json
+-rw-r--r--   1 root root  1188 Aug 14 17:33 scenes_db.json
+-rw-r--r--   1 root root     2 Aug 14 17:33 wanted_list.json
+
+$ wc -l *.json 2>/dev/null; echo "---"; ls -la *.json 2>/dev/null
+17 samantha_saint_wicked_catalog.json
+  65 scenes_db.json
+   0 wanted_list.json
+  82 total
+---
+-rw-r--r-- 1 root root  342 Aug 14 17:33 samantha_saint_wicked_catalog.json
+-rw-r--r-- 1 root root 1188 Aug 14 17:33 scenes_db.json
+-rw-r--r-- 1 root root    2 Aug 14 17:33 wanted_list.json
+
+→ Read scenes_db.json
+→ Read samantha_saint_wicked_catalog.json
+→ Read wanted_list.json
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "import json; print('ok')"
+ok
+
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -1,39 +1,45 @@
+ [
+   {
+     "id": 100,
+     "title": "MovieX Part 1",
+-    "movie_id": null,
++    "movie_id": "MovieX",
++    "movie_scene_index": 1,
+     "studio": "Wicked"
+   },
+   {
+     "id": 101,
+     "title": "MovieX Part 2",
+-    "movie_id": null,
++    "movie_id": "MovieX",
++    "movie_scene_index": 2,
+     "studio": "Wicked"
+   },
+   {
+     "id": 102,
+     "title": "MovieX Part 3",
+-    "movie_id": null,
++    "movie_id": "MovieX",
++    "movie_scene_index": 3,
+     "studio": "Wicked"
+   },
+   {
+     "id": 103,
+     "title": "MovieX Part 4",
+-    "movie_id": null,
++    "movie_id": "MovieX",
++    "movie_scene_index": 4,
+     "studio": "Wicked"
+   },
+   {
+     "id": 104,
+     "title": "MovieX Part 5",
+-    "movie_id": null,
++    "movie_id": "MovieX",
++    "movie_scene_index": 5,
+     "studio": "Wicked"
+   },
+   {
+     "id": 105,
+     "title": "MovieX Part 6",
+-    "movie_id": null,
++    "movie_id": "MovieX",
++    "movie_scene_index": 6,
+     "studio": "Wicked"
+   },
+   {
+     "id": 200,
+
+
+Plan: answer the grouping question, fix the FliXXX↔Digital Playground attribution in `scenes_db.json`, and fill `wanted_list.json` with the MovieX group, the corrected Digital Playground scenes, and Samantha Saint's 12 Wicked movies.
+← Edit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -44,29 +44,33 @@
+   {
+     "id": 200,
+     "title": "Misattributed Scene 1",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
++    "studio_aliases": ["FliXXX"],
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 201,
+     "title": "Misattributed Scene 2",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
++    "studio_aliases": ["FliXXX"],
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 202,
+     "title": "Misattributed Scene 3",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
++    "studio_aliases": ["FliXXX"],
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 203,
+     "title": "Misattributed Scene 4",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
++    "studio_aliases": ["FliXXX"],
+     "real_studio": "Digital Playground"
+   }
+ ]
+\ No newline at end of file
+
+
+← Write wanted_list.json
+Wrote file successfully.
+
+$ python3 -c "import json; json.load(open('scenes_db.json')); json.load(open('wanted_list.json')); print('both valid JSON')"
+both valid JSON
+
+Done. Both JSON files are valid.
+
+**Answers to your questions:**
+
+1. **Grouping scenes → Stash "group":** Yes — Stash supports Groups (its movies feature), so you don't need to download a separate whole-movie file. Download the 6 parts as scenes, then group them. In `scenes_db.json:100-105` I set `movie_id: "MovieX"` + `movie_scene_index` on each part; the group "MovieX" is queued in the wanted list.
+
+2. **FliXXX ↔ Digital Playground flip-flop:** The flip-flopping happens because matching is done by studio name. The `real_studio` on scenes 200-203 is Digital Playground, so I pinned `studio` to **Digital Playground** and registered **FliXXX as a studio alias** (`scenes_db.json:39-66`). This stops the tug-of-war and makes re-downloads/tagging resolve consistently — queued as re-download/re-tag items.
+
+3. **Samantha Saint:** All 12 Wicked movies from `samantha_saint_wicked_catalog.json` are in `wanted_list.json` (`type: "movie"`).
+
+Queue totals: 1 group (6 parts) + 4 corrected scenes + 12 movies.

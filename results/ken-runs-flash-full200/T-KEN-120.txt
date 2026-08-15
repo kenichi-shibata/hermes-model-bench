@@ -1,0 +1,22 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    99 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   894 Aug 15 00:37 performer_catalog.json
+-rw-r--r--   1 root root     2 Aug 15 00:37 wanted_list.json
+
+→ Read performer_catalog.json
+→ Read wanted_list.json
+→ Read CONTEXT_ONLY.md
+
+← Write wanted_list.json
+Wrote file successfully.
+
+$ python3 -c "import json; a=json.load(open('performer_catalog.json')); b=json.load(open('wanted_list.json')); print(len(b), b==a)"
+22 True
+
+Done. All 22 scenes copied from `performer_catalog.json` into `wanted_list.json`; verified identical.

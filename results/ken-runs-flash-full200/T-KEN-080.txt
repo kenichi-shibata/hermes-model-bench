@@ -1,0 +1,43 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    24 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    81 Aug 15 00:37 orphan_scan.json
+
+→ Read orphan_scan.json
+→ Read CONTEXT_ONLY.md
+
+$ xxd orphan_scan.json
+/bin/bash: line 1: xxd: command not found
+
+$ jq . orphan_scan.json
+/bin/bash: line 1: jq: command not found
+
+$ python3 -c "
+import json
+with open('orphan_scan.json') as f:
+    data = json.load(f)
+print('valid JSON')
+print('total_scenes:', data['total_scenes'])
+print('broken_performer_refs:', data['broken_performer_refs'])
+print('num broken:', len(data['broken_performer_refs']))
+print('unique:', len(set(data['broken_performer_refs'])) == len(data['broken_performer_refs']))
+"
+valid JSON
+total_scenes: 50
+broken_performer_refs: [12, 27, 41]
+num broken: 3
+unique: True
+
+Audit complete for `orphan_scan.json` (valid JSON):
+
+- **Total scenes:** 50
+- **Orphans found (broken performer refs):** 3 — scenes `12`, `27`, `41`
+- **Range check:** all refs within 1–50 (valid scene IDs)
+- **Duplicates:** none
+
+These are scenes whose performer references point to performers that no longer exist (deleted), i.e. the orphans. Count matches `broken_performer_refs` (3). No other anomalies in the file.

@@ -1,0 +1,7 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead delegation_trend.json
+Delegation is trending down sharply. Completion rate fell from 90% (day 1) → 70% (day 2) → 40% (day 3), roughly a 28% drop per day. If it keeps falling linearly it'd hit ~10% by day 4, so worth investigating before it bottoms out.

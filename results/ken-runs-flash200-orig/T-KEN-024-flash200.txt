@@ -1,0 +1,188 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 36
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    99 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root  9092 Aug 14 17:33 errored_backlog.json
+-rw-r--r--   1 root root   253 Aug 14 17:33 retry_api_mock.py
+[0m
+[0m→ [0mRead retry_api_mock.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead errored_backlog.json
+[0m
+[0m$ [0mpython3 --version && python3 -c "import json, threading; import retry_api_mock; print(retry_api_mock.retry(5))"
+Python 3.13.5
+{'id': 5, 'status': 'resolved'}
+[0m
+[0m← [0mWrite retry_backlog.py
+Wrote file successfully.
+[0m
+The mock works. Now I'll write a concurrency-constrained retry worker that drains all 200 items with backoff on 429s.
+[0m$ [0mpython3 retry_backlog.py
+items: 200
+resolved: 200
+failed: 0
+total attempts: 200
+avg attempts/item: 1.00
+[0m
+[0m$ [0mpython3 -c "
+import json
+data = json.load(open('resolved_backlog.json'))
+print('entries:', len(data))
+print('first:', data[0])
+print('last:', data[-1])
+print('all resolved:', all(d['status']=='resolved' for d in data))
+print('ids 0-199:', [d['id'] for d in data] == list(range(200)))
+"
+entries: 200
+first: {'id': 0, 'status': 'resolved', 'attempts': 1}
+last: {'id': 199, 'status': 'resolved', 'attempts': 1}
+all resolved: True
+ids 0-199: True
+[0m
+All 200 resolved with 5 workers (no 429s hit, since each worker is serial). Let me push harder with over-subscribed workers to prove the backoff path actually works under real rate-limiting pressure.
+[0m$ [0mpython3 -c "
+import retry_backlog, time
+# over-subscribe: 50 workers vs 5 semaphore slots -> forces 429 + backoff
+import threading
+retry_backlog._results_lock = threading.Lock()
+import json
+items = json.load(open('errored_backlog.json'))
+from concurrent.futures import ThreadPoolExecutor
+retry_backlog.MAX_WORKERS = 50
+retry_backlog.MAX_ATTEMPTS = 500
+t0 = time.time()
+with ThreadPoolExecutor(max_workers=50) as pool:
+    list(pool.map(retry_backlog.drain, items))
+dt = time.time() - t0
+resolved = [r for r in retry_backlog._results.values() if r['status']=='resolved']
+attempts = sum(r['attempts'] for r in retry_backlog._results.values())
+print('resolved:', len(resolved), '/', len(items))
+print('total attempts:', attempts, 'avg:', round(attempts/len(items),1))
+print('elapsed: %.3fs' % dt)
+"
+resolved: 200 / 200
+total attempts: 200 avg: 1.0
+elapsed: 0.017s
+[0m
+Even with 50 workers no 429s occur because mock calls complete in microseconds (GIL serializes them, no contention). Let me verify the backoff path actually works by simulating genuine rate-limit pressure with an artificially slow call wrapper.
+[0m$ [0mpython3 -c "
+import json, threading, time, random
+from concurrent.futures import ThreadPoolExecutor
+import retry_api_mock
+
+# wrap retry() so each call holds the semaphore slot for 5ms -> real contention
+def slow_retry(item_id):
+    r = retry_api_mock.retry(item_id)
+    time.sleep(0.005)
+    return r
+retry_api_mock.retry = slow_retry
+
+import retry_backlog
+retry_backlog._results_lock = threading.Lock()
+items = json.load(open('errored_backlog.json'))
+retry_backlog.MAX_WORKERS = 20
+t0 = time.time()
+with ThreadPoolExecutor(max_workers=20) as pool:
+    list(pool.map(retry_backlog.drain, items))
+dt = time.time() - t0
+resolved = [r for r in retry_backlog._results.values() if r['status']=='resolved']
+attempts = sum(r['attempts'] for r in retry_backlog._results.values())
+print('resolved:', len(resolved), '/', len(items))
+print('total attempts:', attempts, 'avg:', round(attempts/len(items),1))
+print('elapsed: %.3fs' % dt)
+"
+resolved: 0 / 200
+total attempts: 200 avg: 1.0
+elapsed: 0.062s
+[0m
+Test harness bug — `slow_retry` called the already-monkeypatched `retry`, causing recursion. Let me fix the harness.
+[0m$ [0mpython3 -c "
+import json, threading, time
+from concurrent.futures import ThreadPoolExecutor
+import retry_api_mock
+
+orig = retry_api_mock.retry
+def slow_retry(item_id):
+    r = orig(item_id)
+    time.sleep(0.005)
+    return r
+retry_api_mock.retry = slow_retry
+
+import retry_backlog
+retry_backlog._results_lock = threading.Lock()
+items = json.load(open('errored_backlog.json'))
+retry_backlog.MAX_WORKERS = 20
+t0 = time.time()
+with ThreadPoolExecutor(max_workers=20) as pool:
+    list(pool.map(retry_backlog.drain, items))
+dt = time.time() - t0
+resolved = [r for r in retry_backlog._results.values() if r['status']=='resolved']
+attempts = sum(r['attempts'] for r in retry_backlog._results.values())
+print('resolved:', len(resolved), '/', len(items))
+print('total attempts:', attempts, 'avg:', round(attempts/len(items),1))
+print('elapsed: %.3fs' % dt)
+"
+resolved: 200 / 200
+total attempts: 200 avg: 1.0
+elapsed: 0.057s
+[0m
+The mock releases the semaphore before my simulated sleep, so no contention. Let me validate the 429 backoff path directly with a fake that rate-limits a fixed number of times then succeeds.
+[0m$ [0mpython3 -c "
+import json, threading, random, time
+from concurrent.futures import ThreadPoolExecutor
+
+state = {}
+def fake_retry(item_id):
+    n = state.setdefault(item_id, random.randint(1, 4))
+    if n > 0:
+        state[item_id] = n - 1
+        raise Exception('429 rate limited')
+    return {'id': item_id, 'status': 'resolved'}
+
+import retry_backlog
+retry_api_mock = type('m', (), {'retry': staticmethod(fake_retry)})()
+retry_backlog.retry_api_mock = retry_api_mock
+retry_backlog._results_lock = threading.Lock()
+items = json.load(open('errored_backlog.json'))
+with ThreadPoolExecutor(max_workers=5) as pool:
+    list(pool.map(retry_backlog.drain, items))
+resolved = [r for r in retry_backlog._results.values() if r['status']=='resolved']
+attempts = sum(r['attempts'] for r in retry_backlog._results.values())
+print('resolved:', len(resolved), '/', len(items))
+print('total attempts:', attempts, 'avg:', round(attempts/len(items),1), '(rate-limited 1-4x each expected)')
+"
+resolved: 200 / 200
+total attempts: 712 avg: 3.6 (rate-limited 1-4x each expected)
+[0m
+Backoff path confirmed: 200/200 resolved across 712 attempts (avg 3.6, matching the injected 1–4 rate-limits per item). Final clean run of the real deliverable:
+[0m$ [0mpython3 retry_backlog.py && ls -la && python3 -c "
+import json; d=json.load(open('resolved_backlog.json'))
+print('entries:', len(d), '| all resolved:', all(x['status']=='resolved' for x in d), '| ids:', d[0]['id'], '...', d[-1]['id'])
+"
+items: 200
+resolved: 200
+failed: 0
+total attempts: 200
+avg attempts/item: 1.00
+total 60
+drwxr-xr-x   3 root root  4096 Aug 14 17:42 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    99 Aug 14 17:33 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 14 17:42 __pycache__
+-rw-r--r--   1 root root  9092 Aug 14 17:33 errored_backlog.json
+-rw-r--r--   1 root root 13492 Aug 14 17:43 resolved_backlog.json
+-rw-r--r--   1 root root   253 Aug 14 17:33 retry_api_mock.py
+-rw-r--r--   1 root root  2425 Aug 14 17:42 retry_backlog.py
+entries: 200 | all resolved: True | ids: 0 ... 199
+[0m
+Done. `retry_backlog.py` drains all 200 errored items (ids 0–199) through the rate-limited API.
+
+- **Result**: 200/200 resolved, 0 failed → `resolved_backlog.json` (status `resolved`, attempt counts).
+- **Rate-limit handling**: `ThreadPoolExecutor(max_workers=5)` matching the API's `Semaphore(5)`, plus exponential backoff with jitter on 429s (re-verified: 200/200 across 712 attempts when each item was rate-limited 1–4×).
+- **Safety**: bounded attempts per item (default 200), lock-guarded result writes, hard failures (non-429) reported rather than masked.
+
+Everything stayed inside this directory; input file untouched.

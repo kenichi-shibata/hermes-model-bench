@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read firewall_rule_check.json
+Yes. The firewall blocks it: the rule `deny 0.0.0.0/0 except allowlist` (`firewall_rule_check.json:2`) applies, and the traffic source isn't in the allowlist (`firewall_rule_check.json:3`), so the traffic is denied.

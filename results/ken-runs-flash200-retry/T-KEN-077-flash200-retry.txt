@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead keep_logic.json
+Yes. Both `a` (1.2 GB) and `b` (4.8 GB) are playable, so the logic correctly keeps the smaller `a` to save disk space.

@@ -1,0 +1,24 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead layout.css
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit layout.css
+Index: /root/ken-tasks/T-KEN-175/layout.css
+===================================================================
+--- /root/ken-tasks/T-KEN-175/layout.css
++++ /root/ken-tasks/T-KEN-175/layout.css
+@@ -1,1 +1,7 @@
+-.container { width: 1200px; }
++.container {
++  width: 100%;
++  max-width: 1200px;
++  margin: 0 auto;
++  padding-left: 16px;
++  padding-right: 16px;
++}
+
+[0m
+Fixed. The `.container` used a hard-coded `width: 1200px`, causing horizontal overflow on mobile. Now it scales to 100% width with a `max-width: 1200px`, centered with side padding so it stays usable on small screens.

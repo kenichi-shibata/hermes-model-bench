@@ -1,0 +1,7 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead pr_diff_8.py
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+No. The only file is `pr_diff_8.py` (a 3-line diff), and there are no test files. The empty-list case is handled, but the `items is None` edge case — which the comment itself notes crashes — is not tested (and the code doesn't handle it).

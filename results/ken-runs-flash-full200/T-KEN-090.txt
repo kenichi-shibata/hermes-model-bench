@@ -1,0 +1,18 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la && pwd
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    27 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   348 Aug 15 00:37 mem_by_process.json
+/root/ken-tasks/T-KEN-090
+
+→ Read mem_by_process.json
+→ Read CONTEXT_ONLY.md
+The data shows a steady linear leak in a single process: RSS grows exactly 240 MB every 6 hours (~40 MB/hour, ~960 MB/day) with no plateau.
+
+Diagnosis: memory leak — something is accumulating unbounded (e.g., an unbounded cache, timers/goroutines never released, event listeners stacking, or retained references). The constant slope means objects aren't being GC'd or freed.
+
+Next step to pinpoint the culprit would be a heap profile / `top` per-process breakdown, but within the sandbox there's only this series — the pattern is a textbook leak, not a fixed allocation.

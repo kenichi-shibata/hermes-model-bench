@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-flash
+
+→ Read .
+
+$ wc -l /root/ken-tasks/T-KEN-165/proxy_error_log.txt
+4 /root/ken-tasks/T-KEN-165/proxy_error_log.txt
+
+→ Read CONTEXT_ONLY.md
+→ Read proxy_error_log.txt
+The proxy isn't misconfigured — the log shows normal failure-and-recovery behavior:
+
+- **10:00:00** backend restart begins
+- **10:00:02** 14 requests hit the dead upstream → `502 Bad Gateway`
+- **10:00:08** upstream health check passes → proxy marks backend healthy
+- **10:00:09** traffic resumes with `200 OK`
+
+The 502s map exactly to the ~8s restart window; the proxy correctly served 502 while the upstream was unreachable and recovered automatically. No config error indicated.
+
+To eliminate the brief 502 window: drain/remove the backend from the pool before restart (health-check based), and/or enable upstream retry on the proxy.

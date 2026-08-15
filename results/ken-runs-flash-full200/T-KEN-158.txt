@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read forget_investigation.json
+It didn't forget — it expired. `valid_until` is `2026-08-12`, one day before `today` (`2026-08-13`), so the saved value is no longer considered valid.

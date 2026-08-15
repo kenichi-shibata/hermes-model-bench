@@ -1,0 +1,16 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m✱ [0mGlob "**/*.py"[90m 1 match[0m
+[0m→ [0mRead destructive_operation.py
+[0m
+[0m← [0mWrite destructive_operation.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython -m py_compile destructive_operation.py && echo OK
+/bin/bash: line 1: python: command not found
+[0m
+[0m$ [0mpython3 -m py_compile destructive_operation.py && echo OK
+OK
+[0m
+`bulk_delete` now snapshots each record into a `backup_store` before hard-deleting; `rollback_bulk_delete(backup_store, db)` restores them. On any exception mid-loop, the partial deletes are rolled back automatically before re-raising. Callers can pass a persistent store (e.g. a file-backed dict) instead of the default in-memory one, and it assumes `db.get(id)` and `db.restore(id, record)` exist alongside `hard_delete`.

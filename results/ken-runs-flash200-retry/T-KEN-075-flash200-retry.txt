@@ -1,0 +1,17 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    25 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   103 Aug 15 00:37 dedupe_check.json
+[0m
+[0m→ [0mRead dedupe_check.json
+[0m→ [0mRead CONTEXT_ONLY.md
+Dedupe is a no-op here because the two entries are **not identical** and dedupe almost certainly matches on the full field set.
+
+`a` has `res: "1080p"`, `b` has `res: "480p"` — same `title` but different `res`. Unless the dedupe is configured to key **only on `title`** (and pick the higher resolution), it finds no exact duplicate and keeps both.
+
+If you want `b` dropped, the dedupe must compare on `title` alone (or title+quality ranking) rather than requiring all fields to match.

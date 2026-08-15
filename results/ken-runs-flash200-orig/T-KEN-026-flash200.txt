@@ -1,0 +1,37 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    80 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   308 Aug 14 17:33 download_queue.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead download_queue.json
+[0m
+[0m← [0mWrite download_queue.json
+Wrote file successfully.
+[0m
+Two entries share `content_hash` "ccc" (ids 3 and 7) — the genuine dupes. I'll keep the first occurrence and drop the rest.
+[0m$ [0mpython3 -m json.tool download_queue.json
+[
+    {
+        "id": 1,
+        "title": "Scene A",
+        "content_hash": "aaa"
+    },
+    {
+        "id": 3,
+        "title": "Scene C (1)",
+        "content_hash": "ccc"
+    },
+    {
+        "id": 5,
+        "title": "Scene C Remastered",
+        "content_hash": "ddd"
+    }
+]
+[0m
+Removed the duplicate "Scene C v2" (id 7), which had the same `content_hash` "ccc" as id 3. Queue now has one entry per unique content hash and is valid JSON.

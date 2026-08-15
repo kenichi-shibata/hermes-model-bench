@@ -1,0 +1,13 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    58 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    85 Aug 14 17:33 deploy_state.json
+
+→ Read CONTEXT_ONLY.md
+→ Read deploy_state.json
+No — not in sync. `deploy_state.json` shows the deployed SHA (`e4f5g6h`) differs from repo HEAD (`h7i8j9k`) with `3` commits between them, so the deployed version has drifted from the repo.

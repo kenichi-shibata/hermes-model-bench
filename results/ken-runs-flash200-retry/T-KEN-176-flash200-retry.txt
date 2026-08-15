@@ -1,0 +1,25 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m✱ [0mGlob "**/loading_state.jsx"[90m 1 match[0m
+[0m→ [0mRead loading_state.jsx
+[0m
+[0m← [0mEdit loading_state.jsx
+Index: /root/ken-tasks/T-KEN-176/loading_state.jsx
+===================================================================
+--- /root/ken-tasks/T-KEN-176/loading_state.jsx
++++ /root/ken-tasks/T-KEN-176/loading_state.jsx
+@@ -2,7 +2,8 @@
+   const [loading, setLoading] = useState(false);
+   const fetch = async () => {
+     setLoading(true);
+     try { const d = await api.get(); setData(d); }
+-    catch (e) { setLoading(false); }
++    catch (e) {}
++    finally { setLoading(false); }
+   };
+ }
+
+[0m
+The bug: `setLoading(false)` only runs in the `catch`, so after a successful fetch loading stays `true` forever.
+Fixed. `setLoading(false)` now runs in a `finally` block so it fires on both success and error.

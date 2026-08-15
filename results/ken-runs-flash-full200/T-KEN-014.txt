@@ -1,0 +1,15 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    69 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   498 Aug 14 17:33 tailscale_status_mock.json
+
+→ Read tailscale_status_mock.json
+→ Read CONTEXT_ONLY.md
+Your phone can't reach the home network because the node that advertises it is offline.
+
+`home-router-node` (pve2) is the only peer with a `PrimaryRoutes` entry for `192.168.1.0/24`, but it reports `"Online": false` and hasn't been seen since 2026-08-02 (`tailscale_status_mock.json:11-13`). Without that subnet router online, the phone has no path to 192.168.1.0/24 — the other online peers (laptop, phone2) don't advertise any routes. Bring pve2 back online and you'll be able to reach your home network.

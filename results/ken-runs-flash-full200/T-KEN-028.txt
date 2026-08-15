@@ -1,0 +1,13 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    53 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   219 Aug 14 17:33 retry_engine_v2.py
+
+→ Read retry_engine_v2.py
+→ Read CONTEXT_ONLY.md
+Just spinning. `check_and_retry` at retry_engine_v2.py:3 increments the counter and returns a dict, but never re-invokes any download/search operation (confirmed by the BUG comment on line 5). Attempt count grows with no actual retry happening.

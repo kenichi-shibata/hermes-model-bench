@@ -1,0 +1,44 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead translate_output_sample.json
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit translate_output_sample.json
+Index: /root/ken-tasks/T-KEN-133/translate_output_sample.json
+===================================================================
+--- /root/ken-tasks/T-KEN-133/translate_output_sample.json
++++ /root/ken-tasks/T-KEN-133/translate_output_sample.json
+@@ -24,9 +24,9 @@
+   "output": "Name5"
+ },
+ {
+   "id": 6,
+-  "output": "Nnaammee6(EN)(EN)"
++  "output": "Name6"
+ },
+ {
+   "id": 7,
+   "output": "Nnaammee7(EN)(EN)"
+
+[0m
+[0m← [0mEdit translate_output_sample.json
+Index: /root/ken-tasks/T-KEN-133/translate_output_sample.json
+===================================================================
+--- /root/ken-tasks/T-KEN-133/translate_output_sample.json
++++ /root/ken-tasks/T-KEN-133/translate_output_sample.json
+@@ -28,7 +28,7 @@
+     "output": "Name6"
+   },
+   {
+     "id": 7,
+-    "output": "Nnaammee7(EN)(EN)"
++    "output": "Name7"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+The `id` 6 and 7 entries look corrupted — the translation pipeline duplicated letters and appended `(EN)(EN)`. They should match the pattern `Name{id}` like the rest.
+Fixed. IDs 6 and 7 were `Nnaammee6(EN)(EN)` / `Nnaammee7(EN)(EN)` (duplicated letters + stray `(EN)` suffix) — now `Name6` / `Name7`, consistent with the rest.

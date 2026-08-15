@@ -1,0 +1,31 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   124 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   771 Aug 14 17:33 dedupe_auto.py
+-rw-r--r--   1 root root   351 Aug 14 17:33 groups.json
+
+→ Read CONTEXT_ONLY.md
+→ Read dedupe_auto.py
+→ Read groups.json
+
+$ python3 -c "
+import json
+from dedupe_auto import auto_canonicalize_plan
+groups = json.load(open('groups.json'))
+for name, group in groups.items():
+    print(name, '->', auto_canonicalize_plan(group))
+"
+group_1 -> {'action': 'refuse', 'reason': 'playability vs user-data conflict -- needs human review'}
+group_2 -> {'action': 'refuse', 'reason': 'playability vs user-data conflict -- needs human review'}
+
+It isn't doing "nothing" — it's actively **refusing** both groups (verified above). Both groups hit the safety guard at `dedupe_auto.py:12-14`:
+
+- `group_1`: `s1` has `play_count: 12` (real user data) but is `playable: false`; `s2` is `playable: true` but has `play_count: 0`.
+- `group_2`: identical shape with `s3`/`s4`.
+
+That's exactly the `(a_has_data and not a_playable and b_playable and not b_has_data)` branch. Auto-merging would silently keep the playable-but-empty entry and throw away the unplayable entry's play counts, so the engine returns `{"action": "refuse", ...}` per its documented safety contract — the docstring explicitly calls this correct, not a bug.

@@ -1,0 +1,21 @@
+
+> build · deepseek-v4-flash
+
+→ Read fleet_health_snapshot.json
+
+$ python3 -c "import json; d=json.load(open('fleet_health_snapshot.json')); print('valid JSON'); print('services:', len(d)); [print(k, v) for k,v in d.items()]"
+valid JSON
+services: 7
+svc_0 {'error_rate': 0.001}
+svc_1 {'error_rate': 0.001}
+svc_2 {'error_rate': 0.001}
+svc_3 {'error_rate': 0.12}
+svc_4 {'error_rate': 0.001}
+svc_5 {'error_rate': 0.001}
+svc_6 {'error_rate': 0.001}
+
+The JSON is valid and well-formed. The only notable issue is data-level:
+
+- **svc_3** has `error_rate` of **0.12 (12%)** — 120x higher than every other service, all of which sit at **0.001 (0.1%)**. This is a clear outlier and likely an unhealthy/unhealthy threshold breach (typical SLO thresholds are ~1–5%).
+
+Everything else parses cleanly: 7 services, no missing keys, no malformed values.

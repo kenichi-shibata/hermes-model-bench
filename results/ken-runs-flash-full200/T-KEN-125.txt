@@ -1,0 +1,39 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    83 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    55 Aug 15 00:37 collection_manifest.json
+
+→ Read collection_manifest.json
+→ Read CONTEXT_ONLY.md
+
+← Edit collection_manifest.json
+Index: /root/ken-tasks/T-KEN-125/collection_manifest.json
+===================================================================
+--- /root/ken-tasks/T-KEN-125/collection_manifest.json
++++ /root/ken-tasks/T-KEN-125/collection_manifest.json
+@@ -1,6 +1,13 @@
+ {
+   "total_parts": 8,
+   "already_queued": [
+-    1
++    1,
++    2,
++    3,
++    4,
++    5,
++    6,
++    7,
++    8
+   ]
+ }
+\ No newline at end of file
+
+
+The manifest shows 8 parts with only part 1 queued. I'll queue the entire collection.
+→ Read collection_manifest.json
+All 8 parts are now queued in `collection_manifest.json`.

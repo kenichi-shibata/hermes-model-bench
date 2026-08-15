@@ -1,0 +1,15 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    53 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   117 Aug 14 17:33 r18_status_mock.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead r18_status_mock.json
+Yes — r18 is blocked again.
+
+`r18_status_mock.json`: `breaker_open: true`, reason `cloudflare_block`, 6 consecutive fails, 300s cooldown remaining.

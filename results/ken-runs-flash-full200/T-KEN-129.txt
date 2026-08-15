@@ -1,0 +1,26 @@
+
+> build · deepseek-v4-flash
+
+→ Read name_translate.py
+→ Read name_data.json
+
+← Edit name_translate.py
+Index: /root/ken-tasks/T-KEN-129/name_translate.py
+===================================================================
+--- /root/ken-tasks/T-KEN-129/name_translate.py
++++ /root/ken-tasks/T-KEN-129/name_translate.py
+@@ -1,3 +1,3 @@
+ def translate(record):
+-    return romanize(record.get('name_jp'))
++    return romanize(record.get('name_japanese'))
+ def romanize(s): return f'{s} (EN)' if s else None
+
+
+The `translate` function looks up `name_jp` but the JSON key is `name_japanese`.
+$ python -c "import json; from name_translate import translate; print(translate(json.load(open('name_data.json'))))"
+/bin/bash: line 1: python: command not found
+
+$ python3 -c "import json; from name_translate import translate; print(translate(json.load(open('name_data.json'))))"
+彩月七緒 (EN)
+
+Fixed. The lookup key `name_jp` didn't match the actual field `name_japanese` in `name_data.json`, so `romanize` got `None`. It now returns `彩月七緒 (EN)`.

@@ -1,0 +1,1494 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 336
+drwxr-xr-x   2 root root   4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000  12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    126 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root 315596 Aug 14 17:33 performers.json
+-rw-r--r--   1 root root    197 Aug 14 17:33 stashdb_mock.py
+
+→ Read CONTEXT_ONLY.md
+→ Read stashdb_mock.py
+
+$ python3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+print(type(data))
+if isinstance(data, list):
+    print('count:', len(data))
+    print(json.dumps(data[0], indent=2)[:2000])
+elif isinstance(data, dict):
+    print('keys:', list(data.keys()))
+"
+<class 'dict'>
+keys: ['performers']
+
+$ python3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+performers = data['performers']
+print('count:', len(performers))
+print('sample keys:', list(performers[0].keys()))
+print(json.dumps(performers[0], indent=2))
+"
+count: 2700
+sample keys: ['id', 'name', 'image', 'stashdb_id']
+{
+  "id": 0,
+  "name": "Performer0",
+  "image": "http://198.51.100.64:9999/performer/0/image",
+  "stashdb_id": "stashdb-0"
+}
+
+$ python3 -c "
+import json
+from collections import Counter
+with open('performers.json') as f:
+    data = json.load(f)
+performers = data['performers']
+# group by image prefix
+prefix = Counter()
+for p in performers:
+    img = p.get('image') or ''
+    prefix[img.rsplit('/',1)[0]] += 1
+for k,v in prefix.most_common():
+    print(v, k)
+"
+...output truncated...
+
+Full output saved to: /root/.local/share/opencode/tool-output/tool_00156c1c8001Kgh4jBKfi17iSO
+
+1 http://198.51.100.69:9999/performer/739
+1 http://198.51.100.69:9999/performer/740
+1 http://198.51.100.69:9999/performer/741
+1 http://198.51.100.69:9999/performer/742
+1 http://198.51.100.69:9999/performer/743
+1 http://198.51.100.69:9999/performer/744
+1 http://198.51.100.69:9999/performer/745
+1 http://198.51.100.69:9999/performer/746
+1 http://198.51.100.69:9999/performer/747
+1 http://198.51.100.69:9999/performer/748
+1 http://198.51.100.69:9999/performer/749
+1 http://198.51.100.69:9999/performer/750
+1 http://198.51.100.69:9999/performer/751
+1 http://198.51.100.69:9999/performer/752
+1 http://198.51.100.69:9999/performer/753
+1 http://198.51.100.69:9999/performer/754
+1 http://198.51.100.69:9999/performer/755
+1 http://198.51.100.69:9999/performer/756
+1 http://198.51.100.69:9999/performer/757
+1 http://198.51.100.69:9999/performer/758
+1 http://198.51.100.69:9999/performer/759
+1 http://198.51.100.69:9999/performer/760
+1 http://198.51.100.69:9999/performer/761
+1 http://198.51.100.69:9999/performer/762
+1 http://198.51.100.69:9999/performer/763
+1 http://198.51.100.69:9999/performer/764
+1 http://198.51.100.69:9999/performer/765
+1 http://198.51.100.69:9999/performer/766
+1 http://198.51.100.69:9999/performer/767
+1 http://198.51.100.69:9999/performer/768
+1 http://198.51.100.69:9999/performer/769
+1 http://198.51.100.69:9999/performer/770
+1 http://198.51.100.69:9999/performer/771
+1 http://198.51.100.69:9999/performer/772
+1 http://198.51.100.69:9999/performer/773
+1 http://198.51.100.69:9999/performer/774
+1 http://198.51.100.69:9999/performer/775
+1 http://198.51.100.69:9999/performer/776
+1 http://198.51.100.69:9999/performer/777
+1 http://198.51.100.69:9999/performer/778
+1 http://198.51.100.69:9999/performer/779
+1 http://198.51.100.69:9999/performer/780
+1 http://198.51.100.69:9999/performer/781
+1 http://198.51.100.69:9999/performer/782
+1 http://198.51.100.69:9999/performer/783
+1 http://198.51.100.69:9999/performer/784
+1 http://198.51.100.69:9999/performer/785
+1 http://198.51.100.69:9999/performer/786
+1 http://198.51.100.69:9999/performer/787
+1 http://198.51.100.69:9999/performer/788
+1 http://198.51.100.69:9999/performer/789
+1 http://198.51.100.69:9999/performer/790
+1 http://198.51.100.69:9999/performer/791
+1 http://198.51.100.69:9999/performer/792
+1 http://198.51.100.69:9999/performer/793
+1 http://198.51.100.69:9999/performer/794
+1 http://198.51.100.69:9999/performer/795
+1 http://198.51.100.69:9999/performer/796
+1 http://198.51.100.69:9999/performer/797
+1 http://198.51.100.69:9999/performer/798
+1 http://198.51.100.69:9999/performer/799
+1 http://198.51.100.69:9999/performer/800
+1 http://198.51.100.69:9999/performer/801
+1 http://198.51.100.69:9999/performer/802
+1 http://198.51.100.69:9999/performer/803
+1 http://198.51.100.69:9999/performer/804
+1 http://198.51.100.69:9999/performer/805
+1 http://198.51.100.69:9999/performer/806
+1 http://198.51.100.69:9999/performer/807
+1 http://198.51.100.69:9999/performer/808
+1 http://198.51.100.69:9999/performer/809
+1 http://198.51.100.69:9999/performer/810
+1 http://198.51.100.69:9999/performer/811
+1 http://198.51.100.69:9999/performer/812
+1 http://198.51.100.69:9999/performer/813
+1 http://198.51.100.69:9999/performer/814
+1 http://198.51.100.69:9999/performer/815
+1 http://198.51.100.69:9999/performer/816
+1 http://198.51.100.69:9999/performer/817
+1 http://198.51.100.69:9999/performer/818
+1 http://198.51.100.69:9999/performer/819
+1 http://198.51.100.69:9999/performer/820
+1 http://198.51.100.69:9999/performer/821
+1 http://198.51.100.69:9999/performer/822
+1 http://198.51.100.69:9999/performer/823
+1 http://198.51.100.69:9999/performer/824
+1 http://198.51.100.69:9999/performer/825
+1 http://198.51.100.69:9999/performer/826
+1 http://198.51.100.69:9999/performer/827
+1 http://198.51.100.69:9999/performer/828
+1 http://198.51.100.69:9999/performer/829
+1 http://198.51.100.69:9999/performer/830
+1 http://198.51.100.69:9999/performer/831
+1 http://198.51.100.69:9999/performer/832
+1 http://198.51.100.69:9999/performer/833
+1 http://198.51.100.69:9999/performer/834
+1 http://198.51.100.69:9999/performer/835
+1 http://198.51.100.69:9999/performer/836
+1 http://198.51.100.69:9999/performer/837
+1 http://198.51.100.69:9999/performer/838
+1 http://198.51.100.69:9999/performer/839
+1 http://198.51.100.69:9999/performer/840
+1 http://198.51.100.69:9999/performer/841
+1 http://198.51.100.69:9999/performer/842
+1 http://198.51.100.69:9999/performer/843
+1 http://198.51.100.69:9999/performer/844
+1 http://198.51.100.69:9999/performer/845
+1 http://198.51.100.69:9999/performer/846
+1 http://198.51.100.69:9999/performer/847
+1 http://198.51.100.69:9999/performer/848
+1 http://198.51.100.69:9999/performer/849
+1 http://198.51.100.69:9999/performer/850
+1 http://198.51.100.69:9999/performer/851
+1 http://198.51.100.69:9999/performer/852
+1 http://198.51.100.69:9999/performer/853
+1 http://198.51.100.69:9999/performer/854
+1 http://198.51.100.69:9999/performer/855
+1 http://198.51.100.69:9999/performer/856
+1 http://198.51.100.69:9999/performer/857
+1 http://198.51.100.69:9999/performer/858
+1 http://198.51.100.69:9999/performer/859
+1 http://198.51.100.69:9999/performer/860
+1 http://198.51.100.69:9999/performer/861
+1 http://198.51.100.69:9999/performer/862
+1 http://198.51.100.69:9999/performer/863
+1 http://198.51.100.69:9999/performer/864
+1 http://198.51.100.69:9999/performer/865
+1 http://198.51.100.69:9999/performer/866
+1 http://198.51.100.69:9999/performer/867
+1 http://198.51.100.69:9999/performer/868
+1 http://198.51.100.69:9999/performer/869
+1 http://198.51.100.69:9999/performer/870
+1 http://198.51.100.69:9999/performer/871
+1 http://198.51.100.69:9999/performer/872
+1 http://198.51.100.69:9999/performer/873
+1 http://198.51.100.69:9999/performer/874
+1 http://198.51.100.69:9999/performer/875
+1 http://198.51.100.69:9999/performer/876
+1 http://198.51.100.69:9999/performer/877
+1 http://198.51.100.69:9999/performer/878
+1 http://198.51.100.69:9999/performer/879
+1 http://198.51.100.69:9999/performer/880
+1 http://198.51.100.69:9999/performer/881
+1 http://198.51.100.69:9999/performer/882
+1 http://198.51.100.69:9999/performer/883
+1 http://198.51.100.69:9999/performer/884
+1 http://198.51.100.69:9999/performer/885
+1 http://198.51.100.69:9999/performer/886
+1 http://198.51.100.69:9999/performer/887
+1 http://198.51.100.69:9999/performer/888
+1 http://198.51.100.69:9999/performer/889
+1 http://198.51.100.69:9999/performer/890
+1 http://198.51.100.69:9999/performer/891
+1 http://198.51.100.69:9999/performer/892
+1 http://198.51.100.69:9999/performer/893
+1 http://198.51.100.69:9999/performer/894
+1 http://198.51.100.69:9999/performer/895
+1 http://198.51.100.69:9999/performer/896
+1 http://198.51.100.69:9999/performer/897
+1 http://198.51.100.69:9999/performer/898
+1 http://198.51.100.69:9999/performer/899
+1 http://198.51.100.69:9999/performer/900
+1 http://198.51.100.69:9999/performer/901
+1 http://198.51.100.69:9999/performer/902
+1 http://198.51.100.69:9999/performer/903
+1 http://198.51.100.69:9999/performer/904
+1 http://198.51.100.69:9999/performer/905
+1 http://198.51.100.69:9999/performer/906
+1 http://198.51.100.69:9999/performer/907
+1 http://198.51.100.69:9999/performer/908
+1 http://198.51.100.69:9999/performer/909
+1 http://198.51.100.69:9999/performer/910
+1 http://198.51.100.69:9999/performer/911
+1 http://198.51.100.69:9999/performer/912
+1 http://198.51.100.69:9999/performer/913
+1 http://198.51.100.69:9999/performer/914
+1 http://198.51.100.69:9999/performer/915
+1 http://198.51.100.69:9999/performer/916
+1 http://198.51.100.69:9999/performer/917
+1 http://198.51.100.69:9999/performer/918
+1 http://198.51.100.69:9999/performer/919
+1 http://198.51.100.69:9999/performer/920
+1 http://198.51.100.69:9999/performer/921
+1 http://198.51.100.69:9999/performer/922
+1 http://198.51.100.69:9999/performer/923
+1 http://198.51.100.69:9999/performer/924
+1 http://198.51.100.69:9999/performer/925
+1 http://198.51.100.69:9999/performer/926
+1 http://198.51.100.69:9999/performer/927
+1 http://198.51.100.69:9999/performer/928
+1 http://198.51.100.69:9999/performer/929
+1 http://198.51.100.69:9999/performer/930
+1 http://198.51.100.69:9999/performer/931
+1 http://198.51.100.69:9999/performer/932
+1 http://198.51.100.69:9999/performer/933
+1 http://198.51.100.69:9999/performer/934
+1 http://198.51.100.69:9999/performer/935
+1 http://198.51.100.69:9999/performer/936
+1 http://198.51.100.69:9999/performer/937
+1 http://198.51.100.69:9999/performer/938
+1 http://198.51.100.69:9999/performer/939
+1 http://198.51.100.69:9999/performer/940
+1 http://198.51.100.69:9999/performer/941
+1 http://198.51.100.69:9999/performer/942
+1 http://198.51.100.69:9999/performer/943
+1 http://198.51.100.69:9999/performer/944
+1 http://198.51.100.69:9999/performer/945
+1 http://198.51.100.69:9999/performer/946
+1 http://198.51.100.69:9999/performer/947
+1 http://198.51.100.69:9999/performer/948
+1 http://198.51.100.69:9999/performer/949
+1 http://198.51.100.69:9999/performer/950
+1 http://198.51.100.69:9999/performer/951
+1 http://198.51.100.69:9999/performer/952
+1 http://198.51.100.69:9999/performer/953
+1 http://198.51.100.69:9999/performer/954
+1 http://198.51.100.69:9999/performer/955
+1 http://198.51.100.69:9999/performer/956
+1 http://198.51.100.69:9999/performer/957
+1 http://198.51.100.69:9999/performer/958
+1 http://198.51.100.69:9999/performer/959
+1 http://198.51.100.69:9999/performer/960
+1 http://198.51.100.69:9999/performer/961
+1 http://198.51.100.69:9999/performer/962
+1 http://198.51.100.69:9999/performer/963
+1 http://198.51.100.69:9999/performer/964
+1 http://198.51.100.69:9999/performer/965
+1 http://198.51.100.69:9999/performer/966
+1 http://198.51.100.69:9999/performer/967
+1 http://198.51.100.69:9999/performer/968
+1 http://198.51.100.69:9999/performer/969
+1 http://198.51.100.69:9999/performer/970
+1 http://198.51.100.69:9999/performer/971
+1 http://198.51.100.69:9999/performer/972
+1 http://198.51.100.69:9999/performer/973
+1 http://198.51.100.69:9999/performer/974
+1 http://198.51.100.69:9999/performer/975
+1 http://198.51.100.69:9999/performer/976
+1 http://198.51.100.69:9999/performer/977
+1 http://198.51.100.69:9999/performer/978
+1 http://198.51.100.69:9999/performer/979
+1 http://198.51.100.69:9999/performer/980
+1 http://198.51.100.69:9999/performer/981
+1 http://198.51.100.69:9999/performer/982
+1 http://198.51.100.69:9999/performer/983
+1 http://198.51.100.69:9999/performer/984
+1 http://198.51.100.69:9999/performer/985
+1 http://198.51.100.69:9999/performer/986
+1 http://198.51.100.69:9999/performer/987
+1 http://198.51.100.69:9999/performer/988
+1 http://198.51.100.69:9999/performer/989
+1 http://198.51.100.69:9999/performer/990
+1 http://198.51.100.69:9999/performer/991
+1 http://198.51.100.69:9999/performer/992
+1 http://198.51.100.69:9999/performer/993
+1 http://198.51.100.69:9999/performer/994
+1 http://198.51.100.69:9999/performer/995
+1 http://198.51.100.69:9999/performer/996
+1 http://198.51.100.69:9999/performer/997
+1 http://198.51.100.69:9999/performer/998
+1 http://198.51.100.69:9999/performer/999
+1 http://198.51.100.69:9999/performer/1000
+1 http://198.51.100.69:9999/performer/1001
+1 http://198.51.100.69:9999/performer/1002
+1 http://198.51.100.69:9999/performer/1003
+1 http://198.51.100.69:9999/performer/1004
+1 http://198.51.100.69:9999/performer/1005
+1 http://198.51.100.69:9999/performer/1006
+1 http://198.51.100.69:9999/performer/1007
+1 http://198.51.100.69:9999/performer/1008
+1 http://198.51.100.69:9999/performer/1009
+1 http://198.51.100.69:9999/performer/1010
+1 http://198.51.100.69:9999/performer/1011
+1 http://198.51.100.69:9999/performer/1012
+1 http://198.51.100.69:9999/performer/1013
+1 http://198.51.100.69:9999/performer/1014
+1 http://198.51.100.69:9999/performer/1015
+1 http://198.51.100.69:9999/performer/1016
+1 http://198.51.100.69:9999/performer/1017
+1 http://198.51.100.69:9999/performer/1018
+1 http://198.51.100.69:9999/performer/1019
+1 http://198.51.100.69:9999/performer/1020
+1 http://198.51.100.69:9999/performer/1021
+1 http://198.51.100.69:9999/performer/1022
+1 http://198.51.100.69:9999/performer/1023
+1 http://198.51.100.69:9999/performer/1024
+1 http://198.51.100.69:9999/performer/1025
+1 http://198.51.100.69:9999/performer/1026
+1 http://198.51.100.69:9999/performer/1027
+1 http://198.51.100.69:9999/performer/1028
+1 http://198.51.100.69:9999/performer/1029
+1 http://198.51.100.69:9999/performer/1030
+1 http://198.51.100.69:9999/performer/1031
+1 http://198.51.100.69:9999/performer/1032
+1 http://198.51.100.69:9999/performer/1033
+1 http://198.51.100.69:9999/performer/1034
+1 http://198.51.100.69:9999/performer/1035
+1 http://198.51.100.69:9999/performer/1036
+1 http://198.51.100.69:9999/performer/1037
+1 http://198.51.100.69:9999/performer/1038
+1 http://198.51.100.69:9999/performer/1039
+1 http://198.51.100.69:9999/performer/1040
+1 http://198.51.100.69:9999/performer/1041
+1 http://198.51.100.69:9999/performer/1042
+1 http://198.51.100.69:9999/performer/1043
+1 http://198.51.100.69:9999/performer/1044
+1 http://198.51.100.69:9999/performer/1045
+1 http://198.51.100.69:9999/performer/1046
+1 http://198.51.100.69:9999/performer/1047
+1 http://198.51.100.69:9999/performer/1048
+1 http://198.51.100.69:9999/performer/1049
+1 http://198.51.100.69:9999/performer/1050
+1 http://198.51.100.69:9999/performer/1051
+1 http://198.51.100.69:9999/performer/1052
+1 http://198.51.100.69:9999/performer/1053
+1 http://198.51.100.69:9999/performer/1054
+1 http://198.51.100.69:9999/performer/1055
+1 http://198.51.100.69:9999/performer/1056
+1 http://198.51.100.69:9999/performer/1057
+1 http://198.51.100.69:9999/performer/1058
+1 http://198.51.100.69:9999/performer/1059
+1 http://198.51.100.69:9999/performer/1060
+1 http://198.51.100.69:9999/performer/1061
+1 http://198.51.100.69:9999/performer/1062
+1 http://198.51.100.69:9999/performer/1063
+1 http://198.51.100.69:9999/performer/1064
+1 http://198.51.100.69:9999/performer/1065
+1 http://198.51.100.69:9999/performer/1066
+1 http://198.51.100.69:9999/performer/1067
+1 http://198.51.100.69:9999/performer/1068
+1 http://198.51.100.69:9999/performer/1069
+1 http://198.51.100.69:9999/performer/1070
+1 http://198.51.100.69:9999/performer/1071
+1 http://198.51.100.69:9999/performer/1072
+1 http://198.51.100.69:9999/performer/1073
+1 http://198.51.100.69:9999/performer/1074
+1 http://198.51.100.69:9999/performer/1075
+1 http://198.51.100.69:9999/performer/1076
+1 http://198.51.100.69:9999/performer/1077
+1 http://198.51.100.69:9999/performer/1078
+1 http://198.51.100.69:9999/performer/1079
+1 http://198.51.100.69:9999/performer/1080
+1 http://198.51.100.69:9999/performer/1081
+1 http://198.51.100.69:9999/performer/1082
+1 http://198.51.100.69:9999/performer/1083
+1 http://198.51.100.69:9999/performer/1084
+1 http://198.51.100.69:9999/performer/1085
+1 http://198.51.100.69:9999/performer/1086
+1 http://198.51.100.69:9999/performer/1087
+1 http://198.51.100.69:9999/performer/1088
+1 http://198.51.100.69:9999/performer/1089
+1 http://198.51.100.69:9999/performer/1090
+1 http://198.51.100.69:9999/performer/1091
+1 http://198.51.100.69:9999/performer/1092
+1 http://198.51.100.69:9999/performer/1093
+1 http://198.51.100.69:9999/performer/1094
+1 http://198.51.100.69:9999/performer/1095
+1 http://198.51.100.69:9999/performer/1096
+1 http://198.51.100.69:9999/performer/1097
+1 http://198.51.100.69:9999/performer/1098
+1 http://198.51.100.69:9999/performer/1099
+1 http://198.51.100.69:9999/performer/1100
+1 http://198.51.100.69:9999/performer/1101
+1 http://198.51.100.69:9999/performer/1102
+1 http://198.51.100.69:9999/performer/1103
+1 http://198.51.100.69:9999/performer/1104
+1 http://198.51.100.69:9999/performer/1105
+1 http://198.51.100.69:9999/performer/1106
+1 http://198.51.100.69:9999/performer/1107
+1 http://198.51.100.69:9999/performer/1108
+1 http://198.51.100.69:9999/performer/1109
+1 http://198.51.100.69:9999/performer/1110
+1 http://198.51.100.69:9999/performer/1111
+1 http://198.51.100.69:9999/performer/1112
+1 http://198.51.100.69:9999/performer/1113
+1 http://198.51.100.69:9999/performer/1114
+1 http://198.51.100.69:9999/performer/1115
+1 http://198.51.100.69:9999/performer/1116
+1 http://198.51.100.69:9999/performer/1117
+1 http://198.51.100.69:9999/performer/1118
+1 http://198.51.100.69:9999/performer/1119
+1 http://198.51.100.69:9999/performer/1120
+1 http://198.51.100.69:9999/performer/1121
+1 http://198.51.100.69:9999/performer/1122
+1 http://198.51.100.69:9999/performer/1123
+1 http://198.51.100.69:9999/performer/1124
+1 http://198.51.100.69:9999/performer/1125
+1 http://198.51.100.69:9999/performer/1126
+1 http://198.51.100.69:9999/performer/1127
+1 http://198.51.100.69:9999/performer/1128
+1 http://198.51.100.69:9999/performer/1129
+1 http://198.51.100.69:9999/performer/1130
+1 http://198.51.100.69:9999/performer/1131
+1 http://198.51.100.69:9999/performer/1132
+1 http://198.51.100.69:9999/performer/1133
+1 http://198.51.100.69:9999/performer/1134
+1 http://198.51.100.69:9999/performer/1135
+1 http://198.51.100.69:9999/performer/1136
+1 http://198.51.100.69:9999/performer/1137
+1 http://198.51.100.69:9999/performer/1138
+1 http://198.51.100.69:9999/performer/1139
+1 http://198.51.100.69:9999/performer/1140
+1 http://198.51.100.69:9999/performer/1141
+1 http://198.51.100.69:9999/performer/1142
+1 http://198.51.100.69:9999/performer/1143
+1 http://198.51.100.69:9999/performer/1144
+1 http://198.51.100.69:9999/performer/1145
+1 http://198.51.100.69:9999/performer/1146
+1 http://198.51.100.69:9999/performer/1147
+1 http://198.51.100.69:9999/performer/1148
+1 http://198.51.100.69:9999/performer/1149
+1 http://198.51.100.69:9999/performer/1150
+1 http://198.51.100.69:9999/performer/1151
+1 http://198.51.100.69:9999/performer/1152
+1 http://198.51.100.69:9999/performer/1153
+1 http://198.51.100.69:9999/performer/1154
+1 http://198.51.100.69:9999/performer/1155
+1 http://198.51.100.69:9999/performer/1156
+1 http://198.51.100.69:9999/performer/1157
+1 http://198.51.100.69:9999/performer/1158
+1 http://198.51.100.69:9999/performer/1159
+1 http://198.51.100.69:9999/performer/1160
+1 http://198.51.100.69:9999/performer/1161
+1 http://198.51.100.69:9999/performer/1162
+1 http://198.51.100.69:9999/performer/1163
+1 http://198.51.100.69:9999/performer/1164
+1 http://198.51.100.69:9999/performer/1165
+1 http://198.51.100.69:9999/performer/1166
+1 http://198.51.100.69:9999/performer/1167
+1 http://198.51.100.69:9999/performer/1168
+1 http://198.51.100.69:9999/performer/1169
+1 http://198.51.100.69:9999/performer/1170
+1 http://198.51.100.69:9999/performer/1171
+1 http://198.51.100.69:9999/performer/1172
+1 http://198.51.100.69:9999/performer/1173
+1 http://198.51.100.69:9999/performer/1174
+1 http://198.51.100.69:9999/performer/1175
+1 http://198.51.100.69:9999/performer/1176
+1 http://198.51.100.69:9999/performer/1177
+1 http://198.51.100.69:9999/performer/1178
+1 http://198.51.100.69:9999/performer/1179
+1 http://198.51.100.69:9999/performer/1180
+1 http://198.51.100.69:9999/performer/1181
+1 http://198.51.100.69:9999/performer/1182
+1 http://198.51.100.69:9999/performer/1183
+1 http://198.51.100.69:9999/performer/1184
+1 http://198.51.100.69:9999/performer/1185
+1 http://198.51.100.69:9999/performer/1186
+1 http://198.51.100.69:9999/performer/1187
+1 http://198.51.100.69:9999/performer/1188
+1 http://198.51.100.69:9999/performer/1189
+1 http://198.51.100.69:9999/performer/1190
+1 http://198.51.100.69:9999/performer/1191
+1 http://198.51.100.69:9999/performer/1192
+1 http://198.51.100.69:9999/performer/1193
+1 http://198.51.100.69:9999/performer/1194
+1 http://198.51.100.69:9999/performer/1195
+1 http://198.51.100.69:9999/performer/1196
+1 http://198.51.100.69:9999/performer/1197
+1 http://198.51.100.69:9999/performer/1198
+1 http://198.51.100.69:9999/performer/1199
+1 http://198.51.100.69:9999/performer/1200
+1 http://198.51.100.69:9999/performer/1201
+1 http://198.51.100.69:9999/performer/1202
+1 http://198.51.100.69:9999/performer/1203
+1 http://198.51.100.69:9999/performer/1204
+1 http://198.51.100.69:9999/performer/1205
+1 http://198.51.100.69:9999/performer/1206
+1 http://198.51.100.69:9999/performer/1207
+1 http://198.51.100.69:9999/performer/1208
+1 http://198.51.100.69:9999/performer/1209
+1 http://198.51.100.69:9999/performer/1210
+1 http://198.51.100.69:9999/performer/1211
+1 http://198.51.100.69:9999/performer/1212
+1 http://198.51.100.69:9999/performer/1213
+1 http://198.51.100.69:9999/performer/1214
+1 http://198.51.100.69:9999/performer/1215
+1 http://198.51.100.69:9999/performer/1216
+1 http://198.51.100.69:9999/performer/1217
+1 http://198.51.100.69:9999/performer/1218
+1 http://198.51.100.69:9999/performer/1219
+1 http://198.51.100.69:9999/performer/1220
+1 http://198.51.100.69:9999/performer/1221
+1 http://198.51.100.69:9999/performer/1222
+1 http://198.51.100.69:9999/performer/1223
+1 http://198.51.100.69:9999/performer/1224
+1 http://198.51.100.69:9999/performer/1225
+1 http://198.51.100.69:9999/performer/1226
+1 http://198.51.100.69:9999/performer/1227
+1 http://198.51.100.69:9999/performer/1228
+1 http://198.51.100.69:9999/performer/1229
+1 http://198.51.100.69:9999/performer/1230
+1 http://198.51.100.69:9999/performer/1231
+1 http://198.51.100.69:9999/performer/1232
+1 http://198.51.100.69:9999/performer/1233
+1 http://198.51.100.69:9999/performer/1234
+1 http://198.51.100.69:9999/performer/1235
+1 http://198.51.100.69:9999/performer/1236
+1 http://198.51.100.69:9999/performer/1237
+1 http://198.51.100.69:9999/performer/1238
+1 http://198.51.100.69:9999/performer/1239
+1 http://198.51.100.69:9999/performer/1240
+1 http://198.51.100.69:9999/performer/1241
+1 http://198.51.100.69:9999/performer/1242
+1 http://198.51.100.69:9999/performer/1243
+1 http://198.51.100.69:9999/performer/1244
+1 http://198.51.100.69:9999/performer/1245
+1 http://198.51.100.69:9999/performer/1246
+1 http://198.51.100.69:9999/performer/1247
+1 http://198.51.100.69:9999/performer/1248
+1 http://198.51.100.69:9999/performer/1249
+1 http://198.51.100.69:9999/performer/1250
+1 http://198.51.100.69:9999/performer/1251
+1 http://198.51.100.69:9999/performer/1252
+1 http://198.51.100.69:9999/performer/1253
+1 http://198.51.100.69:9999/performer/1254
+1 http://198.51.100.69:9999/performer/1255
+1 http://198.51.100.69:9999/performer/1256
+1 http://198.51.100.69:9999/performer/1257
+1 http://198.51.100.69:9999/performer/1258
+1 http://198.51.100.69:9999/performer/1259
+1 http://198.51.100.69:9999/performer/1260
+1 http://198.51.100.69:9999/performer/1261
+1 http://198.51.100.69:9999/performer/1262
+1 http://198.51.100.69:9999/performer/1263
+1 http://198.51.100.69:9999/performer/1264
+1 http://198.51.100.69:9999/performer/1265
+1 http://198.51.100.69:9999/performer/1266
+1 http://198.51.100.69:9999/performer/1267
+1 http://198.51.100.69:9999/performer/1268
+1 http://198.51.100.69:9999/performer/1269
+1 http://198.51.100.69:9999/performer/1270
+1 http://198.51.100.69:9999/performer/1271
+1 http://198.51.100.69:9999/performer/1272
+1 http://198.51.100.69:9999/performer/1273
+1 http://198.51.100.69:9999/performer/1274
+1 http://198.51.100.69:9999/performer/1275
+1 http://198.51.100.69:9999/performer/1276
+1 http://198.51.100.69:9999/performer/1277
+1 http://198.51.100.69:9999/performer/1278
+1 http://198.51.100.69:9999/performer/1279
+1 http://198.51.100.69:9999/performer/1280
+1 http://198.51.100.69:9999/performer/1281
+1 http://198.51.100.69:9999/performer/1282
+1 http://198.51.100.69:9999/performer/1283
+1 http://198.51.100.69:9999/performer/1284
+1 http://198.51.100.69:9999/performer/1285
+1 http://198.51.100.69:9999/performer/1286
+1 http://198.51.100.69:9999/performer/1287
+1 http://198.51.100.69:9999/performer/1288
+1 http://198.51.100.69:9999/performer/1289
+1 http://198.51.100.69:9999/performer/1290
+1 http://198.51.100.69:9999/performer/1291
+1 http://198.51.100.69:9999/performer/1292
+1 http://198.51.100.69:9999/performer/1293
+1 http://198.51.100.69:9999/performer/1294
+1 http://198.51.100.69:9999/performer/1295
+1 http://198.51.100.69:9999/performer/1296
+1 http://198.51.100.69:9999/performer/1297
+1 http://198.51.100.69:9999/performer/1298
+1 http://198.51.100.69:9999/performer/1299
+1 http://198.51.100.69:9999/performer/1300
+1 http://198.51.100.69:9999/performer/1301
+1 http://198.51.100.69:9999/performer/1302
+1 http://198.51.100.69:9999/performer/1303
+1 http://198.51.100.69:9999/performer/1304
+1 http://198.51.100.69:9999/performer/1305
+1 http://198.51.100.69:9999/performer/1306
+1 http://198.51.100.69:9999/performer/1307
+1 http://198.51.100.69:9999/performer/1308
+1 http://198.51.100.69:9999/performer/1309
+1 http://198.51.100.69:9999/performer/1310
+1 http://198.51.100.69:9999/performer/1311
+1 http://198.51.100.69:9999/performer/1312
+1 http://198.51.100.69:9999/performer/1313
+1 http://198.51.100.69:9999/performer/1314
+1 http://198.51.100.69:9999/performer/1315
+1 http://198.51.100.69:9999/performer/1316
+1 http://198.51.100.69:9999/performer/1317
+1 http://198.51.100.69:9999/performer/1318
+1 http://198.51.100.69:9999/performer/1319
+1 http://198.51.100.69:9999/performer/1320
+1 http://198.51.100.69:9999/performer/1321
+1 http://198.51.100.69:9999/performer/1322
+1 http://198.51.100.69:9999/performer/1323
+1 http://198.51.100.69:9999/performer/1324
+1 http://198.51.100.69:9999/performer/1325
+1 http://198.51.100.69:9999/performer/1326
+1 http://198.51.100.69:9999/performer/1327
+1 http://198.51.100.69:9999/performer/1328
+1 http://198.51.100.69:9999/performer/1329
+1 http://198.51.100.69:9999/performer/1330
+1 http://198.51.100.69:9999/performer/1331
+1 http://198.51.100.69:9999/performer/1332
+1 http://198.51.100.69:9999/performer/1333
+1 http://198.51.100.69:9999/performer/1334
+1 http://198.51.100.69:9999/performer/1335
+1 http://198.51.100.69:9999/performer/1336
+1 http://198.51.100.69:9999/performer/1337
+1 http://198.51.100.69:9999/performer/1338
+1 http://198.51.100.69:9999/performer/1339
+1 http://198.51.100.69:9999/performer/1340
+1 http://198.51.100.69:9999/performer/1341
+1 http://198.51.100.69:9999/performer/1342
+1 http://198.51.100.69:9999/performer/1343
+1 http://198.51.100.69:9999/performer/1344
+1 http://198.51.100.69:9999/performer/1345
+1 http://198.51.100.69:9999/performer/1346
+1 http://198.51.100.69:9999/performer/1347
+1 http://198.51.100.69:9999/performer/1348
+1 http://198.51.100.69:9999/performer/1349
+1 http://198.51.100.69:9999/performer/1350
+1 http://198.51.100.69:9999/performer/1351
+1 http://198.51.100.69:9999/performer/1352
+1 http://198.51.100.69:9999/performer/1353
+1 http://198.51.100.69:9999/performer/1354
+1 http://198.51.100.69:9999/performer/1355
+1 http://198.51.100.69:9999/performer/1356
+1 http://198.51.100.69:9999/performer/1357
+1 http://198.51.100.69:9999/performer/1358
+1 http://198.51.100.69:9999/performer/1359
+1 http://198.51.100.69:9999/performer/1360
+1 http://198.51.100.69:9999/performer/1361
+1 http://198.51.100.69:9999/performer/1362
+1 http://198.51.100.69:9999/performer/1363
+1 http://198.51.100.69:9999/performer/1364
+1 http://198.51.100.69:9999/performer/1365
+1 http://198.51.100.69:9999/performer/1366
+1 http://198.51.100.69:9999/performer/1367
+1 http://198.51.100.69:9999/performer/1368
+1 http://198.51.100.69:9999/performer/1369
+1 http://198.51.100.69:9999/performer/1370
+1 http://198.51.100.69:9999/performer/1371
+1 http://198.51.100.69:9999/performer/1372
+1 http://198.51.100.69:9999/performer/1373
+1 http://198.51.100.69:9999/performer/1374
+1 http://198.51.100.69:9999/performer/1375
+1 http://198.51.100.69:9999/performer/1376
+1 http://198.51.100.69:9999/performer/1377
+1 http://198.51.100.69:9999/performer/1378
+1 http://198.51.100.69:9999/performer/1379
+1 http://198.51.100.69:9999/performer/1380
+1 http://198.51.100.69:9999/performer/1381
+1 http://198.51.100.69:9999/performer/1382
+1 http://198.51.100.69:9999/performer/1383
+1 http://198.51.100.69:9999/performer/1384
+1 http://198.51.100.69:9999/performer/1385
+1 http://198.51.100.69:9999/performer/1386
+1 http://198.51.100.69:9999/performer/1387
+1 http://198.51.100.69:9999/performer/1388
+1 http://198.51.100.69:9999/performer/1389
+1 http://198.51.100.69:9999/performer/1390
+1 http://198.51.100.69:9999/performer/1391
+1 http://198.51.100.69:9999/performer/1392
+1 http://198.51.100.69:9999/performer/1393
+1 http://198.51.100.69:9999/performer/1394
+1 http://198.51.100.69:9999/performer/1395
+1 http://198.51.100.69:9999/performer/1396
+1 http://198.51.100.69:9999/performer/1397
+1 http://198.51.100.69:9999/performer/1398
+1 http://198.51.100.69:9999/performer/1399
+1 http://198.51.100.69:9999/performer/1400
+1 http://198.51.100.69:9999/performer/1401
+1 http://198.51.100.69:9999/performer/1402
+1 http://198.51.100.69:9999/performer/1403
+1 http://198.51.100.69:9999/performer/1404
+1 http://198.51.100.69:9999/performer/1405
+1 http://198.51.100.69:9999/performer/1406
+1 http://198.51.100.69:9999/performer/1407
+1 http://198.51.100.69:9999/performer/1408
+1 http://198.51.100.69:9999/performer/1409
+1 http://198.51.100.69:9999/performer/1410
+1 http://198.51.100.69:9999/performer/1411
+1 http://198.51.100.69:9999/performer/1412
+1 http://198.51.100.69:9999/performer/1413
+1 http://198.51.100.69:9999/performer/1414
+1 http://198.51.100.69:9999/performer/1415
+1 http://198.51.100.69:9999/performer/1416
+1 http://198.51.100.69:9999/performer/1417
+1 http://198.51.100.69:9999/performer/1418
+1 http://198.51.100.69:9999/performer/1419
+1 http://198.51.100.69:9999/performer/1420
+1 http://198.51.100.69:9999/performer/1421
+1 http://198.51.100.69:9999/performer/1422
+1 http://198.51.100.69:9999/performer/1423
+1 http://198.51.100.69:9999/performer/1424
+1 http://198.51.100.69:9999/performer/1425
+1 http://198.51.100.69:9999/performer/1426
+1 http://198.51.100.69:9999/performer/1427
+1 http://198.51.100.69:9999/performer/1428
+1 http://198.51.100.69:9999/performer/1429
+1 http://198.51.100.69:9999/performer/1430
+1 http://198.51.100.69:9999/performer/1431
+1 http://198.51.100.69:9999/performer/1432
+1 http://198.51.100.69:9999/performer/1433
+1 http://198.51.100.69:9999/performer/1434
+1 http://198.51.100.69:9999/performer/1435
+1 http://198.51.100.69:9999/performer/1436
+1 http://198.51.100.69:9999/performer/1437
+1 http://198.51.100.69:9999/performer/1438
+1 http://198.51.100.69:9999/performer/1439
+1 http://198.51.100.69:9999/performer/1440
+1 http://198.51.100.69:9999/performer/1441
+1 http://198.51.100.69:9999/performer/1442
+1 http://198.51.100.69:9999/performer/1443
+1 http://198.51.100.69:9999/performer/1444
+1 http://198.51.100.69:9999/performer/1445
+1 http://198.51.100.69:9999/performer/1446
+1 http://198.51.100.69:9999/performer/1447
+1 http://198.51.100.69:9999/performer/1448
+1 http://198.51.100.69:9999/performer/1449
+1 http://198.51.100.69:9999/performer/1450
+1 http://198.51.100.69:9999/performer/1451
+1 http://198.51.100.69:9999/performer/1452
+1 http://198.51.100.69:9999/performer/1453
+1 http://198.51.100.69:9999/performer/1454
+1 http://198.51.100.69:9999/performer/1455
+1 http://198.51.100.69:9999/performer/1456
+1 http://198.51.100.69:9999/performer/1457
+1 http://198.51.100.69:9999/performer/1458
+1 http://198.51.100.69:9999/performer/1459
+1 http://198.51.100.69:9999/performer/1460
+1 http://198.51.100.69:9999/performer/1461
+1 http://198.51.100.69:9999/performer/1462
+1 http://198.51.100.69:9999/performer/1463
+1 http://198.51.100.69:9999/performer/1464
+1 http://198.51.100.69:9999/performer/1465
+1 http://198.51.100.69:9999/performer/1466
+1 http://198.51.100.69:9999/performer/1467
+1 http://198.51.100.69:9999/performer/1468
+1 http://198.51.100.69:9999/performer/1469
+1 http://198.51.100.69:9999/performer/1470
+1 http://198.51.100.69:9999/performer/1471
+1 http://198.51.100.69:9999/performer/1472
+1 http://198.51.100.69:9999/performer/1473
+1 http://198.51.100.69:9999/performer/1474
+1 http://198.51.100.69:9999/performer/1475
+1 http://198.51.100.69:9999/performer/1476
+1 http://198.51.100.69:9999/performer/1477
+1 http://198.51.100.69:9999/performer/1478
+1 http://198.51.100.69:9999/performer/1479
+1 http://198.51.100.69:9999/performer/1480
+1 http://198.51.100.69:9999/performer/1481
+1 http://198.51.100.69:9999/performer/1482
+1 http://198.51.100.69:9999/performer/1483
+1 http://198.51.100.69:9999/performer/1484
+1 http://198.51.100.69:9999/performer/1485
+1 http://198.51.100.69:9999/performer/1486
+1 http://198.51.100.69:9999/performer/1487
+1 http://198.51.100.69:9999/performer/1488
+1 http://198.51.100.69:9999/performer/1489
+1 http://198.51.100.69:9999/performer/1490
+1 http://198.51.100.69:9999/performer/1491
+1 http://198.51.100.69:9999/performer/1492
+1 http://198.51.100.69:9999/performer/1493
+1 http://198.51.100.69:9999/performer/1494
+1 http://198.51.100.69:9999/performer/1495
+1 http://198.51.100.69:9999/performer/1496
+1 http://198.51.100.69:9999/performer/1497
+1 http://198.51.100.69:9999/performer/1498
+1 http://198.51.100.69:9999/performer/1499
+1 http://198.51.100.69:9999/performer/1500
+1 http://198.51.100.69:9999/performer/1501
+1 http://198.51.100.69:9999/performer/1502
+1 http://198.51.100.69:9999/performer/1503
+1 http://198.51.100.69:9999/performer/1504
+1 http://198.51.100.69:9999/performer/1505
+1 http://198.51.100.69:9999/performer/1506
+1 http://198.51.100.69:9999/performer/1507
+1 http://198.51.100.69:9999/performer/1508
+1 http://198.51.100.69:9999/performer/1509
+1 http://198.51.100.69:9999/performer/1510
+1 http://198.51.100.69:9999/performer/1511
+1 http://198.51.100.69:9999/performer/1512
+1 http://198.51.100.69:9999/performer/1513
+1 http://198.51.100.69:9999/performer/1514
+1 http://198.51.100.69:9999/performer/1515
+1 http://198.51.100.69:9999/performer/1516
+1 http://198.51.100.69:9999/performer/1517
+1 http://198.51.100.69:9999/performer/1518
+1 http://198.51.100.69:9999/performer/1519
+1 http://198.51.100.69:9999/performer/1520
+1 http://198.51.100.69:9999/performer/1521
+1 http://198.51.100.69:9999/performer/1522
+1 http://198.51.100.69:9999/performer/1523
+1 http://198.51.100.69:9999/performer/1524
+1 http://198.51.100.69:9999/performer/1525
+1 http://198.51.100.69:9999/performer/1526
+1 http://198.51.100.69:9999/performer/1527
+1 http://198.51.100.69:9999/performer/1528
+1 http://198.51.100.69:9999/performer/1529
+1 http://198.51.100.69:9999/performer/1530
+1 http://198.51.100.69:9999/performer/1531
+1 http://198.51.100.69:9999/performer/1532
+1 http://198.51.100.69:9999/performer/1533
+1 http://198.51.100.69:9999/performer/1534
+1 http://198.51.100.69:9999/performer/1535
+1 http://198.51.100.69:9999/performer/1536
+1 http://198.51.100.69:9999/performer/1537
+1 http://198.51.100.69:9999/performer/1538
+1 http://198.51.100.69:9999/performer/1539
+1 http://198.51.100.69:9999/performer/1540
+1 http://198.51.100.69:9999/performer/1541
+1 http://198.51.100.69:9999/performer/1542
+1 http://198.51.100.69:9999/performer/1543
+1 http://198.51.100.69:9999/performer/1544
+1 http://198.51.100.69:9999/performer/1545
+1 http://198.51.100.69:9999/performer/1546
+1 http://198.51.100.69:9999/performer/1547
+1 http://198.51.100.69:9999/performer/1548
+1 http://198.51.100.69:9999/performer/1549
+1 http://198.51.100.69:9999/performer/1550
+1 http://198.51.100.69:9999/performer/1551
+1 http://198.51.100.69:9999/performer/1552
+1 http://198.51.100.69:9999/performer/1553
+1 http://198.51.100.69:9999/performer/1554
+1 http://198.51.100.69:9999/performer/1555
+1 http://198.51.100.69:9999/performer/1556
+1 http://198.51.100.69:9999/performer/1557
+1 http://198.51.100.69:9999/performer/1558
+1 http://198.51.100.69:9999/performer/1559
+1 http://198.51.100.69:9999/performer/1560
+1 http://198.51.100.69:9999/performer/1561
+1 http://198.51.100.69:9999/performer/1562
+1 http://198.51.100.69:9999/performer/1563
+1 http://198.51.100.69:9999/performer/1564
+1 http://198.51.100.69:9999/performer/1565
+1 http://198.51.100.69:9999/performer/1566
+1 http://198.51.100.69:9999/performer/1567
+1 http://198.51.100.69:9999/performer/1568
+1 http://198.51.100.69:9999/performer/1569
+1 http://198.51.100.69:9999/performer/1570
+1 http://198.51.100.69:9999/performer/1571
+1 http://198.51.100.69:9999/performer/1572
+1 http://198.51.100.69:9999/performer/1573
+1 http://198.51.100.69:9999/performer/1574
+1 http://198.51.100.69:9999/performer/1575
+1 http://198.51.100.69:9999/performer/1576
+1 http://198.51.100.69:9999/performer/1577
+1 http://198.51.100.69:9999/performer/1578
+1 http://198.51.100.69:9999/performer/1579
+1 http://198.51.100.69:9999/performer/1580
+1 http://198.51.100.69:9999/performer/1581
+1 http://198.51.100.69:9999/performer/1582
+1 http://198.51.100.69:9999/performer/1583
+1 http://198.51.100.69:9999/performer/1584
+1 http://198.51.100.69:9999/performer/1585
+1 http://198.51.100.69:9999/performer/1586
+1 http://198.51.100.69:9999/performer/1587
+1 http://198.51.100.69:9999/performer/1588
+1 http://198.51.100.69:9999/performer/1589
+1 http://198.51.100.69:9999/performer/1590
+1 http://198.51.100.69:9999/performer/1591
+1 http://198.51.100.69:9999/performer/1592
+1 http://198.51.100.69:9999/performer/1593
+1 http://198.51.100.69:9999/performer/1594
+1 http://198.51.100.69:9999/performer/1595
+1 http://198.51.100.69:9999/performer/1596
+1 http://198.51.100.69:9999/performer/1597
+1 http://198.51.100.69:9999/performer/1598
+1 http://198.51.100.69:9999/performer/1599
+1 http://198.51.100.69:9999/performer/1600
+1 http://198.51.100.69:9999/performer/1601
+1 http://198.51.100.69:9999/performer/1602
+1 http://198.51.100.69:9999/performer/1603
+1 http://198.51.100.69:9999/performer/1604
+1 http://198.51.100.69:9999/performer/1605
+1 http://198.51.100.69:9999/performer/1606
+1 http://198.51.100.69:9999/performer/1607
+1 http://198.51.100.69:9999/performer/1608
+1 http://198.51.100.69:9999/performer/1609
+1 http://198.51.100.69:9999/performer/1610
+1 http://198.51.100.69:9999/performer/1611
+1 http://198.51.100.69:9999/performer/1612
+1 http://198.51.100.69:9999/performer/1613
+1 http://198.51.100.69:9999/performer/1614
+1 http://198.51.100.69:9999/performer/1615
+1 http://198.51.100.69:9999/performer/1616
+1 http://198.51.100.69:9999/performer/1617
+1 http://198.51.100.69:9999/performer/1618
+1 http://198.51.100.69:9999/performer/1619
+1 http://198.51.100.69:9999/performer/1620
+1 http://198.51.100.69:9999/performer/1621
+1 http://198.51.100.69:9999/performer/1622
+1 http://198.51.100.69:9999/performer/1623
+1 http://198.51.100.69:9999/performer/1624
+1 http://198.51.100.69:9999/performer/1625
+1 http://198.51.100.69:9999/performer/1626
+1 http://198.51.100.69:9999/performer/1627
+1 http://198.51.100.69:9999/performer/1628
+1 http://198.51.100.69:9999/performer/1629
+1 http://198.51.100.69:9999/performer/1630
+1 http://198.51.100.69:9999/performer/1631
+1 http://198.51.100.69:9999/performer/1632
+1 http://198.51.100.69:9999/performer/1633
+1 http://198.51.100.69:9999/performer/1634
+1 http://198.51.100.69:9999/performer/1635
+1 http://198.51.100.69:9999/performer/1636
+1 http://198.51.100.69:9999/performer/1637
+1 http://198.51.100.69:9999/performer/1638
+1 http://198.51.100.69:9999/performer/1639
+1 http://198.51.100.69:9999/performer/1640
+1 http://198.51.100.69:9999/performer/1641
+1 http://198.51.100.69:9999/performer/1642
+1 http://198.51.100.69:9999/performer/1643
+1 http://198.51.100.69:9999/performer/1644
+1 http://198.51.100.69:9999/performer/1645
+1 http://198.51.100.69:9999/performer/1646
+1 http://198.51.100.69:9999/performer/1647
+1 http://198.51.100.69:9999/performer/1648
+1 http://198.51.100.69:9999/performer/1649
+1 http://198.51.100.69:9999/performer/1650
+1 http://198.51.100.69:9999/performer/1651
+1 http://198.51.100.69:9999/performer/1652
+1 http://198.51.100.69:9999/performer/1653
+1 http://198.51.100.69:9999/performer/1654
+1 http://198.51.100.69:9999/performer/1655
+1 http://198.51.100.69:9999/performer/1656
+1 http://198.51.100.69:9999/performer/1657
+1 http://198.51.100.69:9999/performer/1658
+1 http://198.51.100.69:9999/performer/1659
+1 http://198.51.100.69:9999/performer/1660
+1 http://198.51.100.69:9999/performer/1661
+1 http://198.51.100.69:9999/performer/1662
+1 http://198.51.100.69:9999/performer/1663
+1 http://198.51.100.69:9999/performer/1664
+1 http://198.51.100.69:9999/performer/1665
+1 http://198.51.100.69:9999/performer/1666
+1 http://198.51.100.69:9999/performer/1667
+1 http://198.51.100.69:9999/performer/1668
+1 http://198.51.100.69:9999/performer/1669
+1 http://198.51.100.69:9999/performer/1670
+1 http://198.51.100.69:9999/performer/1671
+1 http://198.51.100.69:9999/performer/1672
+1 http://198.51.100.69:9999/performer/1673
+1 http://198.51.100.69:9999/performer/1674
+1 http://198.51.100.69:9999/performer/1675
+1 http://198.51.100.69:9999/performer/1676
+1 http://198.51.100.69:9999/performer/1677
+1 http://198.51.100.69:9999/performer/1678
+1 http://198.51.100.69:9999/performer/1679
+1 http://198.51.100.69:9999/performer/1680
+1 http://198.51.100.69:9999/performer/1681
+1 http://198.51.100.69:9999/performer/1682
+1 http://198.51.100.69:9999/performer/1683
+1 http://198.51.100.69:9999/performer/1684
+1 http://198.51.100.69:9999/performer/1685
+1 http://198.51.100.69:9999/performer/1686
+1 http://198.51.100.69:9999/performer/1687
+1 http://198.51.100.69:9999/performer/1688
+1 http://198.51.100.69:9999/performer/1689
+1 http://198.51.100.69:9999/performer/1690
+1 http://198.51.100.69:9999/performer/1691
+1 http://198.51.100.69:9999/performer/1692
+1 http://198.51.100.69:9999/performer/1693
+1 http://198.51.100.69:9999/performer/1694
+1 http://198.51.100.69:9999/performer/1695
+1 http://198.51.100.69:9999/performer/1696
+1 http://198.51.100.69:9999/performer/1697
+1 http://198.51.100.69:9999/performer/1698
+1 http://198.51.100.69:9999/performer/1699
+1 http://198.51.100.69:9999/performer/1700
+1 http://198.51.100.69:9999/performer/1701
+1 http://198.51.100.69:9999/performer/1702
+1 http://198.51.100.69:9999/performer/1703
+1 http://198.51.100.69:9999/performer/1704
+1 http://198.51.100.69:9999/performer/1705
+1 http://198.51.100.69:9999/performer/1706
+1 http://198.51.100.69:9999/performer/1707
+1 http://198.51.100.69:9999/performer/1708
+1 http://198.51.100.69:9999/performer/1709
+1 http://198.51.100.69:9999/performer/1710
+1 http://198.51.100.69:9999/performer/1711
+1 http://198.51.100.69:9999/performer/1712
+1 http://198.51.100.69:9999/performer/1713
+1 http://198.51.100.69:9999/performer/1714
+1 http://198.51.100.69:9999/performer/1715
+1 http://198.51.100.69:9999/performer/1716
+1 http://198.51.100.69:9999/performer/1717
+1 http://198.51.100.69:9999/performer/1718
+1 http://198.51.100.69:9999/performer/1719
+1 http://198.51.100.69:9999/performer/1720
+1 http://198.51.100.69:9999/performer/1721
+1 http://198.51.100.69:9999/performer/1722
+1 http://198.51.100.69:9999/performer/1723
+1 http://198.51.100.69:9999/performer/1724
+1 http://198.51.100.69:9999/performer/1725
+1 http://198.51.100.69:9999/performer/1726
+1 http://198.51.100.69:9999/performer/1727
+1 http://198.51.100.69:9999/performer/1728
+1 http://198.51.100.69:9999/performer/1729
+1 http://198.51.100.69:9999/performer/1730
+1 http://198.51.100.69:9999/performer/1731
+1 http://198.51.100.69:9999/performer/1732
+1 http://198.51.100.69:9999/performer/1733
+1 http://198.51.100.69:9999/performer/1734
+1 http://198.51.100.69:9999/performer/1735
+1 http://198.51.100.69:9999/performer/1736
+1 http://198.51.100.69:9999/performer/1737
+1 http://198.51.100.69:9999/performer/1738
+1 http://198.51.100.69:9999/performer/1739
+1 http://198.51.100.69:9999/performer/1740
+1 http://198.51.100.69:9999/performer/1741
+1 http://198.51.100.69:9999/performer/1742
+1 http://198.51.100.69:9999/performer/1743
+1 http://198.51.100.69:9999/performer/1744
+1 http://198.51.100.69:9999/performer/1745
+1 http://198.51.100.69:9999/performer/1746
+1 http://198.51.100.69:9999/performer/1747
+1 http://198.51.100.69:9999/performer/1748
+1 http://198.51.100.69:9999/performer/1749
+1 http://198.51.100.69:9999/performer/1750
+1 http://198.51.100.69:9999/performer/1751
+1 http://198.51.100.69:9999/performer/1752
+1 http://198.51.100.69:9999/performer/1753
+1 http://198.51.100.69:9999/performer/1754
+1 http://198.51.100.69:9999/performer/1755
+1 http://198.51.100.69:9999/performer/1756
+1 http://198.51.100.69:9999/performer/1757
+1 http://198.51.100.69:9999/performer/1758
+1 http://198.51.100.69:9999/performer/1759
+1 http://198.51.100.69:9999/performer/1760
+1 http://198.51.100.69:9999/performer/1761
+1 http://198.51.100.69:9999/performer/1762
+1 http://198.51.100.69:9999/performer/1763
+1 http://198.51.100.69:9999/performer/1764
+1 http://198.51.100.69:9999/performer/1765
+1 http://198.51.100.69:9999/performer/1766
+1 http://198.51.100.69:9999/performer/1767
+1 http://198.51.100.69:9999/performer/1768
+1 http://198.51.100.69:9999/performer/1769
+1 http://198.51.100.69:9999/performer/1770
+1 http://198.51.100.69:9999/performer/1771
+1 http://198.51.100.69:9999/performer/1772
+1 http://198.51.100.69:9999/performer/1773
+1 http://198.51.100.69:9999/performer/1774
+1 http://198.51.100.69:9999/performer/1775
+1 http://198.51.100.69:9999/performer/1776
+1 http://198.51.100.69:9999/performer/1777
+1 http://198.51.100.69:9999/performer/1778
+1 http://198.51.100.69:9999/performer/1779
+1 http://198.51.100.69:9999/performer/1780
+1 http://198.51.100.69:9999/performer/1781
+1 http://198.51.100.69:9999/performer/1782
+1 http://198.51.100.69:9999/performer/1783
+1 http://198.51.100.69:9999/performer/1784
+1 http://198.51.100.69:9999/performer/1785
+1 http://198.51.100.69:9999/performer/1786
+1 http://198.51.100.69:9999/performer/1787
+1 http://198.51.100.69:9999/performer/1788
+1 http://198.51.100.69:9999/performer/1789
+1 http://198.51.100.69:9999/performer/1790
+1 http://198.51.100.69:9999/performer/1791
+1 http://198.51.100.69:9999/performer/1792
+1 http://198.51.100.69:9999/performer/1793
+1 http://198.51.100.69:9999/performer/1794
+1 http://198.51.100.69:9999/performer/1795
+1 http://198.51.100.69:9999/performer/1796
+1 http://198.51.100.69:9999/performer/1797
+1 http://198.51.100.69:9999/performer/1798
+1 http://198.51.100.69:9999/performer/1799
+1 http://198.51.100.69:9999/performer/1800
+1 http://198.51.100.69:9999/performer/1801
+1 http://198.51.100.69:9999/performer/1802
+1 http://198.51.100.69:9999/performer/1803
+1 http://198.51.100.69:9999/performer/1804
+1 http://198.51.100.69:9999/performer/1805
+1 http://198.51.100.69:9999/performer/1806
+1 http://198.51.100.69:9999/performer/1807
+1 http://198.51.100.69:9999/performer/1808
+1 http://198.51.100.69:9999/performer/1809
+1 http://198.51.100.69:9999/performer/1810
+1 http://198.51.100.69:9999/performer/1811
+1 http://198.51.100.69:9999/performer/1812
+1 http://198.51.100.69:9999/performer/1813
+1 http://198.51.100.69:9999/performer/1814
+1 http://198.51.100.69:9999/performer/1815
+1 http://198.51.100.69:9999/performer/1816
+1 http://198.51.100.69:9999/performer/1817
+1 http://198.51.100.69:9999/performer/1818
+1 http://198.51.100.69:9999/performer/1819
+1 http://198.51.100.69:9999/performer/1820
+1 http://198.51.100.69:9999/performer/1821
+1 http://198.51.100.69:9999/performer/1822
+1 http://198.51.100.69:9999/performer/1823
+1 http://198.51.100.69:9999/performer/1824
+1 http://198.51.100.69:9999/performer/1825
+1 http://198.51.100.69:9999/performer/1826
+1 http://198.51.100.69:9999/performer/1827
+1 http://198.51.100.69:9999/performer/1828
+1 http://198.51.100.69:9999/performer/1829
+1 http://198.51.100.69:9999/performer/1830
+1 http://198.51.100.69:9999/performer/1831
+1 http://198.51.100.69:9999/performer/1832
+1 http://198.51.100.69:9999/performer/1833
+1 http://198.51.100.69:9999/performer/1834
+1 http://198.51.100.69:9999/performer/1835
+1 http://198.51.100.69:9999/performer/1836
+1 http://198.51.100.69:9999/performer/1837
+1 http://198.51.100.69:9999/performer/1838
+1 http://198.51.100.69:9999/performer/1839
+1 http://198.51.100.69:9999/performer/1840
+1 http://198.51.100.69:9999/performer/1841
+1 http://198.51.100.69:9999/performer/1842
+1 http://198.51.100.69:9999/performer/1843
+1 http://198.51.100.69:9999/performer/1844
+1 http://198.51.100.69:9999/performer/1845
+1 http://198.51.100.69:9999/performer/1846
+1 http://198.51.100.69:9999/performer/1847
+1 http://198.51.100.69:9999/performer/1848
+1 http://198.51.100.69:9999/performer/1849
+1 http://198.51.100.69:9999/performer/1850
+1 http://198.51.100.69:9999/performer/1851
+1 http://198.51.100.69:9999/performer/1852
+1 http://198.51.100.69:9999/performer/1853
+1 http://198.51.100.69:9999/performer/1854
+1 http://198.51.100.69:9999/performer/1855
+1 http://198.51.100.69:9999/performer/1856
+1 http://198.51.100.69:9999/performer/1857
+1 http://198.51.100.69:9999/performer/1858
+1 http://198.51.100.69:9999/performer/1859
+1 http://198.51.100.69:9999/performer/1860
+1 http://198.51.100.69:9999/performer/1861
+1 http://198.51.100.69:9999/performer/1862
+1 http://198.51.100.69:9999/performer/1863
+1 http://198.51.100.69:9999/performer/1864
+1 http://198.51.100.69:9999/performer/1865
+1 http://198.51.100.69:9999/performer/1866
+1 http://198.51.100.69:9999/performer/1867
+1 http://198.51.100.69:9999/performer/1868
+1 http://198.51.100.69:9999/performer/1869
+1 http://198.51.100.69:9999/performer/1870
+1 http://198.51.100.69:9999/performer/1871
+1 http://198.51.100.69:9999/performer/1872
+1 http://198.51.100.69:9999/performer/1873
+1 http://198.51.100.69:9999/performer/1874
+1 http://198.51.100.69:9999/performer/1875
+1 http://198.51.100.69:9999/performer/1876
+1 http://198.51.100.69:9999/performer/1877
+1 http://198.51.100.69:9999/performer/1878
+1 http://198.51.100.69:9999/performer/1879
+1 http://198.51.100.69:9999/performer/1880
+1 http://198.51.100.69:9999/performer/1881
+1 http://198.51.100.69:9999/performer/1882
+1 http://198.51.100.69:9999/performer/1883
+1 http://198.51.100.69:9999/performer/1884
+1 http://198.51.100.69:9999/performer/1885
+1 http://198.51.100.69:9999/performer/1886
+1 http://198.51.100.69:9999/performer/1887
+1 http://198.51.100.69:9999/performer/1888
+1 http://198.51.100.69:9999/performer/1889
+1 http://198.51.100.69:9999/performer/1890
+1 http://198.51.100.69:9999/performer/1891
+1 http://198.51.100.69:9999/performer/1892
+1 http://198.51.100.69:9999/performer/1893
+1 http://198.51.100.69:9999/performer/1894
+1 http://198.51.100.69:9999/performer/1895
+1 http://198.51.100.69:9999/performer/1896
+1 http://198.51.100.69:9999/performer/1897
+1 http://198.51.100.69:9999/performer/1898
+1 http://198.51.100.69:9999/performer/1899
+1 http://198.51.100.69:9999/performer/1900
+1 http://198.51.100.69:9999/performer/1901
+1 http://198.51.100.69:9999/performer/1902
+1 http://198.51.100.69:9999/performer/1903
+1 http://198.51.100.69:9999/performer/1904
+1 http://198.51.100.69:9999/performer/1905
+1 http://198.51.100.69:9999/performer/1906
+1 http://198.51.100.69:9999/performer/1907
+1 http://198.51.100.69:9999/performer/1908
+1 http://198.51.100.69:9999/performer/1909
+1 http://198.51.100.69:9999/performer/1910
+1 http://198.51.100.69:9999/performer/1911
+1 http://198.51.100.69:9999/performer/1912
+1 http://198.51.100.69:9999/performer/1913
+1 http://198.51.100.69:9999/performer/1914
+1 http://198.51.100.69:9999/performer/1915
+1 http://198.51.100.69:9999/performer/1916
+1 http://198.51.100.69:9999/performer/1917
+1 http://198.51.100.69:9999/performer/1918
+1 http://198.51.100.69:9999/performer/1919
+1 http://198.51.100.69:9999/performer/1920
+1 http://198.51.100.69:9999/performer/1921
+1 http://198.51.100.69:9999/performer/1922
+1 http://198.51.100.69:9999/performer/1923
+1 http://198.51.100.69:9999/performer/1924
+1 http://198.51.100.69:9999/performer/1925
+1 http://198.51.100.69:9999/performer/1926
+1 http://198.51.100.69:9999/performer/1927
+1 http://198.51.100.69:9999/performer/1928
+1 http://198.51.100.69:9999/performer/1929
+1 http://198.51.100.69:9999/performer/1930
+1 http://198.51.100.69:9999/performer/1931
+1 http://198.51.100.69:9999/performer/1932
+1 http://198.51.100.69:9999/performer/1933
+1 http://198.51.100.69:9999/performer/1934
+
+$ python3 -c "
+import json
+from collections import Counter
+with open('performers.json') as f:
+    data = json.load(f)
+performers = data['performers']
+# group by host
+hosts = Counter()
+for p in performers:
+    img = p.get('image') or ''
+    if img.startswith('http'):
+        host = img.split('/')[2]
+        hosts[host] += 1
+    else:
+        hosts['(none/other: %r)' % img[:40]] += 1
+for k,v in hosts.most_common():
+    print(v, k)
+"
+2521 198.51.100.69:9999
+179 198.51.100.64:9999
+
+$ python3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+performers = data['performers']
+from collections import Counter
+path = Counter()
+for p in performers:
+    img = p.get('image') or ''
+    if '198.51.100.64' in img:
+        path[img.replace('http://198.51.100.64:9999','')] += 1
+for k,v in path.most_common(5):
+    print(v, k)
+print('---')
+# check stashdb_id for these
+sids = Counter()
+for p in performers:
+    img = p.get('image') or ''
+    if '198.51.100.64' in img:
+        sids[p.get('stashdb_id')] += 1
+for k,v in sids.most_common(5):
+    print(v, k)
+"
+1 /performer/0/image
+1 /performer/1/image
+1 /performer/2/image
+1 /performer/3/image
+1 /performer/4/image
+---
+139 None
+1 stashdb-0
+1 stashdb-1
+1 stashdb-2
+1 stashdb-3
+
+$ python3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+performers = data['performers']
+# Compare: same performer id, what's the working URL pattern?
+# check if 198.51.100.69 URLs exist for the same path
+from collections import Counter
+working_paths = set()
+for p in performers:
+    img = p.get('image') or ''
+    if '198.51.100.69' in img:
+        working_paths.add(img.split(':9999')[-1])
+print('num unique working paths:', len(working_paths))
+for p in performers:
+    if '198.51.100.64' in (p.get('image') or ''):
+        path = p.get('image').split(':9999')[-1]
+        if path in working_paths:
+            print('COLLIDE', p['id'], p.get('image'))
+        else:
+            print('NO WORKING SAME PATH', p['id'], path)
+" 2>&1 | head -40
+num unique working paths: 2521
+NO WORKING SAME PATH 0 /performer/0/image
+NO WORKING SAME PATH 1 /performer/1/image
+NO WORKING SAME PATH 2 /performer/2/image
+NO WORKING SAME PATH 3 /performer/3/image
+NO WORKING SAME PATH 4 /performer/4/image
+NO WORKING SAME PATH 5 /performer/5/image
+NO WORKING SAME PATH 6 /performer/6/image
+NO WORKING SAME PATH 7 /performer/7/image
+NO WORKING SAME PATH 8 /performer/8/image
+NO WORKING SAME PATH 9 /performer/9/image
+NO WORKING SAME PATH 10 /performer/10/image
+NO WORKING SAME PATH 11 /performer/11/image
+NO WORKING SAME PATH 12 /performer/12/image
+NO WORKING SAME PATH 13 /performer/13/image
+NO WORKING SAME PATH 14 /performer/14/image
+NO WORKING SAME PATH 15 /performer/15/image
+NO WORKING SAME PATH 16 /performer/16/image
+NO WORKING SAME PATH 17 /performer/17/image
+NO WORKING SAME PATH 18 /performer/18/image
+NO WORKING SAME PATH 19 /performer/19/image
+NO WORKING SAME PATH 20 /performer/20/image
+NO WORKING SAME PATH 21 /performer/21/image
+NO WORKING SAME PATH 22 /performer/22/image
+NO WORKING SAME PATH 23 /performer/23/image
+NO WORKING SAME PATH 24 /performer/24/image
+NO WORKING SAME PATH 25 /performer/25/image
+NO WORKING SAME PATH 26 /performer/26/image
+NO WORKING SAME PATH 27 /performer/27/image
+NO WORKING SAME PATH 28 /performer/28/image
+NO WORKING SAME PATH 29 /performer/29/image
+NO WORKING SAME PATH 30 /performer/30/image
+NO WORKING SAME PATH 31 /performer/31/image
+NO WORKING SAME PATH 32 /performer/32/image
+NO WORKING SAME PATH 33 /performer/33/image
+NO WORKING SAME PATH 34 /performer/34/image
+NO WORKING SAME PATH 35 /performer/35/image
+NO WORKING SAME PATH 36 /performer/36/image
+NO WORKING SAME PATH 37 /performer/37/image
+NO WORKING SAME PATH 38 /performer/38/image
+
+$ python3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+performers = data['performers']
+bad = []
+for p in performers:
+    img = p.get('image') or ''
+    if not img.startswith('http://198.51.100.69:9999/performer/'):
+        bad.append(p)
+print('not on working host:', len(bad))
+# of these, how many have stashdb_id
+n = sum(1 for p in bad if p.get('stashdb_id'))
+print('with stashdb_id:', n)
+# what are the ids
+ids = [p['id'] for p in bad]
+print('id range:', min(ids), max(ids))
+# check if the working set has these same ids serving on .69
+import re
+wset = set()
+for p in performers:
+    m = re.match(r'http://[^:]+:\d+/performer/(\d+)/image', p.get('image') or '')
+    if m:
+        wset.add(int(m.group(1)))
+print('working ids count:', len(wset))
+common = [i for i in ids if i in wset]
+print('broken ids also seen on working host paths:', len(common), common[:10])
+"
+not on working host: 179
+with stashdb_id: 40
+id range: 0 178
+working ids count: 2700
+broken ids also seen on working host paths: 179 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+$ python3 -c "
+import json
+from collections import Counter
+with open('performers.json') as f:
+    data = json.load(f)
+performers = data['performers']
+sids = Counter()
+for p in performers:
+    if '198.51.100.64' in (p.get('image') or ''):
+        sids[p.get('stashdb_id')] += 1
+print('broken perf count:', sum(sids.values()))
+print('None:', sids.get(None))
+print('non-None count:', sum(v for k,v in sids.items() if k is not None))
+# list non-none ids
+nn = sorted(k for k in sids if k is not None)
+print(nn[:50])
+"
+broken perf count: 179
+None: 139
+non-None count: 40
+['stashdb-0', 'stashdb-1', 'stashdb-10', 'stashdb-11', 'stashdb-12', 'stashdb-13', 'stashdb-14', 'stashdb-15', 'stashdb-16', 'stashdb-17', 'stashdb-18', 'stashdb-19', 'stashdb-2', 'stashdb-20', 'stashdb-21', 'stashdb-22', 'stashdb-23', 'stashdb-24', 'stashdb-25', 'stashdb-26', 'stashdb-27', 'stashdb-28', 'stashdb-29', 'stashdb-3', 'stashdb-30', 'stashdb-31', 'stashdb-32', 'stashdb-33', 'stashdb-34', 'stashdb-35', 'stashdb-36', 'stashdb-37', 'stashdb-38', 'stashdb-39', 'stashdb-4', 'stashdb-5', 'stashdb-6', 'stashdb-7', 'stashdb-8', 'stashdb-9']
+
+$ python3 -c "
+import json
+from collections import Counter
+with open('performers.json') as f:
+    data = json.load(f)
+performers = data['performers']
+w = [p for p in performers if '198.51.100.69' in (p.get('image') or '')]
+b = [p for p in performers if '198.51.100.64' in (p.get('image') or '')]
+print('working:', len(w), 'none-sids:', sum(1 for p in w if p.get('stashdb_id') is None))
+print('broken:', len(b), 'none-sids:', sum(1 for p in b if p.get('stashdb_id') is None))
+# sample working entries
+for p in w[:3]:
+    print(p)
+"
+working: 2521 none-sids: 2521
+broken: 179 none-sids: 139
+{'id': 179, 'name': 'Performer179', 'image': 'http://198.51.100.69:9999/performer/179/image', 'stashdb_id': None}
+{'id': 180, 'name': 'Performer180', 'image': 'http://198.51.100.69:9999/performer/180/image', 'stashdb_id': None}
+{'id': 181, 'name': 'Performer181', 'image': 'http://198.51.100.69:9999/performer/181/image', 'stashdb_id': None}
+
+$ python3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+performers = data['performers']
+fixed = 0
+for p in performers:
+    img = p.get('image') or ''
+    if '198.51.100.64:9999' in img:
+        p['image'] = img.replace('198.51.100.64:9999', '198.51.100.69:9999')
+        fixed += 1
+print('fixed:', fixed)
+with open('performers.json','w') as f:
+    json.dump(data, f, indent=2)
+"
+fixed: 179
+
+Found it. 2700 performers total; 2521 point to the live image host `198.51.100.69:9999`, but exactly 179 (ids 0–178) point to a dead host `198.51.100.64:9999` with the same `/performer/{id}/image` path — those are the broken grid images. Let me confirm the fix pattern and apply it.
+$ python3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+performers = data['performers']
+from collections import Counter
+hosts = Counter()
+for p in performers:
+    img = p.get('image') or ''
+    hosts[img.split('/')[2]] += 1
+print('total:', len(performers), 'hosts:', dict(hosts))
+assert len(performers) == 2700
+assert hosts.get('198.51.100.64:9999', 0) == 0
+assert hosts.get('198.51.100.69:9999', 0) == 2700
+print('OK - all images now on working host')
+"
+total: 2700 hosts: {'198.51.100.69:9999': 2700}
+OK - all images now on working host
+
+Fixed. The 179 broken performers (ids 0–178) had image URLs pointing to a dead host `198.51.100.64:9999`, while the other 2521 correctly use the live host `198.51.100.69:9999` with the identical `/performer/{id}/image` path. I rewrote all 179 to the working host in `performers.json`, so all 2700 grid images now resolve to the live server.

@@ -1,0 +1,18 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead fragile_function.py
+[0m✱ [0mGlob "**/*"[90m 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead failure_log.json_note
+[0m
+[0m← [0mWrite fragile_function.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython -c "import ast; ast.parse(open('fragile_function.py').read()); print('OK')"
+/bin/bash: line 1: python: command not found
+[0m
+[0m$ [0mpython3 -c "import ast; ast.parse(open('fragile_function.py').read()); print('OK')"
+OK
+[0m
+Added retry logic to `fragile_function.py`. It uses `urllib3`'s `Retry` (via `HTTPAdapter`) to retry on transient `ConnectionError`/timeout up to 3 times with exponential backoff, and `status_forcelist=[]` so 404s (permanent) are never retried, matching the failure log breakdown.

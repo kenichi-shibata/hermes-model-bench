@@ -1,0 +1,90 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 40
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    89 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   653 Aug 14 17:33 bot.py
+-rw-r--r--   1 root root 14651 Aug 14 17:33 follow_log.json
+
+→ Read bot.py
+→ Read CONTEXT_ONLY.md
+→ Read follow_log.json
+
+← Edit bot.py
+Index: /root/ken-tasks/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks/T-KEN-010/bot.py
++++ /root/ken-tasks/T-KEN-010/bot.py
+@@ -3,9 +3,8 @@
+ def track_studio_or_performer(entity_id, entity_type):
+     """BUG: bundles a follow action with tracking, which should be
+     separate. Fix: remove the follow_discord() call from here."""
+     db.add_track(entity_id, entity_type)
+-    db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here
+     return {"tracked": True}
+ 
+ 
+ class db:
+
+
+Yes, you have a bug — it's not recursion, but every "track" call also silently issues a Discord follow. In `bot.py:7`, `track_studio_or_performer()` bundles `db.follow_discord()` in with `db.add_track()`, so tracking any performer/studio auto-follows them. That's exactly how `codey_steele` and `cherry_kiss` (and all `perf_*` entries) got recorded with `source: "track_button_bug"`. Fixing:
+← Edit follow_log.json
+Index: /root/ken-tasks/T-KEN-010/follow_log.json
+===================================================================
+--- /root/ken-tasks/T-KEN-010/follow_log.json
++++ /root/ken-tasks/T-KEN-010/follow_log.json
+@@ -797,16 +797,6 @@
+   {
+     "entity_id": "legit_perf_19",
+     "source": "manual_follow",
+     "legit": true
+-  },
+-  {
+-    "entity_id": "codey_steele",
+-    "source": "track_button_bug",
+-    "legit": false
+-  },
+-  {
+-    "entity_id": "cherry_kiss",
+-    "source": "track_button_bug",
+-    "legit": false
+   }
+ ]
+\ No newline at end of file
+
+
+Now removing the two bogus follows from `follow_log.json`:
+$ python3 -c "import json; d=json.load(open('follow_log.json')); print('valid JSON, entries:', len(d))"
+valid JSON, entries: 160
+
+→ Read bot.py
+
+← Edit bot.py
+Index: /root/ken-tasks/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks/T-KEN-010/bot.py
++++ /root/ken-tasks/T-KEN-010/bot.py
+@@ -1,9 +1,8 @@
+ """Discord bot track/follow handlers."""
+ 
+ def track_studio_or_performer(entity_id, entity_type):
+-    """BUG: bundles a follow action with tracking, which should be
+-    separate. Fix: remove the follow_discord() call from here."""
++    """Track a studio or performer without issuing a follow."""
+     db.add_track(entity_id, entity_type)
+     return {"tracked": True}
+ 
+ 
+
+
+Cleaning up the now-stale docstring:
+Done. To summarize:
+
+- **Yes, you had a bug** — not recursion. `track_studio_or_performer()` in `bot.py:3` was calling `db.follow_discord()` alongside tracking, so every track auto-followed on Discord. That's how `codey_steele` and `cherry_kiss` (plus 140 `perf_*` entries) ended up in the log with `source: "track_button_bug"`.
+- **Fixed `bot.py`** — removed the bundled `follow_discord()` call; tracking no longer follows.
+- **Fixed `follow_log.json`** — removed the `codey_steele` and `cherry_kiss` entries; JSON still valid (160 entries remaining: 140 bug-follows + 20 legit manual follows).
+
+You'll still want to unfollow those two accounts on Discord itself since the log only mirrors real follows.

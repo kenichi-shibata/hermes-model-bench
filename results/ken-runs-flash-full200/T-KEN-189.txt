@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read pr_diff_stats.json
+Yes. Only 15 of 200 lines (7.5%) are the actual fix; the remaining 185 lines are pure reformatting, which inflates the PR and makes it harder to review. The diff could be ~93% smaller.

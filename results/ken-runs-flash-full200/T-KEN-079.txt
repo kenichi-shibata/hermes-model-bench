@@ -1,0 +1,57 @@
+
+> build · deepseek-v4-flash
+
+→ Read canonical_bug.py
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    24 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    81 Aug 15 00:37 canonical_bug.py
+
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "
+from canonical_bug import pick_canonical
+items = [
+    {'id': 1, 'upload_date': '2024-05-01', 'name': 'A'},
+    {'id': 2, 'upload_date': '2024-06-01'},
+    {'id': 3, 'upload_date': '2024-04-01', 'name': 'A', 'email': 'a@x.com'},
+]
+print('current:', pick_canonical(items))
+"
+current: {'id': 2, 'upload_date': '2024-06-01'}
+
+← Edit canonical_bug.py
+Index: /root/ken-tasks/T-KEN-079/canonical_bug.py
+===================================================================
+--- /root/ken-tasks/T-KEN-079/canonical_bug.py
++++ /root/ken-tasks/T-KEN-079/canonical_bug.py
+@@ -1,2 +1,5 @@
+ def pick_canonical(items):
+-    return max(items, key=lambda i: i['upload_date'])
++    return max(items, key=lambda i: (
++        sum(v is not None and v != '' for v in i.values()),
++        i.get('upload_date'),
++    ))
+
+
+$ python3 -c "
+from canonical_bug import pick_canonical
+items = [
+    {'id': 1, 'upload_date': '2024-05-01', 'name': 'A'},
+    {'id': 2, 'upload_date': '2024-06-01'},
+    {'id': 3, 'upload_date': '2024-04-01', 'name': 'A', 'email': 'a@x.com'},
+]
+print(pick_canonical(items))
+tie = [
+    {'id': 1, 'upload_date': '2024-05-01', 'name': 'A'},
+    {'id': 2, 'upload_date': '2024-06-01', 'name': 'B'},
+]
+print(pick_canonical(tie))
+"
+{'id': 3, 'upload_date': '2024-04-01', 'name': 'A', 'email': 'a@x.com'}
+{'id': 2, 'upload_date': '2024-06-01', 'name': 'B'}
+
+Fixed. The bug: `pick_canonical` chose by latest `upload_date`, so a sparse/partial record could win over a richer one. A canonical record should be the most complete. Now it picks the item with the most non-empty fields, using latest `upload_date` only as a tiebreaker (`canonical_bug.py:1`).

@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read spend_breakdown.json
+Yes — overspending confirmed. Total cost is 10.0, of which 8.0 is the repeated subtask, but that subtask is marked `repeated_subtask_cacheable: true`. Cacheable work shouldn't be re-charged, so the 8.0 (80% of the total) looks like an avoidable duplicate expense.

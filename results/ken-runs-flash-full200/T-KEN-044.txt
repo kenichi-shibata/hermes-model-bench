@@ -1,0 +1,42 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   101 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   128 Aug 14 17:33 title_translate.py
+-rw-r--r--   1 root root   736 Aug 14 17:33 titles_data.json
+
+→ Read title_translate.py
+→ Read titles_data.json
+→ Read CONTEXT_ONLY.md
+
+← Write title_translate.py
+Wrote file successfully.
+
+$ python3 -c "
+import json
+from title_translate import translate
+data = json.load(open('titles_data.json'))
+for item in data:
+    print(item['id'], repr(item['title_jp']), '->', translate(item['title_jp']))
+"
+0 'いいタイトル' -> iitaitoru (EN)
+1 'いいタイトル' -> iitaitoru (EN)
+2 'いいタイトル' -> iitaitoru (EN)
+3 'いいタイトル' -> iitaitoru (EN)
+4 'いいタイトル' -> iitaitoru (EN)
+5 'いいタイトル' -> iitaitoru (EN)
+6 'いいタイトル' -> iitaitoru (EN)
+7 'いいタイトル' -> iitaitoru (EN)
+8 '���' -> None
+9 '���' -> None
+
+Fixed. `romanize_lib` in `title_translate.py` previously only appended ` (EN)` without actually romanizing, so kana-only titles stayed Japanese-only.
+
+- Added a hiragana/katakana→romaji converter (`_romanize_kana`), so `いいタイトル` → `iitaitoru (EN)`.
+- Garbled sources (U+FFFD, ids 8–9) still correctly return `None` as untranslatable.
+
+Verified all 10 entries: ids 0–7 now romanized, ids 8–9 `None`.

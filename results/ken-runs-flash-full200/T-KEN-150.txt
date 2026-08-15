@@ -1,0 +1,19 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    32 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    84 Aug 15 00:37 tier_config_vs_task.json
+
+→ Read tier_config_vs_task.json
+→ Read CONTEXT_ONLY.md
+✱ Glob "**/*" 2 matches
+**No.** Delegation is not using the right tier.
+
+- `routing_rule: "always_expensive_tier"` sends *every* task to the costliest tier.
+- `task_complexity_considered: false` means complexity is never factored in.
+
+Simple/low-complexity tasks should route to cheaper tiers; only complex tasks warrant the expensive tier.

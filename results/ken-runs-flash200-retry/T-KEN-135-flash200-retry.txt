@@ -1,0 +1,19 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead single_case_data.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-135/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    29 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    40 Aug 15 00:37 single_case_data.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mfind /root/ken-tasks/T-KEN-135/ -mindepth 1 -maxdepth 2 2>/dev/null
+/root/ken-tasks/T-KEN-135/single_case_data.json
+/root/ken-tasks/T-KEN-135/CONTEXT_ONLY.md
+[0m
+Because this record has **nothing to translate**: both `name_jp` and `name_en` are `null` (single_case_data.json:2-3). Translation runs on a source `name_jp` string; with no Japanese source present, there's nothing to produce an `name_en` from. The "others" you're comparing against would have non-null `name_jp` values. This file is just an empty placeholder case.

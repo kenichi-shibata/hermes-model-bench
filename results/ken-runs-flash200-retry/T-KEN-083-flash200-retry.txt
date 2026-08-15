@@ -1,0 +1,7 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead post_merge_state.json
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+**Merge failed.** The file shows `play_count: null` but `expected_play_count: 15` — the value wasn't preserved, so the merge did not actually work.

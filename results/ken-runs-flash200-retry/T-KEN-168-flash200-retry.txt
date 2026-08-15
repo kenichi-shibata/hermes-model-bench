@@ -1,0 +1,7 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead vpn_route_table.json
+Yes — `local_lan_route_overridden_by_vpn: true` means the VPN overrides the local LAN route, so local-network traffic (e.g., printers, NAS, local servers) gets pushed through the VPN tunnel instead of staying on the LAN. That effectively blocks direct local access.
+
+Only real "blocking" signal in this file is that one flag; `accept_routes: true` just means it accepts VPN-provided routes (normal).

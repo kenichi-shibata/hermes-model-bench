@@ -1,0 +1,20 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    72 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   331 Aug 14 17:33 node_facts.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead node_facts.json
+Choose **node_A** for the test LXC.
+
+Reasoning from `node_facts.json`:
+- **node_B runs `trading-stack`** (a financial system) — a test workload there risks resource contention with critical production. That alone disqualifies it.
+- node_A has more effective memory (674 MB free + 8500 MB reclaimable cache vs node_B's 478 MB + 4500 MB).
+- Thin-pool headroom is essentially a tie (200 vs 202 GB), so it doesn't offset node_B's risk.
+
+Spin up the test container on **node_A**.

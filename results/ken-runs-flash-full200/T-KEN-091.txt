@@ -1,0 +1,15 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    30 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   109 Aug 15 00:37 error_correlation.json
+
+→ Read error_correlation.json
+→ Read CONTEXT_ONLY.md
+Code problem.
+
+The error spike (`10:01`) directly follows the deploy (`10:00`) and `infra_metrics_stable: true` rules out infra causes. This points to a regression introduced by the deploy.

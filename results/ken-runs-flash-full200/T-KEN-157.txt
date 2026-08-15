@@ -1,0 +1,26 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la saved_fact_verification.json
+-rw-r--r-- 1 root root 90 Aug 15 00:37 saved_fact_verification.json
+
+→ Read saved_fact_verification.json
+
+$ python3 -c "import json; d=json.load(open('saved_fact_verification.json')); print(json.dumps(d, indent=2))"
+{
+  "exists": true,
+  "expected_date": "2026-08-13",
+  "actual_saved_date": "2026-08-31"
+}
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    36 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    90 Aug 15 00:37 saved_fact_verification.json
+
+→ Read CONTEXT_ONLY.md
+File saved correctly. It's valid JSON and well-formed (exists: true).
+
+One thing to flag: the date doesn't match — expected `2026-08-13` but actual saved date is `2026-08-31`. If the expected date was the requirement, the save is wrong; otherwise the file itself is fine.

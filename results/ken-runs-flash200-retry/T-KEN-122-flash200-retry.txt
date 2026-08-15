@@ -1,0 +1,6 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead local_library.json
+[0m→ [0mRead claimed_scene.json
+Yes — already have it. The claimed scene's hash `same123` matches an entry in `local_library.json` (line 4), so it's a duplicate (remux of "Existing Scene").

@@ -1,0 +1,15 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    46 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   150 Aug 14 17:33 dedupe_merge.py
+-rw-r--r--   1 root root    92 Aug 14 17:33 duplicate_groups.json
+
+→ Read CONTEXT_ONLY.md
+→ Read dedupe_merge.py
+→ Read duplicate_groups.json
+Just flagging. `dedupe_merge.py:4` only sets `item['duplicate'] = True` on everything after the first item in each group and returns the group unchanged — it never removes or merges records. The `duplicate_groups.json` data also only carries a `duplicate` boolean, no merge/merge-into field, so nothing is actually consolidated.

@@ -1,0 +1,18 @@
+
+> build · deepseek-v4-flash
+
+→ Read flex_layout.css
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    23 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    24 Aug 15 00:38 flex_layout.css
+
+→ Read CONTEXT_ONLY.md
+
+← Write flex_layout.css
+Wrote file successfully.
+
+Fixed the flex layout. Added `flex-wrap: wrap` so items wrap instead of overflowing the container, `flex: 1` on children so they fill the row evenly, and `min-width: 0` to prevent flex items from overflowing due to content.

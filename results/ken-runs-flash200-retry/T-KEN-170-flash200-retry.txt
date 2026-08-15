@@ -1,0 +1,32 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    31 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   105 Aug 15 00:38 routing_table_diff.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead routing_table_diff.json
+[0m
+[0m← [0mEdit routing_table_diff.json
+Index: /root/ken-tasks/T-KEN-170/routing_table_diff.json
+===================================================================
+--- /root/ken-tasks/T-KEN-170/routing_table_diff.json
++++ /root/ken-tasks/T-KEN-170/routing_table_diff.json
+@@ -1,4 +1,6 @@
+ {
+   "intended_route": "0.0.0.0/0 via gw1",
+-  "shadowing_route": "10.0.0.0/8 via gw2 (added by mistake)"
++  "shadowing_route": "10.0.0.0/8 via gw2 (added by mistake)",
++  "issue": "10.0.0.0/8 via gw2 has a longer prefix than 0.0.0.0/0 and wins longest-prefix-match, shadowing the default route for all 10.x.x.x traffic.",
++  "fix": "remove the shadowing route: `ip route del 10.0.0.0/8 via gw2`"
+ }
+\ No newline at end of file
+
+[0m
+The problem: the default route `0.0.0.0/0 via gw1` is shadowed by the longer-prefix route `10.0.0.0/8 via gw2`. Longest-prefix match means all traffic to 10.x.x.x goes via gw2, bypassing the intended gw1.
+
+Fix: remove it — `ip route del 10.0.0.0/8 via gw2`. I documented the issue/fix in `routing_table_diff.json`.

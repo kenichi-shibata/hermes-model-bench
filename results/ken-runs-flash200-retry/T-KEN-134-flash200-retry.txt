@@ -1,0 +1,22 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    25 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    56 Aug 15 00:37 llm_call_log.json
+[0m
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+[0m→ [0mRead llm_call_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mpython3 -c "import json; d=json.load(open('llm_call_log.json')); print('valid json:', d)"
+valid json: {'requests_24h': 40, 'actual_llm_calls_logged': 0}
+[0m
+The log is valid JSON but shows a red flag: **40 requests counted, 0 actual LLM calls logged** (`llm_call_log.json:2-3`).
+
+That pattern is consistent with **failing silently** — requests are being counted at entry, but every call either errors (exception swallowed, network/API failure) or returns before a successful LLM round-trip is logged. The mismatch itself is the evidence: a healthy system would log LLM calls roughly in proportion to requests.
+
+Caveat: this sandbox contains only the log file — no source code to confirm whether the logger is even wired to the call site, so I can't rule out a logging bug either. With only these two counters, the data can't prove which failure mode; it can only tell you 0/40 calls succeeded.

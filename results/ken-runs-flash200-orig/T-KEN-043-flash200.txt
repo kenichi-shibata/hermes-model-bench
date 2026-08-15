@@ -1,0 +1,40 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    51 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    14 Aug 14 17:33 trending_cache.py
+-rw-r--r--   1 root root    75 Aug 14 17:33 trending_cache_meta.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead trending_cache.py
+[0m→ [0mRead trending_cache_meta.json
+[0m
+[0m← [0mWrite trending_cache.py
+Wrote file successfully.
+[0m
+[0m← [0mWrite trending_cache_meta.json
+Wrote file successfully.
+[0m
+Both files read. Let me analyze the issue.
+
+**Diagnosis:** The freshness check is being compared against a frozen `now` timestamp stored inside `trending_cache_meta.json` instead of the real current time. `last_refresh` is `2026-08-11T18:00:00` and the persisted `now` is `2026-08-13T00:00:00` (today is actually `2026-08-14`), so the TTL computation is anchored to a stale, never-advancing timestamp. The cache never sees itself as expired (or refreshes once and then re-fixes `now`), so trending never updates.
+
+`now` is not state that belongs in the meta file — it must be computed as `datetime.now()` at check time. Let me fix both files.
+Now verify the freshness check behaves correctly with real time:
+[0m$ [0mpython3 -c "
+import trending_cache as t
+print('stale:', t.is_stale(t.load_meta()))
+"
+stale: True
+[0m
+Fixed. The bug: `trending_cache_meta.json` persisted a hardcoded `now` timestamp (`2026-08-13T00:00:00`) that the TTL check used as "current time." Since it never advanced, the cache never expired against real wall-clock time.
+
+Changes:
+- `trending_cache.py`: `is_stale()` now uses `datetime.now()` at check time instead of a stored `now`; added the missing load/refresh logic.
+- `trending_cache_meta.json`: dropped the bogus `now` field — only `last_refresh` is real state.
+
+Verified: with `last_refresh` at `2026-08-11T18:00:00` and today being `2026-08-14`, `is_stale()` correctly returns `True` (well past the 6h TTL), so trending will refresh.

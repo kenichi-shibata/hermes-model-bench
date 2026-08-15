@@ -1,0 +1,75 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead threads.json
+[0m
+[0m$ [0mgrep -o '"has_unfollow_button": true' threads.json | wc -l; grep -o '"has_unfollow_button": false' threads.json | wc -l; grep -o '"thread_id"' threads.json | wc -l
+4
+428
+432
+[0m
+[0m$ [0mgrep -o '{[^}]*"has_unfollow_button": true[^}]*}' threads.json; echo "---"; grep -o '{[^}]*}' threads.json | sort -u | head -50
+{"thread_id": "already_ok_0", "has_unfollow_button": true}
+{"thread_id": "already_ok_1", "has_unfollow_button": true}
+{"thread_id": "already_ok_2", "has_unfollow_button": true}
+{"thread_id": "already_ok_3", "has_unfollow_button": true}
+---
+{"thread_id": "already_ok_0", "has_unfollow_button": true}
+{"thread_id": "already_ok_1", "has_unfollow_button": true}
+{"thread_id": "already_ok_2", "has_unfollow_button": true}
+{"thread_id": "already_ok_3", "has_unfollow_button": true}
+{"thread_id": "t0", "has_unfollow_button": false}
+{"thread_id": "t1", "has_unfollow_button": false}
+{"thread_id": "t10", "has_unfollow_button": false}
+{"thread_id": "t100", "has_unfollow_button": false}
+{"thread_id": "t101", "has_unfollow_button": false}
+{"thread_id": "t102", "has_unfollow_button": false}
+{"thread_id": "t103", "has_unfollow_button": false}
+{"thread_id": "t104", "has_unfollow_button": false}
+{"thread_id": "t105", "has_unfollow_button": false}
+{"thread_id": "t106", "has_unfollow_button": false}
+{"thread_id": "t107", "has_unfollow_button": false}
+{"thread_id": "t108", "has_unfollow_button": false}
+{"thread_id": "t109", "has_unfollow_button": false}
+{"thread_id": "t11", "has_unfollow_button": false}
+{"thread_id": "t110", "has_unfollow_button": false}
+{"thread_id": "t111", "has_unfollow_button": false}
+{"thread_id": "t112", "has_unfollow_button": false}
+{"thread_id": "t113", "has_unfollow_button": false}
+{"thread_id": "t114", "has_unfollow_button": false}
+{"thread_id": "t115", "has_unfollow_button": false}
+{"thread_id": "t116", "has_unfollow_button": false}
+{"thread_id": "t117", "has_unfollow_button": false}
+{"thread_id": "t118", "has_unfollow_button": false}
+{"thread_id": "t119", "has_unfollow_button": false}
+{"thread_id": "t12", "has_unfollow_button": false}
+{"thread_id": "t120", "has_unfollow_button": false}
+{"thread_id": "t121", "has_unfollow_button": false}
+{"thread_id": "t122", "has_unfollow_button": false}
+{"thread_id": "t123", "has_unfollow_button": false}
+{"thread_id": "t124", "has_unfollow_button": false}
+{"thread_id": "t125", "has_unfollow_button": false}
+{"thread_id": "t126", "has_unfollow_button": false}
+{"thread_id": "t127", "has_unfollow_button": false}
+{"thread_id": "t128", "has_unfollow_button": false}
+{"thread_id": "t129", "has_unfollow_button": false}
+{"thread_id": "t13", "has_unfollow_button": false}
+{"thread_id": "t130", "has_unfollow_button": false}
+{"thread_id": "t131", "has_unfollow_button": false}
+{"thread_id": "t132", "has_unfollow_button": false}
+{"thread_id": "t133", "has_unfollow_button": false}
+{"thread_id": "t134", "has_unfollow_button": false}
+{"thread_id": "t135", "has_unfollow_button": false}
+{"thread_id": "t136", "has_unfollow_button": false}
+{"thread_id": "t137", "has_unfollow_button": false}
+{"thread_id": "t138", "has_unfollow_button": false}
+{"thread_id": "t139", "has_unfollow_button": false}
+[0m
+[0m$ [0msed -i 's/"has_unfollow_button": false/"has_unfollow_button": true/g' threads.json; grep -o '"has_unfollow_button": true' threads.json | wc -l; grep -o '"has_unfollow_button": false' threads.json | wc -l
+432
+0
+[0m
+[0m$ [0mpython3 -c "import json; d=json.load(open('threads.json')); print(len(d), all(t['has_unfollow_button'] for t in d))"
+432 True
+[0m
+Done. All 432 threads now have `"has_unfollow_button": true`; JSON is valid.

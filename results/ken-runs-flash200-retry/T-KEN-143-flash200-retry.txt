@@ -1,0 +1,16 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead alert_vs_ground_truth.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-143/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    34 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    87 Aug 15 00:37 alert_vs_ground_truth.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+The alert is likely a false positive caused by stale data. The `check_data_age_min: 120` (2 hours old) means the alert evaluated metrics from 120 minutes ago, when usage was at 95%. The current ground truth is 45%, so the 95% figure no longer reflects reality — the alert fired on outdated data instead of re-checking the live value.
+
+Root cause: missing/lax data freshness validation before alert evaluation, so a 2-hour-old reading triggered a 95% alert while actual usage had already dropped to 45%. Fix: enforce a freshness threshold (e.g., fail or suppress the alert when `check_data_age_min` exceeds the acceptable window) and re-evaluate against current data.

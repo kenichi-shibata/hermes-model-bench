@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read alert_dispatch_log.json
+No. `dispatched_flag` is true but `outbound_call_result` is `"timeout"`, so the alert attempt failed and never went out.

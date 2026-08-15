@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    65 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   512 Aug 14 17:33 queue_state.json
+
+→ Read queue_state.json
+→ Read CONTEXT_ONLY.md
+Yes. All 5 items are stuck at **0%** and every one has the identical `stalled_since_min: 47` — same stall time across the whole queue points to a systemic failure, not per-item trouble.
+
+Likely causes for a full queue stalling at 0% simultaneously:
+- **News server unreachable** (connection lost/auth expired/down) — no articles fetched at all, hence zero progress on everything.
+- Network/DNS outage on the host.
+- All server slots saturated/failed so SAB never even starts pulling articles.
+
+Since nothing moved past 0, articles aren't being delivered at all — check SAB's connection/warning log for server errors rather than the individual downloads. If servers are fine, it's likely a stall-out that needs a queue retry.

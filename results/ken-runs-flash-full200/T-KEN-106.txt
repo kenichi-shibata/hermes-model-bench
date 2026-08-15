@@ -1,0 +1,25 @@
+
+> build · deepseek-v4-flash
+
+→ Read recovery_test.json
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    26 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    63 Aug 15 00:37 recovery_test.json
+
+→ Read CONTEXT_ONLY.md
+
+$ ls -la; find . -type f -name '.*' 2>/dev/null; md5sum recovery_test.json
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    26 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    63 Aug 15 00:37 recovery_test.json
+7e2f9ca89638be9e200b0a9ef3e7946d  recovery_test.json
+
+No. We cannot actually recover from this state.
+
+The sandbox contains only `recovery_test.json` (the state report) and `CONTEXT_ONLY.md` (a pointer). The JSON reports `file_exists: true` but `checksum_matches_manifest: false` — yet there is no manifest, no backup, no expected checksum, and no original source anywhere in the directory to restore the correct content from. The file exists but is (by its own report) corrupt/inconsistent, and nothing here provides the data needed to repair it. So recovery is not possible from this state.

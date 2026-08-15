@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-flash
+
+→ Read ratings_api.py
+→ Read ratings_db.json
+The bug: `get_rating` divides by `vote_count`, so scenes with 0 votes (ids 0–2) throw a `ZeroDivisionError` and break the page.
+
+← Edit ratings_api.py
+Index: /root/ken-tasks/T-KEN-030/ratings_api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-030/ratings_api.py
++++ /root/ken-tasks/T-KEN-030/ratings_api.py
+@@ -1,2 +1,4 @@
+ def get_rating(scene):
++    if scene['vote_count'] == 0:
++        return 0
+     return scene['total_score'] / scene['vote_count']
+
+
+Fixed. `ratings_api.py:2` now guards against `vote_count == 0`, returning 0 instead of crashing on the unrrated scenes.

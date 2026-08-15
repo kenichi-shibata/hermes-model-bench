@@ -1,0 +1,32 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    26 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root  2202 Aug 15 00:37 check_history.json
+
+→ Read check_history.json
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "
+import json
+d=json.load(open('check_history.json'))
+total=len(d)
+fp=sum(1 for e in d if not e['was_real_issue'])
+tp=sum(1 for e in d if e['was_real_issue'])
+print('total triggers:', total)
+print('true positives:', tp)
+print('false positives:', fp)
+print('false positive rate: %.1f%%' % (100*fp/total))
+print('false positive triggers:', [e['trigger'] for e in d if not e['was_real_issue']])
+"
+total triggers: 40
+true positives: 30
+false positives: 10
+false positive rate: 25.0%
+false positive triggers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 36]
+
+False positive rate: **25%** (10 of 40 triggers). Every 4th trigger was a false positive — triggers 0, 4, 8, 12, 16, 20, 24, 28, 32, 36.

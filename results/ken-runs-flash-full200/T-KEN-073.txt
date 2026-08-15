@@ -1,0 +1,19 @@
+
+> build · deepseek-v4-flash
+
+→ Read embed_builder.py
+→ Read scene_for_embed.json
+
+← Edit embed_builder.py
+Index: /root/ken-tasks/T-KEN-073/embed_builder.py
+===================================================================
+--- /root/ken-tasks/T-KEN-073/embed_builder.py
++++ /root/ken-tasks/T-KEN-073/embed_builder.py
+@@ -1,2 +1,2 @@
+ def build_embed(scene):
+-    return {'image': scene.get('cover_url')}
++    return {'image': scene.get('thumbnail_url')}
+
+
+The embed looks up `cover_url`, but the JSON only has `thumbnail_url` — so `.get()` returns `None`. Fix the key to `thumbnail_url`.
+Fixed. `embed_builder.py:2` now reads `thumbnail_url`, matching `scene_for_embed.json`.

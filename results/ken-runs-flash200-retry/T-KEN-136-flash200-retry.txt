@@ -1,0 +1,26 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    31 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   158 Aug 15 00:37 verification_pairs.json
+[0m
+[0m→ [0mRead verification_pairs.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mpython3 -c "
+import json
+data = json.load(open('verification_pairs.json'))
+for i, pair in enumerate(data, 1):
+    match = pair['romanized'].strip().lower() == pair['verified_real'].strip().lower()
+    print(f'Pair {i}: MATCH' if match else f'Pair {i}: MISMATCH')
+"
+Pair 1: MATCH
+Pair 2: MISMATCH
+[0m
+Results:
+- **Pair 1: MATCH** — `"Correct Name"` matches `"Correct Name"`
+- **Pair 2: MISMATCH** — `"Wrong Nmae"` ≠ `"Correct Name 2"` (typo and different name)

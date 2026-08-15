@@ -1,0 +1,30 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-033
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   109 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   110 Aug 14 17:33 studio_hierarchy.json
+-rw-r--r--   1 root root   133 Aug 14 17:33 studio_page_api.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead studio_hierarchy.json
+[0m→ [0mRead studio_page_api.py
+[0m
+[0m← [0mWrite studio_page_api.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 -c "
+import studio_page_api as s
+studios = {'parent1': {'name': 'MegaStudio'}, 'child_a': {'name': 'Alpha'}, 'child_b': {'name': 'Beta'}, 'solo': {'name': 'Solo'}}
+print(s.get_studio('parent1', studios))
+print(s.get_studio('child_a', studios))
+print(s.get_studio('solo', studios))
+"
+{'id': 'parent1', 'name': 'MegaStudio', 'child_studios': [{'id': 'child_a', 'name': 'Alpha'}, {'id': 'child_b', 'name': 'Beta'}]}
+{'id': 'child_a', 'name': 'Alpha'}
+{'id': 'solo', 'name': 'Solo'}
+[0m
+Fixed `studio_page_api.py:1` so `get_studio` now reads `studio_hierarchy.json` and returns `child_studios` (sub groups) for parent studios, pulling each child's name from the `studios` data. Child/leaf studios are unchanged.

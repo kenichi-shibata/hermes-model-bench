@@ -1,0 +1,14 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la && wc -c api_trace.json
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    22 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    76 Aug 15 00:37 api_trace.json
+76 api_trace.json
+[0m
+[0m→ [0mRead api_trace.json
+[0m→ [0mRead CONTEXT_ONLY.md
+The API is slow because it issues **500 sequential DB queries** (8ms each = ~4000ms, ~90% of the 4500ms total). Classic N+1 query problem — likely a missing join or eager-loading. The fix is to batch queries (e.g., one `IN` clause or JOIN instead of per-row queries).

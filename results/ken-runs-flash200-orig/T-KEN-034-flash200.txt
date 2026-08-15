@@ -1,0 +1,15 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root    83 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    56 Aug 14 17:33 cover_image_resolver.py
+-rw-r--r--   1 root root  2152 Aug 14 17:33 scenes_covers.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead cover_image_resolver.py
+[0m→ [0mRead scenes_covers.json
+Scenes with IDs 0–4 have `cover_url: null` in `scenes_covers.json:5,11,17,23,29`, while scenes 5–19 have actual URLs. The resolver `cover_image_resolver.py:2` just returns `scene.get('cover_url')`, so it passes through the `null` — meaning those scenes have no cover image simply because no cover was set in the data.

@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead post_rate.json
+Spamming. 15 consecutive posts (t=0–14) are all flagged `burst: true`, with the burst only ending at t=15. That's an abnormal flood; normal posting wouldn't show a 15-message burst streak in the hour.

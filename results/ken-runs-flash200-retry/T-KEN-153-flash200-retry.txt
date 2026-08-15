@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead before_after_comparison.json
+No. Pass count is unchanged (18 → 18) and cost dropped 10x (3.0 → 0.3), so the model switch didn't break anything.

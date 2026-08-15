@@ -1,0 +1,17 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    49 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    25 Aug 15 00:37 host_metrics.json
+-rw-r--r--   1 root root    22 Aug 15 00:37 service_x_metrics.json
+
+→ Read CONTEXT_ONLY.md
+→ Read host_metrics.json
+→ Read service_x_metrics.json
+`service_x_metrics.json` shows `latency_ms: 40`, and `host_metrics.json` shows `cpu_steal_pct: 60`.
+
+High CPU steal (60%) means the hypervisor is giving your CPU cycles to other VMs on the same host — your instance is CPU-starved, which inflates latency. The slowness is host-level contention, not a service x code problem.

@@ -1,0 +1,8 @@
+
+> build · deepseek-v4-flash
+
+✱ Glob "**/swap_stats.json" 1 match
+→ Read swap_stats.json
+! permission requested: external_directory (/proc/*); auto-rejecting
+✗ free -m && echo "---" && swapon --show && echo "---" && cat /proc/meminfo | grep -i swap failed
+Error: The user rejected permission to use this specific tool call.

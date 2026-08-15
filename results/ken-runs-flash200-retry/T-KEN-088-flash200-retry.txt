@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead db_vs_app.json
+Not the DB. The DB query is 12ms; serialization is 3800ms — the bottleneck is the app layer serializing 50,000 rows, not the query itself.

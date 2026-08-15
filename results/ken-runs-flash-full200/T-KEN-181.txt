@@ -1,0 +1,25 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:38 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 01:32 ..
+-rw-r--r--   1 root root    28 Aug 15 00:38 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   112 Aug 15 00:38 dark_mode_styles.css
+
+→ Read CONTEXT_ONLY.md
+→ Read dark_mode_styles.css
+
+← Edit dark_mode_styles.css
+Index: /root/ken-tasks/T-KEN-181/dark_mode_styles.css
+===================================================================
+--- /root/ken-tasks/T-KEN-181/dark_mode_styles.css
++++ /root/ken-tasks/T-KEN-181/dark_mode_styles.css
+@@ -1,2 +1,2 @@
+-.sidebar { background: white; }
++.sidebar { background: white; } .dark .sidebar { background: black; }
+ .header { background-color: white; } .dark .header { background-color: black; }
+
+
+Added `.dark .sidebar { background: black; }` matching the existing `.header` pattern, so the sidebar now gets dark mode too.

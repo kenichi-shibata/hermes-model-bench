@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead cheap_model_accuracy.json
+No — 60% accuracy on a safety-critical task category is not good enough. I'd keep using the expensive model for `safety_critical_merge`.

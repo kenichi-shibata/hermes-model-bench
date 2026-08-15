@@ -1,0 +1,21 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead recent_chat_context.json
+[0m→ [0mRead catalog_candidates.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-123
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root   113 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   188 Aug 15 00:37 catalog_candidates.json
+-rw-r--r--   1 root root    57 Aug 15 00:37 recent_chat_context.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mWrite queue.json
+Wrote file successfully.
+[0m
+Matched: candidate id 2 (performer X at studio Y). Queueing it now.
+Queued scene id 2 (performer X, studio Y) in `queue.json`.

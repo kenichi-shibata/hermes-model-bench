@@ -1,0 +1,8 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead post_handler.py
+[0m→ [0mRead message_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+Because `post()` has no idempotency tracking (post_handler.py:1-2). It fires `webhook.send(message)` unconditionally, so every invocation posts. `message_log.json` shows the same `"New scene!"` sent twice, 5s apart (10:00:00, 10:00:05) — evidence the handler was invoked twice (retry, double-firing event, or two webhook calls) and nothing deduplicated it. Fix: record a message hash/id in a log and skip sending if it's already present.

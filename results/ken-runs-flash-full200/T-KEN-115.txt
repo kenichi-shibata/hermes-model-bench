@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read weekly_completion.json
+100% — all 11 tasks (id 0–10) have status `completed`.

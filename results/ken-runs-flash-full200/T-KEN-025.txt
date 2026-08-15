@@ -1,0 +1,15 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   102 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    85 Aug 14 17:33 indexer_freshness.json
+-rw-r--r--   1 root root    54 Aug 14 17:33 scene_claim.json
+
+→ Read CONTEXT_ONLY.md
+→ Read indexer_freshness.json
+→ Read scene_claim.json
+The scene is on `site_c`, whose indexer last ran **2h ago** and runs on a **6h interval** — so the next run is ~4h out. It hasn't shown up yet because the indexer simply hasn't re-run since the claim; the scene should appear after that next run, not before.

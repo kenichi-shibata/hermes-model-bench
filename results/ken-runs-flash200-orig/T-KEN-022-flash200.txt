@@ -1,0 +1,6 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead sab_config.json
+[0m→ [0mRead speed_log.json
+sab is capped at its own config: `sab_config.json:2` sets `max_download_speed_kbps` to 500, and the log shows throughput pinned at ~485–494 kbps — right up against that throttle. So the slowness isn't the network, it's the 500 kbps speed limit.

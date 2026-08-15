@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-flash
+
+→ Read thin_pool_status.json
+Tight, yes — but not physically. The data volume itself is only 42% used; what's at 95% is `allocated_pct_of_physical`, i.e. the thin-provisioned allocation already mapped against the pool's total size. Thin volumes will stop accepting writes once that hits 100%, so at 95% you're near the point where LVM autoextend kicks in / writes start failing. Worth adding capacity or trimming unallocated extents now.

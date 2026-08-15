@@ -1,0 +1,9 @@
+
+> build · deepseek-v4-flash
+
+→ Read performer_disambiguation.json
+✱ Glob "**/*" 2 matches
+→ Read CONTEXT_ONLY.md
+**Cannot determine.** The file gives no disambiguating data — both entries (`p1`, `p2`) are identical: name "Jane Doe", `verified: true`. There's no genre, dates, labels, album references, or external IDs to tell if either is the intended performer or a namesake. `verified: true` just claims authenticity; it doesn't say who.
+
+To resolve, I'd need at least one distinguishing field per record (e.g., genre/role, birth year, label, or a MusicBrainz/ISNI identifier) plus the target performer's known attributes.

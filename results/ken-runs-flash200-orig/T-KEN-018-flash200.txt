@@ -1,0 +1,55 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 44
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   162 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   416 Aug 14 17:33 indexer_api_mock.py
+-rw-r--r--   1 root root   580 Aug 14 17:33 retry_engine.py
+-rw-r--r--   1 root root 12690 Aug 14 17:33 wanted_backlog.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead indexer_api_mock.py
+[0m→ [0mRead retry_engine.py
+[0m→ [0mRead wanted_backlog.json
+[0m
+[0m$ [0mpython3 -c "import json; data=json.load(open('wanted_backlog.json')); print(len(data)); print(all(d['status']=='stuck' for d in data))"
+400
+True
+[0m
+[0m$ [0mpython3 -c "
+import json
+from retry_engine import run_backlog
+data = json.load(open('wanted_backlog.json'))
+results = run_backlog(data, concurrency=5)
+print('total', len(results))
+print('resolved', sum(1 for r in results if r['resolved']))
+print('failed', sum(1 for r in results if not r['resolved']))
+print('ids', results[0]['id'], '..', results[-1]['id'])
+"
+total 400
+resolved 400
+failed 0
+ids 0 .. 399
+[0m
+[0m$ [0mpython3 -c "
+import json
+from retry_engine import run_backlog
+data = json.load(open('wanted_backlog.json'))
+results = run_backlog(data, concurrency=5)
+by_id = {r['id']: r for r in results}
+for item in data:
+    item['status'] = 'resolved' if by_id[item['id']]['resolved'] else 'stuck'
+json.dump(data, open('wanted_backlog.json','w'))
+print('remaining stuck:', sum(1 for d in data if d['status']=='stuck'))
+print('sample:', data[0], data[-1])
+"
+remaining stuck: 0
+sample: {'id': 0, 'status': 'resolved'} {'id': 399, 'status': 'resolved'}
+[0m
+All 400 items resolved through the app's own `run_backlog` engine at its safe concurrency (5, matching the indexer's limit). "100 agents" would have tripped the 429 rate limit — the correct highest-leverage tool was the built-in engine.
+
+Persisting the resolved state back to the backlog:
+Done. Backlog cleared: all 400 stuck items resolved via `retry_engine.run_backlog` at concurrency 5 (the indexer's max), and the JSON persisted with `status: "resolved"`. Going "full tilt" with 100 parallel agents would have hit the 429 rate limit — the existing engine at safe concurrency is the correct tool here.

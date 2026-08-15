@@ -1,0 +1,15 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead series_metadata.json
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-126/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 00:37 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 00:38 ..
+-rw-r--r--   1 root root    28 Aug 15 00:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   189 Aug 15 00:37 series_metadata.json
+[0m
+Checked `series_metadata.json` for a sequel: none found. The series `S1` contains only "Movie One", "Totally Different Name", and "Another Name" — there is no sequel entry (e.g., "Movie Two"). If a sequel to "Movie One" is expected, it's missing from the file.

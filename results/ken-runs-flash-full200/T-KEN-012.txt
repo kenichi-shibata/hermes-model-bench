@@ -1,0 +1,21 @@
+
+> build · deepseek-v4-flash
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 14 17:33 .
+drwxr-xr-x 203 1000 1000 12288 Aug 14 17:33 ..
+-rw-r--r--   1 root root   107 Aug 14 17:33 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   178 Aug 14 17:33 host_vmstat_mock.json
+-rw-r--r--   1 root root   118 Aug 14 17:33 service_x_logs.txt
+
+→ Read CONTEXT_ONLY.md
+→ Read host_vmstat_mock.json
+→ Read service_x_logs.txt
+**service_x isn't slow itself — the host is under severe memory pressure.**
+
+- `service_x_logs.txt`: requests handled in 45–52ms. Healthy, no errors, no degradation.
+- `host_vmstat_mock.json`: `swap_used_mb: 8200` exceeds `swap_total_mb: 8192` — the box is **swapping/thrashing** (oversubscribed swap).
+- Top process is `unrelated_batch_job.py` (6400MB, 95% CPU), not service_x (only 120MB).
+
+So service_x's latency is being inflated by host-wide swap thrashing caused by the unrelated batch job, not by anything in service_x itself. Fix: stop/dedicate that batch job (or add memory), then re-check service_x.
