@@ -88,13 +88,49 @@ def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path
 
     palette = ["#1b2a4a", "#c0783c", "#4a7a5a", "#8a3b5a", "#3b6b8a", "#a0762c"]
 
+    # Per-axis min-max rescaling so real differences are visible even when
+    # every arm scores in a tight high band on a given axis (e.g. 9.8-10.0
+    # on correctness would otherwise look like a single flat line at the
+    # chart's outer edge). Rescales each axis independently into [2, 10] --
+    # never down to 0, so a "worst on this axis" arm still reads as a real
+    # shape rather than collapsing to the center. The RAW (un-rescaled)
+    # value is always annotated at each vertex so the true numbers are
+    # never hidden by the visual stretch -- this is a readability aid, not
+    # a substitute for the real data.
+    raw_by_dim = {dim: [scores_by_arm[arm][dim] for arm in scores_by_arm] for dim in dims}
+    rescaled_by_arm: dict[str, list[float]] = {arm: [] for arm in scores_by_arm}
+    for dim in dims:
+        vals = raw_by_dim[dim]
+        lo, hi = min(vals), max(vals)
+        for arm in scores_by_arm:
+            raw_v = scores_by_arm[arm][dim]
+            if hi == lo:
+                rescaled = 10.0  # every arm tied on this axis -- draw at full extent, not squashed
+            else:
+                rescaled = 2.0 + 8.0 * (raw_v - lo) / (hi - lo)
+            rescaled_by_arm[arm].append(rescaled)
+
+    linestyles = ["-", "--", "-."]
     for i, (arm, scores) in enumerate(scores_by_arm.items()):
-        values = [scores[dim] for dim in dims]
+        values = rescaled_by_arm[arm][:]
         values += values[:1]
+        raw_values = [scores[dim] for dim in dims]
         color = palette[i % len(palette)]
-        ax.plot(angles, values, linewidth=2.5, color=color, label=arm, solid_capstyle="round")
-        ax.fill(angles, values, alpha=0.15, color=color)
-        ax.scatter(angles, values, s=28, color=color, zorder=5)
+        ls = linestyles[i % len(linestyles)]
+        ax.plot(angles, values, linewidth=3.2, linestyle=ls, color=color, label=arm, solid_capstyle="round", zorder=4 + i)
+        ax.fill(angles, values, alpha=0.12, color=color)
+        ax.scatter(angles, values, s=40, color=color, zorder=10 + i, edgecolors="white", linewidths=1.2)
+        # Annotate the REAL (raw) value at each vertex, offset radially
+        # outward per-arm so overlapping labels from different arms don't
+        # stack on top of each other.
+        label_r_offset = 0.9 + i * 0.55
+        for angle, rescaled_v, raw_v in zip(angles[:-1], values[:-1], raw_values):
+            ax.annotate(
+                f"{raw_v:.2f}" if raw_v < 1 else f"{raw_v:.1f}",
+                xy=(angle, rescaled_v),
+                xytext=(angle, rescaled_v + label_r_offset),
+                fontsize=8.5, color=color, fontweight="bold", ha="center", va="center",
+            )
 
     ax.set_theta_offset(np.pi / 2)
     ax.set_theta_direction(-1)
@@ -104,13 +140,22 @@ def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path
         fontsize=15, color="#333333", fontweight="medium",
     )
     ax.tick_params(axis="x", pad=18)
-    ax.set_ylim(0, 10)
+    ax.set_ylim(0, 13.5)  # headroom above 10 for the raw-value annotations
     ax.set_yticks([2, 4, 6, 8, 10])
     ax.set_yticklabels([])  # reference image has no radial number labels
     ax.grid(color="#bbbbbb", linewidth=0.8, alpha=0.7)
     ax.spines["polar"].set_color("#bbbbbb")
+    # Suppress the outer ring beyond 10 (the annotation headroom) from
+    # visually implying a real "11" or "12" gridline exists.
+    ax.spines["polar"].set_bounds(0, 10) if hasattr(ax.spines["polar"], "set_bounds") else None
 
     ax.set_title(title, pad=40, fontsize=22, fontweight="bold", color="#333333")
+
+    ax.text(
+        0.5, -0.08,
+        "Axes are scaled per-dimension (each arm's real score is printed at its point) to make close differences visible -- not all axes share the same absolute scale.",
+        transform=ax.transAxes, ha="center", va="top", fontsize=8.5, color="#777777", style="italic",
+    )
 
     if len(scores_by_arm) > 1:
         ax.legend(loc="upper right", bbox_to_anchor=(1.35, 1.08), fontsize=9, frameon=False)
