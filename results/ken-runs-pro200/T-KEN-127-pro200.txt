@@ -1,0 +1,30 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    73 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    86 Aug 15 05:20 owned_items.json
+-rw-r--r--   1 root root   122 Aug 15 05:20 set_manifest.json
+[0m
+[0m→ [0mRead set_manifest.json
+[0m→ [0mRead owned_items.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mls -la; find . -type f
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    73 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    86 Aug 15 05:20 owned_items.json
+-rw-r--r--   1 root root   122 Aug 15 05:20 set_manifest.json
+./CONTEXT_ONLY.md
+./owned_items.json
+./set_manifest.json
+[0m
+[0m← [0mWrite queue.json
+Wrote file successfully.
+[0m
+Missing items `item_7`, `item_8`, `item_9` queued to `queue.json`.

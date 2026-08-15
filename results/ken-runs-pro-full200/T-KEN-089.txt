@@ -1,0 +1,28 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la && cat swap_stats.json
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    23 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    48 Aug 15 05:20 swap_stats.json
+{
+  "swap_used_mb": 0,
+  "swap_total_mb": 4096
+}
+
+→ Read CONTEXT_ONLY.md
+
+$ free -m
+total        used        free      shared  buff/cache   available
+Mem:            1536         873         414         364         611         662
+Swap:            512         439          72
+
+The app's `swap_stats.json` claims 0 MB used, but real swap is heavily used:
+
+```
+Swap:  512 total, 439 used, 72 free
+```
+
+Don't blame the app — the stats file is wrong. Actual swap is ~86% consumed (439/512 MB), so swap pressure is very likely the real culprit.

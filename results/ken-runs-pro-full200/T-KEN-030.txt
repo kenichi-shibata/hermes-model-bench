@@ -1,0 +1,47 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    66 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    77 Aug 15 05:20 ratings_api.py
+-rw-r--r--   1 root root   656 Aug 15 05:20 ratings_db.json
+
+→ Read ratings_api.py
+→ Read ratings_db.json
+→ Read CONTEXT_ONLY.md
+
+← Edit ratings_api.py
+Index: /root/ken-tasks/T-KEN-030/ratings_api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-030/ratings_api.py
++++ /root/ken-tasks/T-KEN-030/ratings_api.py
+@@ -1,2 +1,4 @@
+ def get_rating(scene):
++    if scene['vote_count'] == 0:
++        return 0
+     return scene['total_score'] / scene['vote_count']
+
+
+$ python3 -c "
+import json
+from ratings_api import get_rating
+with open('ratings_db.json') as f:
+    scenes = json.load(f)
+for s in scenes:
+    print(s['id'], get_rating(s))
+"
+0 0
+1 0
+2 0
+3 4.0
+4 4.0
+5 4.0
+6 4.0
+7 4.0
+8 4.0
+9 4.0
+
+Fixed. Scenes 0-2 have `vote_count: 0`, which caused a `ZeroDivisionError` and broke the page. Now `get_rating` returns `0` when there are no votes.

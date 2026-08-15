@@ -1,0 +1,14 @@
+
+> build · deepseek-v4-pro
+
+→ Read pr_diff_stats.json
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    26 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   109 Aug 15 05:20 pr_diff_stats.json
+
+→ Read CONTEXT_ONLY.md
+Yes. 185 of 200 lines (92.5%) are reformatting, while only 15 lines are the actual fix. The diff is far bigger than it needs to be.

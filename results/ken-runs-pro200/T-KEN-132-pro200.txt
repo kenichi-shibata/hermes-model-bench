@@ -1,0 +1,13 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead translate_cache_meta.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-132/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    33 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    48 Aug 15 05:20 translate_cache_meta.json
+[0m
+Yes. `cached_at_days_ago` (95) exceeds `ttl_days` (90), so the translation cache is stale.

@@ -1,0 +1,6 @@
+
+> build · deepseek-v4-pro
+
+→ Read garbage_scan.json
+✱ Grep "\(EN\)\(EN\)" in . · 3 matches
+Double-translation garbage found at IDs **5, 22, and 41** — their values are `"x(EN)(EN)"` (the `(EN)` marker is duplicated).

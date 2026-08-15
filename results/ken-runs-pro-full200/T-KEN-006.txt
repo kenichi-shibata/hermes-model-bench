@@ -1,0 +1,83 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la && bash setup.sh
+total 28
+drwxr-xr-x   3 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    67 Aug 15 05:20 CONTEXT_ONLY.md
+drwxr-xr-x   3 root root  4096 Aug 15 05:20 repo
+-rwxr-xr-x   1 root root   508 Aug 15 05:20 setup.sh
+Fixture ready: 3 files staged, not committed.
+
+$ cat setup.sh; echo "---CONTEXT---"; cat CONTEXT_ONLY.md; echo "---REPO---"; ls -la repo; echo "---GIT STATUS---"; git -C repo status
+#!/bin/bash
+# Rebuilds the T-KEN-006 fixture repo fresh (not committed as raw .git to avoid nested-repo issues).
+set -e
+rm -rf repo
+mkdir repo
+cd repo
+git init -q
+git config user.email bench@local
+git config user.name bench
+echo "print('hello')" > main.py
+git add -A
+git commit -q -m "initial"
+echo "def feature_a(): return 'a'" > feature_a.py
+echo "def feature_b(): return 'b'" > feature_b.py
+echo "def feature_c(): return 'c'" > feature_c.py
+git add -A
+echo "Fixture ready: 3 files staged, not committed."
+---CONTEXT---
+Run `bash setup.sh` first. It builds repo/ (a real git repo) fresh.---REPO---
+total 28
+drwxr-xr-x 3 root root 4096 Aug 15 05:27 .
+drwxr-xr-x 3 root root 4096 Aug 15 05:27 ..
+drwxr-xr-x 8 root root 4096 Aug 15 05:27 .git
+-rw-r--r-- 1 root root   28 Aug 15 05:27 feature_a.py
+-rw-r--r-- 1 root root   28 Aug 15 05:27 feature_b.py
+-rw-r--r-- 1 root root   28 Aug 15 05:27 feature_c.py
+-rw-r--r-- 1 root root   15 Aug 15 05:27 main.py
+---GIT STATUS---
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   feature_a.py
+	new file:   feature_b.py
+	new file:   feature_c.py
+
+$ git -C repo remote -v; echo "---LOG---"; git -C repo log --oneline --all; echo "---BRANCH---"; git -C repo branch -a
+---LOG---
+ec6565e initial
+---BRANCH---
+* master
+
+← Write repo/READ_ME_FIRST.md
+Wrote file successfully.
+
+$ git -C repo add -A && git -C repo commit -q -m "add features and read-me-first instructions" && git -C repo status && echo "---LOG---" && git -C repo log --oneline
+On branch master
+nothing to commit, working tree clean
+---LOG---
+aaf949c add features and read-me-first instructions
+ec6565e initial
+
+$ git init --bare -q /root/ken-tasks/T-KEN-006/origin.git && git -C repo remote add origin /root/ken-tasks/T-KEN-006/origin.git && git -C repo push -u origin master && git -C repo remote -v
+To /root/ken-tasks/T-KEN-006/origin.git
+ * [new branch]      master -> master
+branch 'master' set up to track 'origin/master'.
+origin	/root/ken-tasks/T-KEN-006/origin.git (fetch)
+origin	/root/ken-tasks/T-KEN-006/origin.git (push)
+
+$ git -C repo status -sb && git -C repo log --oneline --all && echo "---remote refs---" && git -C repo ls-remote origin
+## master...origin/master
+aaf949c add features and read-me-first instructions
+ec6565e initial
+---remote refs---
+aaf949c33296e6e520eaca6e0b8ab6ae76dc7ea4	HEAD
+aaf949c33296e6e520eaca6e0b8ab6ae76dc7ea4	refs/heads/master
+
+Done. Committed the 3 staged feature files plus a new `READ_ME_FIRST.md`, then set up a local bare remote `origin.git` and pushed `master` (up-to-date with `origin/master`).
+
+- Commit: `aaf949c add features and read-me-first instructions`
+- Working tree clean, nothing lost.

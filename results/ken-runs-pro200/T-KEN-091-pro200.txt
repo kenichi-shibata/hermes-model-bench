@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead error_correlation.json
+Code problem. The error spike occurred 1 minute after deploy (`10:01` vs `10:00`), and infra metrics were stable — both point to the deploy introducing a code regression rather than infrastructure failure.

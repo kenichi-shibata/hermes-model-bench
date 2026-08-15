@@ -1,0 +1,52 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    62 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   159 Aug 15 05:20 elo_engine.py
+-rw-r--r--   1 root root    92 Aug 15 05:20 match_history.json
+[0m
+[0m→ [0mRead elo_engine.py
+[0m→ [0mRead match_history.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mpython3 -c "
+from elo_engine import update
+import json
+
+ratings = {}
+with open('match_history.json') as f:
+    history = json.load(f)
+
+for m in history:
+    update(m['winner'], m['loser'], ratings)
+
+print('final ratings:', ratings)
+"
+final ratings: {'a': 1564, 'b': 1468, 'c': 1468}
+[0m
+No — it's not implementing Elo. The code just does a fixed ±32 point swap regardless of rating difference (`elo_engine.py:2-3`), so ratings can never reflect how expected a win was.
+
+What it currently produces vs. real Elo:
+
+- Current: after the two matches → `a=1564, b=1468, c=1468`
+- Real Elo (K=32) → `a≈1531, b≈1484, c≈1485`, because `a` was expected to beat `c` after already beating `b`.
+
+The core bug: no expected-score calculation. A proper update looks like:
+
+```python
+def update(winner, loser, ratings, K=32):
+    rw = ratings.get(winner, 1500)
+    rl = ratings.get(loser, 1500)
+    exp = 1 / (1 + 10 ** ((rl - rw) / 400))
+    ratings[winner] = rw + K * (1 - exp)
+    ratings[loser] = rl - K * (1 - exp)
+    return ratings
+```
+
+With this, an underdog win moves points more than a favorite win, and equal ratings yield the same ±16 (K/2) split.
+
+Two secondary issues: `ratings` is mutated in place *and* returned (mixing side-effect and return), and the fixed `32` should be a `K` parameter. Want me to rewrite `elo_engine.py` and re-run it?

@@ -1,0 +1,6 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead embed_builder.py
+[0m→ [0mRead scene_for_embed.json
+The JSON uses `thumbnail_url`, but `build_embed` reads `cover_url`, which doesn't exist — so `image` is `None`.

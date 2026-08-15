@@ -1,0 +1,21 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-017
+total 32
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   146 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   201 Aug 15 05:20 old_notes.md
+-rw-r--r--   1 root root    88 Aug 15 05:20 queue_fixture.json
+-rw-r--r--   1 root root   476 Aug 15 05:20 retry_engine.py
+[0m
+[0m→ [0mRead old_notes.md
+[0m→ [0mRead retry_engine.py
+[0m→ [0mRead queue_fixture.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-017 && python3 -c "import json; from retry_engine import check; q=json.load(open('queue_fixture.json')); print(check(q))"
+{'success_count': 8, 'total': 8}
+[0m
+No. The bug is gone — running `check()` on the fixture returns `success_count=8, total=8` (not 1/8).

@@ -1,0 +1,15 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-141
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    28 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   101 Aug 15 05:20 missed_incident.json
+
+→ Read missed_incident.json
+→ Read CONTEXT_ONLY.md
+The check only looks at `http_status` (which is `200`), because `check_examines` is `"status_code_only"`. The error is in the `body` ("internal error occurred"), which the check ignores — so it reports healthy despite the failure.
+
+Fix: change the check to examine the body (e.g., assert the body doesn't contain an error message) instead of only the status code.

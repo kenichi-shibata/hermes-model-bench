@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read delegation_trend.json
+Delegation is declining: day 1 = 90%, day 2 = 70%, day 3 = 40% completion. It's dropped 50 points in three days and is trending downward.

@@ -1,0 +1,49 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-133
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    36 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   378 Aug 15 05:20 translate_output_sample.json
+[0m
+[0m→ [0mRead translate_output_sample.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit translate_output_sample.json
+Index: /root/ken-tasks/T-KEN-133/translate_output_sample.json
+===================================================================
+--- /root/ken-tasks/T-KEN-133/translate_output_sample.json
++++ /root/ken-tasks/T-KEN-133/translate_output_sample.json
+@@ -24,9 +24,9 @@
+   "output": "Name5"
+ },
+ {
+   "id": 6,
+-  "output": "Nnaammee6(EN)(EN)"
++  "output": "Name6"
+ },
+ {
+   "id": 7,
+   "output": "Nnaammee7(EN)(EN)"
+
+[0m
+[0m← [0mEdit translate_output_sample.json
+Index: /root/ken-tasks/T-KEN-133/translate_output_sample.json
+===================================================================
+--- /root/ken-tasks/T-KEN-133/translate_output_sample.json
++++ /root/ken-tasks/T-KEN-133/translate_output_sample.json
+@@ -28,7 +28,7 @@
+     "output": "Name6"
+   },
+   {
+     "id": 7,
+-    "output": "Nnaammee7(EN)(EN)"
++    "output": "Name7"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+Fixed. IDs 6 and 7 had mangled outputs (`Nnaammee6(EN)(EN)` / `Nnaammee7(EN)(EN)`) instead of proper names `Name6` / `Name7`.

@@ -1,0 +1,13 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    32 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   151 Aug 15 05:20 firewall_rule_check.json
+
+→ Read firewall_rule_check.json
+→ Read CONTEXT_ONLY.md
+Yes. The rule `deny 0.0.0.0/0 except allowlist` blocks all traffic by default, and `traffic_source_in_allowlist` is `false` — so the source isn't on the allowlist and is being blocked. The `rule_added` field ("last week, unrelated hardening pass") is just context about when/why the rule was introduced; it doesn't exempt the traffic.

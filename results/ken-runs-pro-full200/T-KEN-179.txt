@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-pro
+
+✱ Glob "**/form_submit.jsx" 1 match
+→ Read form_submit.jsx
+
+← Edit form_submit.jsx
+Index: /root/ken-tasks/T-KEN-179/form_submit.jsx
+===================================================================
+--- /root/ken-tasks/T-KEN-179/form_submit.jsx
++++ /root/ken-tasks/T-KEN-179/form_submit.jsx
+@@ -1,4 +1,4 @@
+ function handleSubmit(e) {
++  e.preventDefault();
+   api.post('/submit', formData);
+-  // missing e.preventDefault()
+ }
+
+
+Added `e.preventDefault()` to stop the default form submission (page reload) before the API call.

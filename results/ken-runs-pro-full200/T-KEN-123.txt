@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-123
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   113 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   188 Aug 15 05:20 catalog_candidates.json
+-rw-r--r--   1 root root    57 Aug 15 05:20 recent_chat_context.json
+
+→ Read CONTEXT_ONLY.md
+→ Read catalog_candidates.json
+→ Read recent_chat_context.json
+
+← Write queue.json
+Wrote file successfully.
+
+The matching scene is **id 2** (`performer: "X"`, `studio: "Y"`), which exactly matches "the one with performer X at studio Y".
+Queued scene id 2 (`performer X`, `studio Y`) to `queue.json`.

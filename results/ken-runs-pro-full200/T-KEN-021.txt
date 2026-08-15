@@ -1,0 +1,19 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    65 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   512 Aug 15 05:20 queue_state.json
+
+→ Read queue_state.json
+→ Read CONTEXT_ONLY.md
+Yes. All 5 jobs are `"downloading"` at `0%` progress and have been stalled for 47 minutes — every single one, which means the whole queue is stuck, not a single item.
+
+Quick diagnosis:
+- **Stall = 47 min across the board**: no job is making any progress (`progress_pct: 0`), and they've all been idle the same amount of time. That pattern points to a queue-level stall, not per-job failures.
+- **Likely cause**: the downloader has nothing actually transferring — either the server connection is dead, the queue isn't being serviced, or a post-processing/resume bug left them all stuck in `downloading` with no data flowing.
+
+Want me to inspect something specific, or is there a next step (e.g. pause/resume the queue, check the log, restart the worker)? I only have this snapshot to go on, so if there's more data (log file, server config) it'd need to be in the sandbox.

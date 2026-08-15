@@ -1,0 +1,17 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead model_cost_comparison.json
+[0m
+[0m$ [0mpython3 -c "
+cheap = 0.002 * (1+3)
+expensive = 0.08 * (1+1)
+print('cheap total:', cheap)
+print('expensive total:', expensive)
+print('savings:', expensive - cheap)
+"
+cheap total: 0.008
+expensive total: 0.16
+savings: 0.152
+[0m
+Yes. The cheap model costs $0.008 per completed task (4 attempts × $0.002), while the expensive model costs $0.16 (2 attempts × $0.08), saving $0.152 per task.

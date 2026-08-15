@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read top_processes.json
+Yes — `log_rotate.sh` is hogging CPU at 100% and has been running for 6 hours.

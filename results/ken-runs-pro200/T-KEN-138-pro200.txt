@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead fleet_health_snapshot.json
+Yes. `svc_3` has an `error_rate` of `0.12` (12%), while every other service sits at `0.001` (0.1%). That's a clear outlier — likely a failing or misbehaving service.

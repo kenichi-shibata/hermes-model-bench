@@ -1,0 +1,47 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead existing_data_model.py
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-192
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    62 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   181 Aug 15 05:20 existing_data_model.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit existing_data_model.py
+Index: /root/ken-tasks/T-KEN-192/existing_data_model.py
+===================================================================
+--- /root/ken-tasks/T-KEN-192/existing_data_model.py
++++ /root/ken-tasks/T-KEN-192/existing_data_model.py
+@@ -1,5 +1,16 @@
++import csv
++
++
+ class Scene:
+     def __init__(self, id, title, performers):
+         self.id = id
+         self.title = title
+         self.performers = performers  # a list, needs flattening for CSV
++
++
++def export_to_csv(scenes, path):
++    with open(path, "w", newline="") as f:
++        writer = csv.writer(f)
++        writer.writerow(["id", "title", "performers"])
++        for scene in scenes:
++            writer.writerow([scene.id, scene.title, ", ".join(scene.performers)])
+
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-192 && python -c "from existing_data_model import Scene, export_to_csv; s=[Scene(1,'T',['a','b']),Scene(2,'U',['c'])]; export_to_csv(s,'/tmp/opencode/t.csv'); print(open('/tmp/opencode/t.csv').read())"
+/bin/bash: line 1: python: command not found
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-192 && python3 -c "from existing_data_model import Scene, export_to_csv; s=[Scene(1,'T',['a','b']),Scene(2,'U',['c'])]; export_to_csv(s,'/tmp/opencode/t.csv'); print(open('/tmp/opencode/t.csv').read())"
+id,title,performers
+1,T,"a, b"
+2,U,c
+[0m
+Added `export_to_csv(scenes, path)` to `existing_data_model.py`. It writes a header and flattens `performers` into a comma-joined string per row.

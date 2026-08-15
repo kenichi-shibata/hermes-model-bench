@@ -1,0 +1,56 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la && echo "---" && cat point_in_time_snapshots.json 2>/dev/null | head -100
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    95 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    58 Aug 15 05:20 point_in_time_snapshots.json
+---
+{
+  "current": {
+    "metric": 42
+  },
+  "history": null
+}
+
+→ Read CONTEXT_ONLY.md
+
+← Write track.py
+Wrote file successfully.
+
+$ python3 track.py && python3 track.py && python3 track.py && echo "---" && cat point_in_time_snapshots.json
+{'timestamp': '2026-08-15T06:28:13.889741+00:00', 'metric': 42}
+{'timestamp': '2026-08-15T06:28:13.914517+00:00', 'metric': 42}
+{'timestamp': '2026-08-15T06:28:13.938886+00:00', 'metric': 42}
+---
+{
+  "current": {
+    "metric": 42
+  },
+  "history": [
+    {
+      "timestamp": "2026-08-15T06:28:13.889741+00:00",
+      "metric": 42
+    },
+    {
+      "timestamp": "2026-08-15T06:28:13.914517+00:00",
+      "metric": 42
+    },
+    {
+      "timestamp": "2026-08-15T06:28:13.938886+00:00",
+      "metric": 42
+    }
+  ]
+}
+
+Built `track.py`. Each run appends a timestamped `{timestamp, metric}` entry to `history` (auto-initializing it from `null`), preserving the existing `current` block.
+
+Run it on a schedule to capture snapshots over time:
+
+```bash
+python3 track.py                 # manual snapshot
+# or every minute via cron:
+* * * * * cd /root/ken-tasks/T-KEN-197 && python3 track.py
+```

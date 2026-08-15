@@ -1,0 +1,21 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    68 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   159 Aug 15 05:20 flaresolverr_health.json
+
+→ Read flaresolverr_health.json
+→ Read CONTEXT_ONLY.md
+Yes — the data shows the classic FlareSolverr death pattern:
+
+- `t=0` 15% → idle baseline
+- `t=1` 180% → headless Chrome (multi-process) spins up to solve a challenge
+- `t=2–3` 18%/16% → back to baseline immediately
+
+The abrupt 180% spike dropping straight back to idle in one sample (instead of tapering off) suggests the browser process crashed/restarted rather than finished gracefully. Notably, the file is labeled "CPU/memory samples" but contains **no memory field** — so you can't rule out an OOM-kill, which is the usual culprit when FlareSolverr's Chrome dies under load.
+
+Likely fix: bump the container memory limit / `MAX_TIMEOUT`, or reduce concurrent solver workers.

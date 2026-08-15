@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead weekly_completion.json
+100% — 11 of 11 tasks have `status: "completed"`.

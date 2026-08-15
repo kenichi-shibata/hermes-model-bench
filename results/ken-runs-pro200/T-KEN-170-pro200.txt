@@ -1,0 +1,14 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead routing_table_diff.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-170/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    31 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   105 Aug 15 05:20 routing_table_diff.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+The more specific `10.0.0.0/8 via gw2` route shadows the intended `0.0.0.0/0 via gw1` default route. Longest-prefix match means all `10.x.x.x` traffic goes to `gw2` instead of `gw1`. Fix: delete the `10.0.0.0/8` route added by mistake.

@@ -1,0 +1,14 @@
+
+> build · deepseek-v4-pro
+
+→ Read backup_error_log.txt
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    28 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    97 Aug 15 05:20 backup_error_log.txt
+
+→ Read CONTEXT_ONLY.md
+The backup failed with a `BrokenPipeError` at 45% while uploading `backup.tar.gz`. The connection to the upload destination was closed mid-transfer, so the write/upload pipe broke before the file finished sending. Likely causes: network drop, remote server closing the connection, or running out of space/timeout on the target.

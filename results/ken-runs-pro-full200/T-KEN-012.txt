@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-012
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   107 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   178 Aug 15 05:20 host_vmstat_mock.json
+-rw-r--r--   1 root root   118 Aug 15 05:20 service_x_logs.txt
+
+→ Read service_x_logs.txt
+→ Read host_vmstat_mock.json
+→ Read CONTEXT_ONLY.md
+`service_x`'s own logs look healthy (45–52ms), so the slowdown isn't internal. The problem is host-wide:
+
+- **`unrelated_batch_job.py`** is the noisy neighbor: 6400 MB memory and 95% CPU.
+- Swap is **exhausted**: `swap_used_mb: 8200` exceeds `swap_total_mb: 8192`, meaning the host is thrashing heavily.
+
+`service_x` (only 120 MB) is getting starved by memory pressure and swap thrash. Fix: kill or throttle `unrelated_batch_job.py` (or move it to another host) to free memory and relieve the swap contention.

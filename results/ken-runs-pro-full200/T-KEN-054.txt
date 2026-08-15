@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read tailscale_route_status.json
+No. The home router peer is offline (last seen 8 days ago), so the `192.168.1.0/24` route it advertises is unreachable from your phone.

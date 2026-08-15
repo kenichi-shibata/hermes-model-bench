@@ -1,0 +1,37 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    56 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   830 Aug 15 05:20 studio_scenes.json
+
+→ Read studio_scenes.json
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "
+import json
+d=json.load(open('studio_scenes.json'))
+print('total scenes:', len(d))
+print('min/max days_old:', min(x['days_old'] for x in d), max(x['days_old'] for x in d))
+"
+total scenes: 20
+min/max days_old: 0 95
+
+New scenes (released in the last 30 days) from `studio_scenes.json`:
+
+| id | days_old |
+|----|----------|
+| 0  | 0        |
+| 1  | 5        |
+| 2  | 10       |
+| 3  | 15       |
+| 4  | 20       |
+| 5  | 25       |
+| 6  | 30       |
+
+That's 7 of 20 scenes (ids 0–6); the rest (days_old 35–95) are the old ones.
+
+Note: there's no external studio source or cutoff in the sandbox, so I assumed "new" = `days_old <= 30`. Tell me a different threshold (e.g. 14 days) and I'll re-filter.

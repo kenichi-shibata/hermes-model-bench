@@ -1,0 +1,26 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead canonical_bug.py
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-079/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    24 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    81 Aug 15 05:20 canonical_bug.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit canonical_bug.py
+Index: /root/ken-tasks/T-KEN-079/canonical_bug.py
+===================================================================
+--- /root/ken-tasks/T-KEN-079/canonical_bug.py
++++ /root/ken-tasks/T-KEN-079/canonical_bug.py
+@@ -1,2 +1,2 @@
+ def pick_canonical(items):
+-    return max(items, key=lambda i: i['upload_date'])
++    return min(items, key=lambda i: i['upload_date'])
+
+[0m
+The canonical item should be the earliest/original upload, but `max` was picking the most recent. Fixed to `min` at `canonical_bug.py:2`.

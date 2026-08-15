@@ -1,0 +1,19 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-120
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    99 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   894 Aug 15 05:20 performer_catalog.json
+-rw-r--r--   1 root root     2 Aug 15 05:20 wanted_list.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead performer_catalog.json
+[0m→ [0mRead wanted_list.json
+[0m
+[0m← [0mWrite wanted_list.json
+Wrote file successfully.
+[0m
+Done. `wanted_list.json` now contains all 22 scenes from `performer_catalog.json` (ids 0–21 across studios A/B/C).

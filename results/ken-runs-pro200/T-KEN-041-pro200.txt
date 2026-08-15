@@ -1,0 +1,27 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-041
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    45 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   178 Aug 15 05:20 resume_scenes.json
+-rw-r--r--   1 root root    93 Aug 15 05:20 resume_section.py
+[0m
+[0m→ [0mRead resume_section.py
+[0m→ [0mRead resume_scenes.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit resume_section.py
+Index: /root/ken-tasks/T-KEN-041/resume_section.py
+===================================================================
+--- /root/ken-tasks/T-KEN-041/resume_section.py
++++ /root/ken-tasks/T-KEN-041/resume_section.py
+@@ -1,2 +1,2 @@
+ def get_resume(scenes):
+-    return sorted(scenes, key=lambda s: s['added_at'], reverse=True)
++    return sorted(scenes, key=lambda s: s['last_watched_at'], reverse=True)
+
+[0m
+The resume section was sorting by `added_at`; it should sort by `last_watched_at` (most recently watched first).

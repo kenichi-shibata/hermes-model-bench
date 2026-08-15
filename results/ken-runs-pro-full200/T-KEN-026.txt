@@ -1,0 +1,9 @@
+
+> build · deepseek-v4-pro
+
+→ Read download_queue.json
+
+← Write download_queue.json
+Wrote file successfully.
+
+Removed the duplicate by content hash: `id: 7` ("Scene C v2") had the same `content_hash` (`ccc`) as `id: 3`, so it was dropped.

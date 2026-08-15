@@ -1,0 +1,71 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 40
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    89 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   653 Aug 15 05:20 bot.py
+-rw-r--r--   1 root root 14651 Aug 15 05:20 follow_log.json
+[0m
+[0m→ [0mRead bot.py
+[0m→ [0mRead follow_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit bot.py
+Index: /root/ken-tasks/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks/T-KEN-010/bot.py
++++ /root/ken-tasks/T-KEN-010/bot.py
+@@ -1,11 +1,9 @@
+ """Discord bot track/follow handlers."""
+ 
+ def track_studio_or_performer(entity_id, entity_type):
+-    """BUG: bundles a follow action with tracking, which should be
+-    separate. Fix: remove the follow_discord() call from here."""
++    """Track a studio or performer without following them."""
+     db.add_track(entity_id, entity_type)
+-    db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here
+     return {"tracked": True}
+ 
+ 
+ class db:
+
+[0m
+[0m← [0mEdit follow_log.json
+Index: /root/ken-tasks/T-KEN-010/follow_log.json
+===================================================================
+--- /root/ken-tasks/T-KEN-010/follow_log.json
++++ /root/ken-tasks/T-KEN-010/follow_log.json
+@@ -797,16 +797,6 @@
+   {
+     "entity_id": "legit_perf_19",
+     "source": "manual_follow",
+     "legit": true
+-  },
+-  {
+-    "entity_id": "codey_steele",
+-    "source": "track_button_bug",
+-    "legit": false
+-  },
+-  {
+-    "entity_id": "cherry_kiss",
+-    "source": "track_button_bug",
+-    "legit": false
+   }
+ ]
+\ No newline at end of file
+
+[0m
+[0m$ [0mpython3 -c "import json; d=json.load(open('follow_log.json')); print('valid json,', len(d), 'entries'); print([e['entity_id'] for e in d if e['legit'] is False])"
+valid json, 160 entries
+['perf_0', 'perf_1', 'perf_2', 'perf_3', 'perf_4', 'perf_5', 'perf_6', 'perf_7', 'perf_8', 'perf_9', 'perf_10', 'perf_11', 'perf_12', 'perf_13', 'perf_14', 'perf_15', 'perf_16', 'perf_17', 'perf_18', 'perf_19', 'perf_20', 'perf_21', 'perf_22', 'perf_23', 'perf_24', 'perf_25', 'perf_26', 'perf_27', 'perf_28', 'perf_29', 'perf_30', 'perf_31', 'perf_32', 'perf_33', 'perf_34', 'perf_35', 'perf_36', 'perf_37', 'perf_38', 'perf_39', 'perf_40', 'perf_41', 'perf_42', 'perf_43', 'perf_44', 'perf_45', 'perf_46', 'perf_47', 'perf_48', 'perf_49', 'perf_50', 'perf_51', 'perf_52', 'perf_53', 'perf_54', 'perf_55', 'perf_56', 'perf_57', 'perf_58', 'perf_59', 'perf_60', 'perf_61', 'perf_62', 'perf_63', 'perf_64', 'perf_65', 'perf_66', 'perf_67', 'perf_68', 'perf_69', 'perf_70', 'perf_71', 'perf_72', 'perf_73', 'perf_74', 'perf_75', 'perf_76', 'perf_77', 'perf_78', 'perf_79', 'perf_80', 'perf_81', 'perf_82', 'perf_83', 'perf_84', 'perf_85', 'perf_86', 'perf_87', 'perf_88', 'perf_89', 'perf_90', 'perf_91', 'perf_92', 'perf_93', 'perf_94', 'perf_95', 'perf_96', 'perf_97', 'perf_98', 'perf_99', 'perf_100', 'perf_101', 'perf_102', 'perf_103', 'perf_104', 'perf_105', 'perf_106', 'perf_107', 'perf_108', 'perf_109', 'perf_110', 'perf_111', 'perf_112', 'perf_113', 'perf_114', 'perf_115', 'perf_116', 'perf_117', 'perf_118', 'perf_119', 'perf_120', 'perf_121', 'perf_122', 'perf_123', 'perf_124', 'perf_125', 'perf_126', 'perf_127', 'perf_128', 'perf_129', 'perf_130', 'perf_131', 'perf_132', 'perf_133', 'perf_134', 'perf_135', 'perf_136', 'perf_137', 'perf_138', 'perf_139']
+[0m
+Yes — there was a bug. `track_studio_or_performer` was calling `db.follow_discord()` alongside tracking, so every track action silently triggered a follow.
+
+Fixed both:
+- `bot.py:7` — removed the erroneous `db.follow_discord()` call; tracking now only tracks.
+- `follow_log.json` — removed `codey_steele` and `cherry_kiss` (both `"source": "track_button_bug"`, `"legit": false`, so you never actually followed them).
+
+Note: 140 `perf_0..perf_139` entries are also flagged `legit: false` from the same bug — left them since you only called out the two names, but say the word and I'll purge those too.

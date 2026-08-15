@@ -1,0 +1,15 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead pr_diff_1.py
+This is a SQL injection vulnerability. The username is interpolated directly into the query via f-string with no parameterization.
+
+Fix using parameterized queries:
+
+```python
+def get_user(username):
+    query = "SELECT * FROM users WHERE name = ?"
+    return db.execute(query, (username,))
+```
+
+(Use `?` or `%s` depending on the DB driver/DB-API in use.)

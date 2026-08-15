@@ -1,0 +1,13 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-046
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    56 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   168 Aug 15 05:20 missav_sync_log.json
+[0m
+[0m→ [0mRead missav_sync_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+Run 1 completed (8 min). The latest run (run_id 2) is stuck at `"started"` with no completion — so missav sync did **not** actually complete on its most recent attempt.

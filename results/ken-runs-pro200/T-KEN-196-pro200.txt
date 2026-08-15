@@ -1,0 +1,26 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead fragile_function.py
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-196
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    94 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    98 Aug 15 05:20 failure_log.json_note
+-rw-r--r--   1 root root    70 Aug 15 05:20 fragile_function.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead failure_log.json_note
+[0m
+[0m← [0mWrite fragile_function.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython -c "import ast; ast.parse(open('fragile_function.py').read()); print('ok')"
+/bin/bash: line 1: python: command not found
+[0m
+[0m$ [0mpython3 -c "import ast; ast.parse(open('fragile_function.py').read()); print('ok')"
+ok
+[0m
+Added retry logic to `fragile_function.py`: retries transient `ConnectionError`/`Timeout` with exponential backoff (up to 3 retries), while re-raising permanent `HTTPError` (e.g. 404) immediately since retrying won't help.

@@ -1,0 +1,9 @@
+
+> build · deepseek-v4-pro
+
+→ Read tailscale_status_mock.json
+The subnet router for your home network is down.
+
+`home-router-node` (pve2) advertises your home subnet `192.168.1.0/24`, but it's `"Online": false` and hasn't been seen since 2026-08-02 — so Tailscale has no route to `192.168.1.x` from your phone. The other peers are online but don't advertise any routes.
+
+Fix: power on / reconnect that `pve2` node (the Tailscale subnet router), then it should come online and restore the route.

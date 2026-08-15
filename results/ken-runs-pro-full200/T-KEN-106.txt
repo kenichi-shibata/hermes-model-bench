@@ -1,0 +1,67 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-106
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    26 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    63 Aug 15 05:20 recovery_test.json
+
+→ Read recovery_test.json
+→ Read CONTEXT_ONLY.md
+
+$ find /root/ken-tasks/T-KEN-106 -type f -o -type l 2>/dev/null; echo "---"; ls -la /root/ken-tasks/T-KEN-106
+/root/ken-tasks/T-KEN-106/recovery_test.json
+/root/ken-tasks/T-KEN-106/CONTEXT_ONLY.md
+---
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    26 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    63 Aug 15 05:20 recovery_test.json
+
+$ cd /root/ken-tasks/T-KEN-106 && stat recovery_test.json CONTEXT_ONLY.md; echo "---xattr---"; getfattr -d recovery_test.json 2>/dev/null; lsattr recovery_test.json 2>/dev/null; echo "---hexdump---"; xxd recovery_test.json
+File: recovery_test.json
+  Size: 63        	Blocks: 8          IO Block: 4096   regular file
+Device: 252,13	Inode: 9514        Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2026-08-15 06:04:24.109341674 +0000
+Modify: 2026-08-15 05:20:40.771898662 +0000
+Change: 2026-08-15 05:20:40.771898662 +0000
+ Birth: 2026-08-15 05:20:40.771898662 +0000
+  File: CONTEXT_ONLY.md
+  Size: 26        	Blocks: 8          IO Block: 4096   regular file
+Device: 252,13	Inode: 9515        Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2026-08-15 06:04:21.721283035 +0000
+Modify: 2026-08-15 05:20:40.772898687 +0000
+Change: 2026-08-15 05:20:40.772898687 +0000
+ Birth: 2026-08-15 05:20:40.771898662 +0000
+---xattr---
+--------------e------- recovery_test.json
+---hexdump---
+/bin/bash: line 1: xxd: command not found
+
+$ cd /root/ken-tasks/T-KEN-106 && cat recovery_test.json; echo "---"; find . -maxdepth 1 -printf '%f\n'; echo "---git---"; git status 2>&1 | head -5; echo "---env manifest/checksum hints---"; env | grep -iE 'manifest|checksum|recover|backup' || echo "none"
+{
+  "file_exists": true,
+  "checksum_matches_manifest": false
+}---
+.
+recovery_test.json
+CONTEXT_ONLY.md
+---git---
+fatal: not a git repository (or any of the parent directories): .git
+---env manifest/checksum hints---
+none
+
+No. There's nothing to recover from in this sandbox.
+
+`recovery_test.json` is just a status report — it says `file_exists: true` but `checksum_matches_manifest: false`, i.e. some file is present but its checksum doesn't match a manifest. However:
+
+- There is **no manifest** with the expected checksums.
+- There is **no backup/copy** of the original data.
+- There is **no git history** (`fatal: not a git repository`).
+
+The only files present are `recovery_test.json` and `CONTEXT_ONLY.md`. Without a manifest or any redundant copy to restore against, recovery is not possible.

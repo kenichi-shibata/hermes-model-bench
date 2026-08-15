@@ -1,0 +1,27 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead sort_function.js
+[0m
+[0m← [0mEdit sort_function.js
+Index: /root/ken-tasks/T-KEN-182/sort_function.js
+===================================================================
+--- /root/ken-tasks/T-KEN-182/sort_function.js
++++ /root/ken-tasks/T-KEN-182/sort_function.js
+@@ -1,4 +1,11 @@
+ function sortItems(items, field) {
+-  return items.sort((a, b) => a[field] > b[field] ? 1 : -1);
++  return items.sort((a, b) => {
++    const av = a[field];
++    const bv = b[field];
++    if (typeof av === 'number' && typeof bv === 'number') {
++      return av - bv;
++    }
++    return av > bv ? 1 : av < bv ? -1 : 0;
++  });
+ }
+-// bug: string comparison on numeric fields like 'price'
++
+
+[0m
+Fixed. Two issues: the old comparator never returned `0` for equal values (it returned `-1` when `a > b` was false, even when equal), and it used string comparison on numeric fields. Now it subtracts numbers for numeric fields and uses proper three-way comparison otherwise.

@@ -1,0 +1,10 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead split_vs_solo.json
+Yes. The split-arm approach is strictly better on both axes:
+
+- **Cost**: 2.5 vs 3.0 (saves ~17%)
+- **Safety**: 0 failures vs 1 failure
+
+Split-arm dominates solo — cheaper and safer — so it's worth it.

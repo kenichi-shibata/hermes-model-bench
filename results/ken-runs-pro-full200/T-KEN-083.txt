@@ -1,0 +1,19 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    29 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    75 Aug 15 05:20 post_merge_state.json
+
+→ Read post_merge_state.json
+→ Read CONTEXT_ONLY.md
+The merge did **not** actually work.
+
+`post_merge_state.json` shows:
+- `play_count`: `null`
+- `expected_play_count`: `15`
+
+The merged result is `null` instead of the expected `15`, so the values were not combined correctly during the merge. The survivor (`survivor_id: "a"`) kept its own missing/null `play_count` rather than resolving the conflict to `15`.

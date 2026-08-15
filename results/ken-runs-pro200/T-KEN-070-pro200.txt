@@ -1,0 +1,10 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead post_rate.json
+It's spamming.
+
+- 15 of 18 posts (`t=0` through `t=14`) are flagged `burst: true` — a continuous 15-post burst with no gap.
+- Only the last 3 (`t=15–17`) return to `burst: false`.
+
+A sustained run of 15 consecutive burst posts is abnormal; normal traffic would be intermittent.

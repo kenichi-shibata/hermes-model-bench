@@ -1,0 +1,18 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la && wc -l api_trace.json && head -c 2000 api_trace.json
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    22 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    76 Aug 15 05:20 api_trace.json
+4 api_trace.json
+{
+  "total_ms": 4500,
+  "db_query_count": 500,
+  "single_query_ms_each": 8
+}
+
+→ Read CONTEXT_ONLY.md
+N+1 query problem. The API makes **500 DB queries** at ~8ms each (≈4000ms), which dominates the 4500ms total. Instead of one batched query, it's issuing a separate query per item (e.g., in a loop), so latency scales linearly with count. Fix: batch the lookup into a single `WHERE id IN (...)` query (or join), cutting it from ~4.5s to ~10ms.

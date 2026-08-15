@@ -1,0 +1,19 @@
+
+> build · deepseek-v4-pro
+
+→ Read button_handler.jsx
+
+← Edit button_handler.jsx
+Index: /root/ken-tasks/T-KEN-174/button_handler.jsx
+===================================================================
+--- /root/ken-tasks/T-KEN-174/button_handler.jsx
++++ /root/ken-tasks/T-KEN-174/button_handler.jsx
+@@ -1,4 +1,4 @@
+ function MyButton() {
+   const handleClick = () => console.log('clicked');
+-  return <button>Click me</button>; // handleClick never attached
++  return <button onClick={handleClick}>Click me</button>;
+ }
+
+
+Done. Attached `handleClick` to the button via `onClick={handleClick}`.

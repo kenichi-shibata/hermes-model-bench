@@ -1,0 +1,25 @@
+
+> build · deepseek-v4-pro
+
+→ Read flex_layout.css
+
+$ ls -la /root/ken-tasks/T-KEN-178
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    23 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    24 Aug 15 05:20 flex_layout.css
+
+→ Read CONTEXT_ONLY.md
+
+← Edit flex_layout.css
+Index: /root/ken-tasks/T-KEN-178/flex_layout.css
+===================================================================
+--- /root/ken-tasks/T-KEN-178/flex_layout.css
++++ /root/ken-tasks/T-KEN-178/flex_layout.css
+@@ -1,1 +1,1 @@
+-.row { display: flex; }
++.row { display: flex; flex-wrap: wrap; }
+
+
+Added `flex-wrap: wrap` — flex items were overflowing/squeezing onto one line because `.row` defaults to `nowrap`.

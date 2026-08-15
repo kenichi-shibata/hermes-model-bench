@@ -1,0 +1,13 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    34 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   911 Aug 15 05:20 canonical_facts_check.json
+
+→ Read canonical_facts_check.json
+→ Read CONTEXT_ONLY.md
+Yes. `slot_7` is corrupted — its value is `â€™corruptedâ€™` (`\u00e2\u0080\u0099...\u00e2\u0080\u0099`), which is the mojibake of `’corrupted’` (U+2019 right single quote encoded as UTF-8 bytes E2 80 99, then misread as Latin-1). All other slots contain `clean value`.

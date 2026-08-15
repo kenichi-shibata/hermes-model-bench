@@ -1,0 +1,48 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    87 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   813 Aug 15 05:20 dedupe.py
+-rw-r--r--   1 root root   127 Aug 15 05:20 mirror_groups.json
+
+→ Read dedupe.py
+→ Read mirror_groups.json
+→ Read CONTEXT_ONLY.md
+
+← Edit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -7,12 +7,12 @@
+     return max(pool, key=lambda c: c["size_gb"])
+ 
+ 
+ def suggest_keep(candidates):
+-    """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    """DISPLAY-ONLY ranking shown on the review page."""
++    playable = [c for c in candidates if c["playable"]]
++    pool = playable if playable else candidates
++    return max(pool, key=lambda c: c["size_gb"])
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+
+$ python3 -c "
+import json, dedupe
+db = json.load(open('mirror_groups.json'))
+for gid, cands in db.items():
+    print(dedupe.scan_mirror_group(gid, db))
+"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+
+Fixed the bug in `suggest_keep` (dedupe.py:10). It now applies the playability-first check like `pick_canonical`, so `group_42` correctly suggests the playable `scenes:101` (1.8 GB) instead of the dead `scenes:100` (5.2 GB).

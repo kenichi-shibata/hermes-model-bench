@@ -1,0 +1,21 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 32
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   138 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   452 Aug 15 05:20 studio_catalog_page1.json
+-rw-r--r--   1 root root   237 Aug 15 05:20 studio_catalog_page2.json
+-rw-r--r--   1 root root     2 Aug 15 05:20 wanted_list.json
+
+→ Read CONTEXT_ONLY.md
+→ Read studio_catalog_page1.json
+→ Read studio_catalog_page2.json
+→ Read wanted_list.json
+
+← Write wanted_list.json
+Wrote file successfully.
+
+Grabbed all 15 scenes (ids 0–14) from both catalog pages into `wanted_list.json`.

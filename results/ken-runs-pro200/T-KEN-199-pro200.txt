@@ -1,0 +1,58 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-199
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   126 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   114 Aug 15 05:20 existing_related_code.py
+-rw-r--r--   1 root root   112 Aug 15 05:20 requirements_sketch.md
+[0m
+[0m→ [0mRead requirements_sketch.md
+[0m→ [0mRead existing_related_code.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mWrite wanted_watcher.py
+Wrote file successfully.
+[0m
+[0m← [0mWrite wanted_watcher.py
+Wrote file successfully.
+[0m
+[0m← [0mWrite test_wanted_watcher.py
+Wrote file successfully.
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-199 && python -m pytest test_wanted_watcher.py -q 2>&1 || python -m unittest test_wanted_watcher.py 2>&1 || python -c "import wanted_watcher; print('import ok')"
+/bin/bash: line 1: python: command not found
+/bin/bash: line 1: python: command not found
+/bin/bash: line 1: python: command not found
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-199 && (command -v python3 && python3 --version) || ls /usr/bin/python*
+/usr/bin/python3
+Python 3.13.5
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-199 && python3 -m pytest test_wanted_watcher.py -q 2>&1 || python3 -m unittest -v test_wanted_watcher 2>&1
+/usr/bin/python3: No module named pytest
+
+----------------------------------------------------------------------
+Ran 0 tests in 0.000s
+
+NO TESTS RAN
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-199 && python3 -c "
+import test_wanted_watcher as t
+for name in dir(t):
+    if name.startswith('test_'):
+        getattr(t, name)()
+        print('PASS', name)
+"
+PASS test_find_stale_items_flags_older_than_48h
+PASS test_find_stale_items_skips_already_flagged
+PASS test_find_stale_items_skips_missing_timestamp
+PASS test_flag_stale_wanted_items_updates_only_stale
+[0m
+All tests pass. Built `wanted_watcher.py` that watches the wanted list and flags items stuck over 48h, plus tests.
+
+- `find_stale_items()` — pure logic: flags items whose timestamp is older than the 48h threshold, skipping already-flagged and missing-timestamp rows.
+- `flag_stale_wanted_items()` — loads items via the existing `get_wanted_items()`, then writes `is_stale = 1` via `db.update()`; returns flagged ids.
+- Configurable threshold/column names via keyword args; verified with 4 passing tests.

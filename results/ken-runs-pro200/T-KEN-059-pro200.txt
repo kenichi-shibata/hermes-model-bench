@@ -1,0 +1,27 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la && cat ci_run_log.json
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    52 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   155 Aug 15 05:20 ci_run_log.json
+[
+  {
+    "run": 1,
+    "status": "pass"
+  },
+  {
+    "run": 2,
+    "status": "pass"
+  },
+  {
+    "run": 3,
+    "status": "fail",
+    "is_head": true
+  }
+]
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+No — CI is failing. The head run (run 3) has `"status": "fail"` in ci_run_log.json:3. Runs 1 and 2 passed, but the latest run is failing.

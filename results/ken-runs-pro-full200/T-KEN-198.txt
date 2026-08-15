@@ -1,0 +1,60 @@
+
+> build · deepseek-v4-pro
+
+→ Read destructive_operation.py
+
+$ ls -la /root/ken-tasks/T-KEN-198
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    69 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   113 Aug 15 05:20 destructive_operation.py
+
+→ Read CONTEXT_ONLY.md
+
+← Write destructive_operation.py
+Wrote file successfully.
+
+$ cd /root/ken-tasks/T-KEN-198 && python3 -c "
+import destructive_operation as d
+
+class DB:
+    def __init__(self):
+        self.data = {1: 'a', 2: 'b', 3: 'c'}
+    def get(self, i): return self.data[i]
+    def hard_delete(self, i): del self.data[i]
+    def restore(self, r): self.data[r] = r  # simplistic; just to exercise path
+
+db = DB()
+h = d.bulk_delete([1, 2], db)
+assert 1 not in db.data and 2 not in db.data and 3 in db.data
+h.undo()
+assert 1 in db.data and 2 in db.data
+print('ok')
+"
+Traceback (most recent call last):
+  File "<string>", line 15, in <module>
+    assert 1 in db.data and 2 in db.data
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+$ cd /root/ken-tasks/T-KEN-198 && python3 -c "
+import destructive_operation as d
+
+class DB:
+    def __init__(self):
+        self.data = {1: 'a', 2: 'b', 3: 'c'}
+    def get(self, i): return (i, self.data[i])
+    def hard_delete(self, i): del self.data[i]
+    def restore(self, r): self.data[r[0]] = r[1]
+
+db = DB()
+h = d.bulk_delete([1, 2], db)
+assert 1 not in db.data and 2 not in db.data and 3 in db.data
+h.undo()
+assert db.data == {1: 'a', 2: 'b', 3: 'c'}
+print('ok')
+"
+ok
+
+Done. `bulk_delete` now snapshots each record via `db.get()` before hard-deleting and returns a handle whose `.undo()` restores everything (in reverse order).

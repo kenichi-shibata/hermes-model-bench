@@ -1,0 +1,19 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-164
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    26 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   110 Aug 15 05:20 memory_growth.json
+
+→ Read memory_growth.json
+→ Read CONTEXT_ONLY.md
+Memory is bloating.
+
+- Growth: 500 → 700 (+200 items)
+- Distinct new facts: 50
+- Likely duplicates: 150
+
+Expected count if only distinct facts were stored: 550. Actual is 700 — the extra 150 (75% of growth) are duplicates, indicating bloat from duplicate/insufficient deduplication.

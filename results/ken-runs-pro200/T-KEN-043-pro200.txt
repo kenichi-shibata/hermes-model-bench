@@ -1,0 +1,47 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    51 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    14 Aug 15 05:20 trending_cache.py
+-rw-r--r--   1 root root    75 Aug 15 05:20 trending_cache_meta.json
+[0m
+[0m→ [0mRead trending_cache.py
+[0m→ [0mRead trending_cache_meta.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mpython3 -c "
+from datetime import datetime
+last = datetime.fromisoformat('2026-08-11T18:00:00')
+now = datetime.fromisoformat('2026-08-13T00:00:00')
+age = now - last
+print('elapsed:', age)
+print('total_seconds:', age.total_seconds())
+print('days:', age.days)
+print('TTL 6h in seconds:', 6*3600)
+print('age.days < 6 (the buggy check):', age.days < 6)
+"
+elapsed: 1 day, 6:00:00
+total_seconds: 108000.0
+days: 1
+TTL 6h in seconds: 21600
+age.days < 6 (the buggy check): True
+[0m
+[0m← [0mWrite trending_cache.py
+Wrote file successfully.
+[0m
+The cache is stale: `last_refresh` is 30h old (Aug 11 18:00 → Aug 13 00:00), but `TTL_HOURS` is 6. So it should refresh, yet doesn't.
+
+Root cause: the freshness check compares `timedelta.days` (whole days = `1`) against `TTL_HOURS` (`6`). Since `1 < 6`, the cache is wrongly treated as fresh and never updates.
+[0m$ [0mpython3 -c "
+import json
+from trending_cache import is_stale
+meta = json.load(open('trending_cache_meta.json'))
+print('is_stale:', is_stale(meta))
+"
+is_stale: True
+[0m
+Fixed. The bug was a units mismatch: `age.days` (1 whole day) was being compared to `TTL_HOURS` (6), so `1 < 6` always read as "fresh" despite 30h having passed. Now `is_stale()` compares `age` against `timedelta(hours=TTL_HOURS)` and correctly returns `True` for the given meta.

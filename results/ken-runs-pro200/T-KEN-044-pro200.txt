@@ -1,0 +1,71 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-044
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   101 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   128 Aug 15 05:20 title_translate.py
+-rw-r--r--   1 root root   736 Aug 15 05:20 titles_data.json
+[0m
+[0m→ [0mRead title_translate.py
+[0m→ [0mRead titles_data.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-044; python3 -c "import json; print(json.load(open('/root/ken-tasks/T-KEN-044/titles_data.json')))"
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   101 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   128 Aug 15 05:20 title_translate.py
+-rw-r--r--   1 root root   736 Aug 15 05:20 titles_data.json
+[{'id': 0, 'title_jp': 'いいタイトル'}, {'id': 1, 'title_jp': 'いいタイトル'}, {'id': 2, 'title_jp': 'いいタイトル'}, {'id': 3, 'title_jp': 'いいタイトル'}, {'id': 4, 'title_jp': 'いいタイトル'}, {'id': 5, 'title_jp': 'いいタイトル'}, {'id': 6, 'title_jp': 'いいタイトル'}, {'id': 7, 'title_jp': 'いいタイトル'}, {'id': 8, 'title_jp': '���'}, {'id': 9, 'title_jp': '���'}]
+[0m
+[0m$ [0mpython3 -c "
+import json
+d=json.load(open('/root/ken-tasks/T-KEN-044/titles_data.json'))
+for x in d:
+    print(x['id'], repr(x['title_jp']), [hex(ord(c)) for c in x['title_jp']])
+"
+0 'いいタイトル' ['0x3044', '0x3044', '0x30bf', '0x30a4', '0x30c8', '0x30eb']
+1 'いいタイトル' ['0x3044', '0x3044', '0x30bf', '0x30a4', '0x30c8', '0x30eb']
+2 'いいタイトル' ['0x3044', '0x3044', '0x30bf', '0x30a4', '0x30c8', '0x30eb']
+3 'いいタイトル' ['0x3044', '0x3044', '0x30bf', '0x30a4', '0x30c8', '0x30eb']
+4 'いいタイトル' ['0x3044', '0x3044', '0x30bf', '0x30a4', '0x30c8', '0x30eb']
+5 'いいタイトル' ['0x3044', '0x3044', '0x30bf', '0x30a4', '0x30c8', '0x30eb']
+6 'いいタイトル' ['0x3044', '0x3044', '0x30bf', '0x30a4', '0x30c8', '0x30eb']
+7 'いいタイトル' ['0x3044', '0x3044', '0x30bf', '0x30a4', '0x30c8', '0x30eb']
+8 '���' ['0xfffd', '0xfffd', '0xfffd']
+9 '���' ['0xfffd', '0xfffd', '0xfffd']
+[0m
+[0m$ [0mpython3 -c "
+s=open('/root/ken-tasks/T-KEN-044/title_translate.py','rb').read()
+print(repr(s))
+"
+b"def translate(title):\n    return romanize_lib(title)\ndef romanize_lib(t):\n    if '\xef\xbf\xbd' in t: return None\n    return t + ' (EN)'\n"
+[0m
+[0m← [0mWrite title_translate.py
+Wrote file successfully.
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-044 && python3 -c "
+import json, title_translate
+d=json.load(open('titles_data.json'))
+for x in d:
+    print(x['id'], repr(title_translate.translate(x['title_jp'])))
+"
+0 'iitaitoru'
+1 'iitaitoru'
+2 'iitaitoru'
+3 'iitaitoru'
+4 'iitaitoru'
+5 'iitaitoru'
+6 'iitaitoru'
+7 'iitaitoru'
+8 None
+9 None
+[0m
+Fixed. The `romanize_lib` function was just appending `" (EN)"` to Japanese text instead of actually romanizing. Now it converts kana to romaji and still returns `None` for the garbled (U+FFFD) titles.
+
+- `いいタイトル` → `iitaitoru` (ids 0–7)
+- `���` → `None` (ids 8–9)

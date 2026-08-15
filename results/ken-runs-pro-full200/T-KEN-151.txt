@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read cost_benefit.json
+Not worth it. $2.9 extra for only a 5% accuracy gain on a low-stakes task is a poor trade-off.

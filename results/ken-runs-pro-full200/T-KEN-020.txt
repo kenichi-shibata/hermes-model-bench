@@ -1,0 +1,20 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   149 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   141 Aug 15 05:20 backbone_lookup_mock.json
+-rw-r--r--   1 root root   149 Aug 15 05:20 usenet_config.json
+
+→ Read usenet_config.json
+→ Read backbone_lookup_mock.json
+→ Read CONTEXT_ONLY.md
+Not redundant. Both providers are on the Omicron backbone, so you're cooked if Omicron goes down.
+
+- `Eweka` → Omicron
+- `Newshosting` → Omicron
+
+Same backbone = same upstream. The "backup" only protects against a provider-specific outage, not a backbone failure. To be truly redundant, add a provider on a different backbone (e.g. `UsenetExpress` or `BlockNews` → Highwinds).

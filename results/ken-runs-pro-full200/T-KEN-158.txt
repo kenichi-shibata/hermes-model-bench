@@ -1,0 +1,14 @@
+
+> build · deepseek-v4-pro
+
+→ Read forget_investigation.json
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    33 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    85 Aug 15 05:20 forget_investigation.json
+
+→ Read CONTEXT_ONLY.md
+It didn't fail to save — it was saved correctly, but its `valid_until` (2026-08-12) is before `today` (2026-08-13), so the entry was expired and discarded.

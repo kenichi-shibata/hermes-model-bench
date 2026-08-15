@@ -1,0 +1,24 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-175
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    18 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    30 Aug 15 05:20 layout.css
+[0m
+[0m→ [0mRead layout.css
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit layout.css
+Index: /root/ken-tasks/T-KEN-175/layout.css
+===================================================================
+--- /root/ken-tasks/T-KEN-175/layout.css
++++ /root/ken-tasks/T-KEN-175/layout.css
+@@ -1,1 +1,1 @@
+-.container { width: 1200px; }
++.container { width: 100%; max-width: 1200px; margin: 0 auto; }
+
+[0m
+Fixed. The `.container` had a fixed `width: 1200px`, which forced overflow on mobile. Now it's responsive with `width: 100%; max-width: 1200px;`.

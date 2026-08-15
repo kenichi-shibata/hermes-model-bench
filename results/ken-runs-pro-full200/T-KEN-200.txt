@@ -1,0 +1,86 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   109 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   149 Aug 15 05:20 old_broken_approach.py
+-rw-r--r--   1 root root   115 Aug 15 05:20 requirements_recap.md
+
+→ Read CONTEXT_ONLY.md
+→ Read old_broken_approach.py
+→ Read requirements_recap.md
+
+$ ls -la /root/ken-tasks/T-KEN-200/ && find /root/ken-tasks/T-KEN-200 -type f 2>/dev/null
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   109 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   149 Aug 15 05:20 old_broken_approach.py
+-rw-r--r--   1 root root   115 Aug 15 05:20 requirements_recap.md
+/root/ken-tasks/T-KEN-200/old_broken_approach.py
+/root/ken-tasks/T-KEN-200/requirements_recap.md
+/root/ken-tasks/T-KEN-200/CONTEXT_ONLY.md
+
+$ cd /root/ken-tasks/T-KEN-200 && ls -la && cat .git 2>/dev/null; git status 2>&1 | head -20; echo "---python---"; python3 --version
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   109 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   149 Aug 15 05:20 old_broken_approach.py
+-rw-r--r--   1 root root   115 Aug 15 05:20 requirements_recap.md
+fatal: not a git repository (or any of the parent directories): .git
+---python---
+Python 3.13.5
+
+← Write watcher.py
+Wrote file successfully.
+
+$ cd /root/ken-tasks/T-KEN-200 && python3 - <<'EOF'
+import watcher
+
+class FakeDB:
+    def __init__(self):
+        self.rows = [{"id": i, "name": f"item-{i}"} for i in range(1, 6)]
+        self.queries = []
+    def query(self, sql):
+        self.queries.append(sql)
+        if sql.startswith("SELECT COALESCE(MAX"):
+            return [{"max_id": 5}]
+        # parse WHERE id > N ORDER BY id LIMIT L
+        import re
+        m = re.search(r"WHERE id > (\d+)", sql)
+        lim = int(re.search(r"LIMIT (\d+)", sql).group(1))
+        if not m:
+            return []
+        after = int(m.group(1))
+        return [r for r in self.rows if r["id"] > after][:lim]
+
+db = FakeDB()
+alerts = []
+w = watcher.ItemWatcher(db.query, alerts.append, batch_size=2)
+
+# First poll: max_id already 5, so nothing new
+w._poll()
+assert alerts == [], alerts
+print("poll queries:", db.queries)
+
+# Insert new rows beyond watermark
+db.rows.extend([{"id": 6, "name": "item-6"}, {"id": 7, "name": "item-7"}, {"id": 8, "name": "item-8"}])
+w._poll()
+print("alerts after insert:", [a["id"] for a in alerts])
+assert [a["id"] for a in alerts] == [6, 7, 8]
+assert w.last_id == 8
+
+# Verify no full-table scan: every incremental query has WHERE id > ...
+for q in db.queries:
+    assert "WHERE id >" in q or "MAX(id)" in q, q
+print("OK - no full table scans; only incremental WHERE queries")
+EOF
+poll queries: ['SELECT COALESCE(MAX(id), 0) AS max_id FROM everything', 'SELECT * FROM everything WHERE id > 5 ORDER BY id LIMIT 2']
+alerts after insert: [6, 7, 8]
+OK - no full table scans; only incremental WHERE queries
+
+Rewrote the watcher from scratch as `watcher.py`. The fix: instead of `SELECT * FROM everything` every second, it keeps a high-water mark (`last_id`) and only fetches `WHERE id > last_id ORDER BY id LIMIT batch`, paging through the backlog without sleeping and alerting per new row. Verified against a fake DB — no full-table scans, and new rows (including a batch larger than `batch_size`) are all caught.

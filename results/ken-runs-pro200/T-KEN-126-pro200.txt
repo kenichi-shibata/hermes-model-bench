@@ -1,0 +1,14 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead series_metadata.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-126
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    28 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   189 Aug 15 05:20 series_metadata.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+No sequel exists in the data. Series `S1` contains three titles — "Movie One", "Totally Different Name", and "Another Name" — but there is no "Movie Two" or any other sequel entry.

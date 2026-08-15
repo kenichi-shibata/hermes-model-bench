@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read dns_query_results.json
+No. DNS is resolving to `10.0.0.5` but the actual service IP is `10.0.0.9` (record updated 2 days ago) — the DNS record is stale/incorrect.

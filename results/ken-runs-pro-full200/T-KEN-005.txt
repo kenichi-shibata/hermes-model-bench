@@ -1,0 +1,58 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   110 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root  1136 Aug 15 05:20 api.py
+-rw-r--r--   1 root root   224 Aug 15 05:20 scenes.json
+
+→ Read CONTEXT_ONLY.md
+→ Read api.py
+→ Read scenes.json
+
+$ find . -type f 2>/dev/null; echo "---"; ls -la /root/ken-tasks/T-KEN-005
+./scenes.json
+./api.py
+./CONTEXT_ONLY.md
+---
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   110 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root  1136 Aug 15 05:20 api.py
+-rw-r--r--   1 root root   224 Aug 15 05:20 scenes.json
+
+← Edit api.py
+Index: /root/ken-tasks/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-005/api.py
++++ /root/ken-tasks/T-KEN-005/api.py
+@@ -19,10 +19,10 @@
+     return [_scene_out(s, translate=True) for s in scenes]
+ 
+ 
+ def _hydrate_code(scene):
+-    """Used by the resume/continue-watching section. BUG: forgot translate=True."""
+-    return _scene_out(scene)  # missing translate=True
++    """Used by the resume/continue-watching section."""
++    return _scene_out(scene, translate=True)
+ 
+ 
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+
+
+$ cd /root/ken-tasks/T-KEN-005 && python3 -c "
+import json, api
+data = json.load(open('scenes.json'))
+print('trending:', api._home_trending(data['trending']))
+print('resume:', [api._hydrate_code(s) for s in data['resume']])
+"
+trending: [{'id': 1, 'title': 'Trending Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+resume: [{'id': 2, 'title': 'Resume Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+
+→ Read api.py
+Fixed. The resume/continue-watching section (`_hydrate_code`) was missing `translate=True`, so performer names stayed untranslated (no `name_en` romanization) on those homepage cards. Now it passes `translate=True` like `_home_trending`, and `_scene_out` romanizes `name_jp` → `name_en` (the "translation below the Japanese" text) for performer cards. Verified: resume section now emits `Nanao Ayatsuki`.

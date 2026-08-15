@@ -1,0 +1,36 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    72 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   130 Aug 15 05:20 message_log.json
+-rw-r--r--   1 root root    88 Aug 15 05:20 post_handler.py
+[0m
+[0m→ [0mRead post_handler.py
+[0m→ [0mRead message_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+The `post()` function in `post_handler.py:1` has no idempotency/deduplication guard. The log shows the same message ("New scene!") sent twice 5 seconds apart, which is the classic signature of a retry/duplicate event where the handler blindly calls `webhook.send(message)` again on each invocation instead of tracking message IDs or deduplicating.
+
+Two likely causes:
+
+1. **No idempotency key**: `post()` doesn't track whether the message was already sent, so a retry (network timeout, webhook timeout, duplicate event delivery) resends it. The `sent_at` gap of 5s matches a retry/backoff pattern.
+
+2. **No dedup on input**: if the same event is delivered twice upstream, nothing compares it against prior messages.
+
+Fix idea:
+
+```python
+_seen = set()
+
+def post(message, webhook):
+    key = (message, webhook.url)
+    if key in _seen:
+        return
+    _seen.add(key)
+    return webhook.send(message)
+```
+
+The `webhook` object needs a stable identity (`url`) for the key; using just `message` would wrongly block a legitimate repeat post later.

@@ -1,0 +1,33 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-008
+total 32
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   165 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   342 Aug 15 05:20 samantha_saint_wicked_catalog.json
+-rw-r--r--   1 root root  1188 Aug 15 05:20 scenes_db.json
+-rw-r--r--   1 root root     2 Aug 15 05:20 wanted_list.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead wanted_list.json
+[0m
+[0m← [0mWrite scenes_db.json
+Wrote file successfully.
+[0m
+[0m← [0mWrite wanted_list.json
+Wrote file successfully.
+[0m
+Done. Here's what I found and changed:
+
+**1. MovieX parts → Stash group (yes, we can)**
+Stash supports "Groups" (movies) that scenes link to — no need to re-download the whole movie. Grouped `MovieX Part 1–6` under `"group": "MovieX"` in `scenes_db.json`. (In Stash this is the legacy `movie_id`/`group_id` link; the scenes stay as-is, just associated to one group.)
+
+**2. FliXXX ↔ Digital Playground flip-flop**
+All 4 `Misattributed Scene` records had `real_studio: "Digital Playground"` but `studio: "FliXXX"`. Corrected `studio` → `"Digital Playground"` and dropped the redundant `real_studio` field.
+
+**3. Samantha Saint × Wicked**
+Added all 12 movies from the catalog to `wanted_list.json` (with performer + studio so the queue is self-describing).

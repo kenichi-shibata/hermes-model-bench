@@ -1,0 +1,13 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-160
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    38 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    93 Aug 15 05:20 migration_integrity_check.json
+[0m
+[0m→ [0mRead migration_integrity_check.json
+[0m→ [0mRead CONTEXT_ONLY.md
+No. 9950 of 10000 migrated OK — 50 records (0.5%) are unaccounted for, with a `truncated_at_255_chars` corruption pattern. The migration isn't fully holding up.

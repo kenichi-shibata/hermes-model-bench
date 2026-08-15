@@ -1,0 +1,114 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    82 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   200 Aug 15 05:20 card_builder.py
+-rw-r--r--   1 root root   228 Aug 15 05:20 scenes_translation.json
+
+→ Read card_builder.py
+→ Read scenes_translation.json
+→ Read CONTEXT_ONLY.md
+
+$ python3 -c "
+import json, card_builder
+data = json.load(open('scenes_translation.json'))
+for s in data:
+    print(card_builder.build_card(s))
+"
+{'id': 1, 'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki', 'call_site': 'trending'}
+{'id': 2, 'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki', 'call_site': 'resume'}
+
+$ python3 -c "
+import json
+data = json.load(open('scenes_translation.json'))
+jp = data[0]['name_jp']
+print(repr(jp))
+print([hex(ord(c)) for c in jp])
+# dict key from card_builder
+import card_builder
+# inspect source
+"
+'彩月七緒'
+['0x5f69', '0x6708', '0x4e03', '0x7dd2']
+
+$ python3 -c "
+import inspect, card_builder
+src = inspect.getsource(card_builder)
+print(repr(src))
+"
+"def build_card(scene, translate=True):\n    if translate:\n        scene['name_en'] = romanize(scene['name_jp'])\n    return scene\ndef romanize(s): return {'彩月七緒': 'Nanao Ayatsuki'}.get(s, None)\n"
+
+$ python3 -c "
+import card_builder, json
+data = json.load(open('scenes_translation.json'))
+jp = data[0]['name_jp']
+print('rom key result:', card_builder.romanize(jp))
+print('jp == key?', jp == '彩月七緒')
+"
+rom key result: Nanao Ayatsuki
+jp == key? True
+
+$ ls -la; find . -type f -not -path './.git/*' 2>/dev/null; cat CONTEXT_ONLY.md
+total 32
+drwxr-xr-x   3 root root  4096 Aug 15 05:43 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    82 Aug 15 05:20 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 15 05:43 __pycache__
+-rw-r--r--   1 root root   200 Aug 15 05:20 card_builder.py
+-rw-r--r--   1 root root   228 Aug 15 05:20 scenes_translation.json
+./card_builder.py
+./__pycache__/card_builder.cpython-313.pyc
+./scenes_translation.json
+./CONTEXT_ONLY.md
+Files: card_builder.py, scenes_translation.json (some performers missing name_en).
+
+$ python3 -c "
+import card_builder
+# extract dict key from source
+src = open('card_builder.py', encoding='utf-8').read()
+print(repr(src))
+"
+"def build_card(scene, translate=True):\n    if translate:\n        scene['name_en'] = romanize(scene['name_jp'])\n    return scene\ndef romanize(s): return {'彩月七緒': 'Nanao Ayatsuki'}.get(s, None)\n"
+
+% WebFetch https://www.google.com/search?q=%22Nanao+Ayatsuki%22
+
+$ xxd scenes_translation.json; echo "---"; cat scenes_translation.json
+/bin/bash: line 1: xxd: command not found
+---
+[
+  {
+    "id": 1,
+    "name_jp": "\u5f69\u6708\u4e03\u7dd2",
+    "name_en": null,
+    "call_site": "trending"
+  },
+  {
+    "id": 2,
+    "name_jp": "\u5f69\u6708\u4e03\u7dd2",
+    "name_en": null,
+    "call_site": "resume"
+  }
+]
+
+$ od -c scenes_translation.json
+0000000   [  \n           {  \n                   "   i   d   "   :    
+0000020   1   ,  \n                   "   n   a   m   e   _   j   p   "
+0000040   :       "   \   u   5   f   6   9   \   u   6   7   0   8   \
+0000060   u   4   e   0   3   \   u   7   d   d   2   "   ,  \n        
+0000100           "   n   a   m   e   _   e   n   "   :       n   u   l
+0000120   l   ,  \n                   "   c   a   l   l   _   s   i   t
+0000140   e   "   :       "   t   r   e   n   d   i   n   g   "  \n    
+0000160       }   ,  \n           {  \n                   "   i   d   "
+0000200   :       2   ,  \n                   "   n   a   m   e   _   j
+0000220   p   "   :       "   \   u   5   f   6   9   \   u   6   7   0
+0000240   8   \   u   4   e   0   3   \   u   7   d   d   2   "   ,  \n
+0000260                   "   n   a   m   e   _   e   n   "   :       n
+0000300   u   l   l   ,  \n                   "   c   a   l   l   _   s
+0000320   i   t   e   "   :       "   r   e   s   u   m   e   "  \n    
+0000340       }  \n   ]
+0000344
+

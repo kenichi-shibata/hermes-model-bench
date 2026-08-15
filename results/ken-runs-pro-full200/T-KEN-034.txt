@@ -1,0 +1,6 @@
+
+> build · deepseek-v4-pro
+
+→ Read cover_image_resolver.py
+→ Read scenes_covers.json
+Scenes `id` 0–4 are missing cover images because their `cover_url` is `null` in `scenes_covers.json`, while `id` 5–19 have a real `cover_url`. The resolver at `cover_image_resolver.py:2` simply returns `scene.get('cover_url')` with no fallback, so any scene without that field yields `None` even though those scenes still have a `screenshots` entry to fall back on.

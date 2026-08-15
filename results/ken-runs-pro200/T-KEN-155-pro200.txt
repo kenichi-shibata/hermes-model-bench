@@ -1,0 +1,19 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead self_vs_delegate.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-155/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    29 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   103 Aug 15 05:20 self_vs_delegate.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Delegating is the better choice:
+
+- **Do it yourself:** $0 dollar cost, but hidden opportunity cost (your time could go elsewhere).
+- **Delegate:** only $0.05 dollar cost — negligible, and it frees your time.
+
+Since $0.05 is trivial, delegating wins on net: you trade 5 cents to reclaim time that has real (hidden) opportunity cost.

@@ -1,0 +1,13 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    85 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    88 Aug 15 05:20 workflow_runs.json
+
+→ Read CONTEXT_ONLY.md
+→ Read workflow_runs.json
+No. The workflow file exists but has **0 runs in the last 30 days** despite **15 qualifying commits** — so it is not running.

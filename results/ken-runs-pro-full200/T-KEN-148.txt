@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read cheap_model_accuracy.json
+No. The cheap model has only 60% historical accuracy on a safety-critical task, which is not good enough.

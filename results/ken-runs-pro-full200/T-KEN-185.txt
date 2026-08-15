@@ -1,0 +1,17 @@
+
+> build · deepseek-v4-pro
+
+→ Read pr_diff_3.py
+Found a classic gotcha in `pr_diff_3.py:1`:
+
+**Mutable default argument** — `items=[]` is evaluated once at definition time and shared across all calls, so `add_item(1)` and `add_item(2)` both accumulate into the same list.
+
+Fix with a `None` sentinel:
+
+```python
+def add_item(item, items=None):
+    if items is None:
+        items = []
+    items.append(item)
+    return items
+```

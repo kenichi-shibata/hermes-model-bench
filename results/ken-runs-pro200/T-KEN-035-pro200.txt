@@ -1,0 +1,32 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-035
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    65 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   109 Aug 15 05:20 scenes_searchable.json
+-rw-r--r--   1 root root    81 Aug 15 05:20 search_engine.py
+[0m
+[0m→ [0mRead search_engine.py
+[0m→ [0mRead scenes_searchable.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit search_engine.py
+Index: /root/ken-tasks/T-KEN-035/search_engine.py
+===================================================================
+--- /root/ken-tasks/T-KEN-035/search_engine.py
++++ /root/ken-tasks/T-KEN-035/search_engine.py
+@@ -1,2 +1,2 @@
+ def search(query, scenes):
+-    return [s for s in scenes if query in s['title']]
++    return [s for s in scenes if query.lower() in s['title'].lower()]
+
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-035 && python3 -c "import json; from search_engine import search; scenes=json.load(open('scenes_searchable.json')); print(search('samantha', scenes)); print(search('SAMANTHA', scenes)); print(search('other', scenes))"
+[{'id': 1, 'title': 'Samantha Saint Movie'}]
+[{'id': 1, 'title': 'Samantha Saint Movie'}]
+[{'id': 2, 'title': 'Other Scene'}]
+[0m
+Fixed. The search was case-sensitive, so `samantha` wouldn't match `Samantha`. Now both query and title are lowercased.

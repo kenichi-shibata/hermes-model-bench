@@ -1,0 +1,39 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-172
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    32 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    76 Aug 15 05:20 port_forward_config.json
+
+→ Read port_forward_config.json
+→ Read CONTEXT_ONLY.md
+
+$ ls -la /root/ken-tasks/T-KEN-172; cat /root/ken-tasks/T-KEN-172/port_forward_config.json
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    32 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    76 Aug 15 05:20 port_forward_config.json
+{
+  "forward_rule_target_port": 8080,
+  "service_actual_listen_port": 8081
+}
+
+← Edit port_forward_config.json
+Index: /root/ken-tasks/T-KEN-172/port_forward_config.json
+===================================================================
+--- /root/ken-tasks/T-KEN-172/port_forward_config.json
++++ /root/ken-tasks/T-KEN-172/port_forward_config.json
+@@ -1,4 +1,4 @@
+ {
+-  "forward_rule_target_port": 8080,
++  "forward_rule_target_port": 8081,
+   "service_actual_listen_port": 8081
+ }
+\ No newline at end of file
+
+
+The forward rule was targeting port 8080, but the service actually listens on 8081. Updated `forward_rule_target_port` to 8081 to match.

@@ -1,0 +1,32 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-011
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   102 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   382 Aug 15 05:20 PerformerDetailPage.jsx
+-rw-r--r--   1 root root   312 Aug 15 05:20 PerformersGrid.jsx
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead PerformerDetailPage.jsx
+[0m→ [0mRead PerformersGrid.jsx
+[0m
+[0m← [0mWrite PerformerDetailPage.jsx
+Wrote file successfully.
+[0m
+[0m← [0mWrite PerformersGrid.jsx
+Wrote file successfully.
+[0m
+I'll read the files, understand the bugs, then improve both components.
+Done. Here's what I fixed and improved:
+
+**PerformerDetailPage.jsx**
+- Fixed the bug: rank badge now links to `/performers/${performer.id}` using `Link` (the import was already there but unused).
+- Added empty/`null` performer guard, a "back to all performers" link, and optional bio rendering.
+
+**PerformersGrid.jsx**
+- Actually implemented the lazy "Load more" behavior the comment claimed (it previously only sliced the first 60 with no button).
+- Made cards clickable `Link`s to each performer's detail page, with rank display.
+- Added `performers = []` default, an empty state, and a remaining-count label.

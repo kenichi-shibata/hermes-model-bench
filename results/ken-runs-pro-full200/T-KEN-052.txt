@@ -1,0 +1,23 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-052
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    58 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   109 Aug 15 05:20 container_boot_log.txt
+
+→ Read container_boot_log.txt
+→ Read CONTEXT_ONLY.md
+The boot fails because of a mount error in container 112's config.
+
+**Root cause:** `mount: /data: no such device` — the container config defines a `/data` mountpoint pointing to a device/volume that doesn't exist on the host. That mount failure causes the rootfs overlay mount to abort, and the container won't start.
+
+**Fix:** check container 112's config (`/etc/pve/lxc/112.conf` on Proxmox, or `/var/lib/lxc/112/config` on LXC):
+
+```
+lxc.mount.entry: ... /data ...      <- references missing device
+```
+
+Either create/attach the referenced device/volume, or remove the `mount` entry for `/data` (and its `mp0`/`mp1` line). Then `lxc-start` again.

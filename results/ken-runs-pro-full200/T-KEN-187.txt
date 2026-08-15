@@ -1,0 +1,14 @@
+
+> build · deepseek-v4-pro
+
+→ Read pr_diff_5.py
+
+$ ls -la /root/ken-tasks/T-KEN-187/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    20 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   137 Aug 15 05:20 pr_diff_5.py
+
+→ Read CONTEXT_ONLY.md
+Missing: `test_parse_empty_raises` (the `parse` function's empty-input `ValueError` branch is untested).

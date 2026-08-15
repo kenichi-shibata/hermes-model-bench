@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read latency_breakdown.json
+Networking. `network_roundtrip_ms` (198) dominates `compute_ms` (2) by ~99x.

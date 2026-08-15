@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead spawn_error.json
+The spawn failed because the number of concurrently running children (5) hit the configured limit (`max_concurrent_children` = 5), so a new child couldn't be spawned.

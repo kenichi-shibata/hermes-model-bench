@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read cert_status.json
+No. The cert expires in 3 days, so it's still valid.

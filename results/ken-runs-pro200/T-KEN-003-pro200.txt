@@ -1,0 +1,339 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-003
+total 336
+drwxr-xr-x   2 root root   4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000  12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    126 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root 315596 Aug 15 05:20 performers.json
+-rw-r--r--   1 root root    197 Aug 15 05:20 stashdb_mock.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead stashdb_mock.py
+[0m→ [0mRead performers.json[90m [limit=80][0m
+[0m
+[0m$ [0mpython3 -c "
+import json
+d = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+perfs = d['performers']
+print('count', len(perfs))
+print('keys', list(perfs[0].keys()))
+# Check image field variations
+from collections import Counter
+hosts = Counter()
+paths = Counter()
+none_img = 0
+empty_img = 0
+for p in perfs:
+    img = p.get('image')
+    if img is None:
+        none_img += 1
+        continue
+    if img == '':
+        empty_img += 1
+        continue
+    hosts[img] += 1
+print('none_img', none_img, 'empty_img', empty_img)
+print('distinct image urls', len(hosts))
+# show sample of unique
+import itertools
+for u, c in list(hosts.items())[:40]:
+    print(c, u)
+"
+
+count 2700
+keys ['id', 'name', 'image', 'stashdb_id']
+none_img 0 empty_img 0
+distinct image urls 2700
+1 http://198.51.100.64:9999/performer/0/image
+1 http://198.51.100.64:9999/performer/1/image
+1 http://198.51.100.64:9999/performer/2/image
+1 http://198.51.100.64:9999/performer/3/image
+1 http://198.51.100.64:9999/performer/4/image
+1 http://198.51.100.64:9999/performer/5/image
+1 http://198.51.100.64:9999/performer/6/image
+1 http://198.51.100.64:9999/performer/7/image
+1 http://198.51.100.64:9999/performer/8/image
+1 http://198.51.100.64:9999/performer/9/image
+1 http://198.51.100.64:9999/performer/10/image
+1 http://198.51.100.64:9999/performer/11/image
+1 http://198.51.100.64:9999/performer/12/image
+1 http://198.51.100.64:9999/performer/13/image
+1 http://198.51.100.64:9999/performer/14/image
+1 http://198.51.100.64:9999/performer/15/image
+1 http://198.51.100.64:9999/performer/16/image
+1 http://198.51.100.64:9999/performer/17/image
+1 http://198.51.100.64:9999/performer/18/image
+1 http://198.51.100.64:9999/performer/19/image
+1 http://198.51.100.64:9999/performer/20/image
+1 http://198.51.100.64:9999/performer/21/image
+1 http://198.51.100.64:9999/performer/22/image
+1 http://198.51.100.64:9999/performer/23/image
+1 http://198.51.100.64:9999/performer/24/image
+1 http://198.51.100.64:9999/performer/25/image
+1 http://198.51.100.64:9999/performer/26/image
+1 http://198.51.100.64:9999/performer/27/image
+1 http://198.51.100.64:9999/performer/28/image
+1 http://198.51.100.64:9999/performer/29/image
+1 http://198.51.100.64:9999/performer/30/image
+1 http://198.51.100.64:9999/performer/31/image
+1 http://198.51.100.64:9999/performer/32/image
+1 http://198.51.100.64:9999/performer/33/image
+1 http://198.51.100.64:9999/performer/34/image
+1 http://198.51.100.64:9999/performer/35/image
+1 http://198.51.100.64:9999/performer/36/image
+1 http://198.51.100.64:9999/performer/37/image
+1 http://198.51.100.64:9999/performer/38/image
+1 http://198.51.100.64:9999/performer/39/image
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+d = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+perfs = d['performers']
+pat = re.compile(r'^http://198\.51\.100\.64:9999/performer/(\d+)/image$')
+anom = []
+for p in perfs:
+    img = p['image']
+    m = pat.match(img)
+    if not m:
+        anom.append(p)
+    elif int(m.group(1)) != p['id']:
+        anom.append(('id-mismatch', p))
+print('anomalies', len(anom))
+for a in anom[:50]:
+    print(a)
+"
+
+anomalies 2521
+{'id': 179, 'name': 'Performer179', 'image': 'http://198.51.100.69:9999/performer/179/image', 'stashdb_id': None}
+{'id': 180, 'name': 'Performer180', 'image': 'http://198.51.100.69:9999/performer/180/image', 'stashdb_id': None}
+{'id': 181, 'name': 'Performer181', 'image': 'http://198.51.100.69:9999/performer/181/image', 'stashdb_id': None}
+{'id': 182, 'name': 'Performer182', 'image': 'http://198.51.100.69:9999/performer/182/image', 'stashdb_id': None}
+{'id': 183, 'name': 'Performer183', 'image': 'http://198.51.100.69:9999/performer/183/image', 'stashdb_id': None}
+{'id': 184, 'name': 'Performer184', 'image': 'http://198.51.100.69:9999/performer/184/image', 'stashdb_id': None}
+{'id': 185, 'name': 'Performer185', 'image': 'http://198.51.100.69:9999/performer/185/image', 'stashdb_id': None}
+{'id': 186, 'name': 'Performer186', 'image': 'http://198.51.100.69:9999/performer/186/image', 'stashdb_id': None}
+{'id': 187, 'name': 'Performer187', 'image': 'http://198.51.100.69:9999/performer/187/image', 'stashdb_id': None}
+{'id': 188, 'name': 'Performer188', 'image': 'http://198.51.100.69:9999/performer/188/image', 'stashdb_id': None}
+{'id': 189, 'name': 'Performer189', 'image': 'http://198.51.100.69:9999/performer/189/image', 'stashdb_id': None}
+{'id': 190, 'name': 'Performer190', 'image': 'http://198.51.100.69:9999/performer/190/image', 'stashdb_id': None}
+{'id': 191, 'name': 'Performer191', 'image': 'http://198.51.100.69:9999/performer/191/image', 'stashdb_id': None}
+{'id': 192, 'name': 'Performer192', 'image': 'http://198.51.100.69:9999/performer/192/image', 'stashdb_id': None}
+{'id': 193, 'name': 'Performer193', 'image': 'http://198.51.100.69:9999/performer/193/image', 'stashdb_id': None}
+{'id': 194, 'name': 'Performer194', 'image': 'http://198.51.100.69:9999/performer/194/image', 'stashdb_id': None}
+{'id': 195, 'name': 'Performer195', 'image': 'http://198.51.100.69:9999/performer/195/image', 'stashdb_id': None}
+{'id': 196, 'name': 'Performer196', 'image': 'http://198.51.100.69:9999/performer/196/image', 'stashdb_id': None}
+{'id': 197, 'name': 'Performer197', 'image': 'http://198.51.100.69:9999/performer/197/image', 'stashdb_id': None}
+{'id': 198, 'name': 'Performer198', 'image': 'http://198.51.100.69:9999/performer/198/image', 'stashdb_id': None}
+{'id': 199, 'name': 'Performer199', 'image': 'http://198.51.100.69:9999/performer/199/image', 'stashdb_id': None}
+{'id': 200, 'name': 'Performer200', 'image': 'http://198.51.100.69:9999/performer/200/image', 'stashdb_id': None}
+{'id': 201, 'name': 'Performer201', 'image': 'http://198.51.100.69:9999/performer/201/image', 'stashdb_id': None}
+{'id': 202, 'name': 'Performer202', 'image': 'http://198.51.100.69:9999/performer/202/image', 'stashdb_id': None}
+{'id': 203, 'name': 'Performer203', 'image': 'http://198.51.100.69:9999/performer/203/image', 'stashdb_id': None}
+{'id': 204, 'name': 'Performer204', 'image': 'http://198.51.100.69:9999/performer/204/image', 'stashdb_id': None}
+{'id': 205, 'name': 'Performer205', 'image': 'http://198.51.100.69:9999/performer/205/image', 'stashdb_id': None}
+{'id': 206, 'name': 'Performer206', 'image': 'http://198.51.100.69:9999/performer/206/image', 'stashdb_id': None}
+{'id': 207, 'name': 'Performer207', 'image': 'http://198.51.100.69:9999/performer/207/image', 'stashdb_id': None}
+{'id': 208, 'name': 'Performer208', 'image': 'http://198.51.100.69:9999/performer/208/image', 'stashdb_id': None}
+{'id': 209, 'name': 'Performer209', 'image': 'http://198.51.100.69:9999/performer/209/image', 'stashdb_id': None}
+{'id': 210, 'name': 'Performer210', 'image': 'http://198.51.100.69:9999/performer/210/image', 'stashdb_id': None}
+{'id': 211, 'name': 'Performer211', 'image': 'http://198.51.100.69:9999/performer/211/image', 'stashdb_id': None}
+{'id': 212, 'name': 'Performer212', 'image': 'http://198.51.100.69:9999/performer/212/image', 'stashdb_id': None}
+{'id': 213, 'name': 'Performer213', 'image': 'http://198.51.100.69:9999/performer/213/image', 'stashdb_id': None}
+{'id': 214, 'name': 'Performer214', 'image': 'http://198.51.100.69:9999/performer/214/image', 'stashdb_id': None}
+{'id': 215, 'name': 'Performer215', 'image': 'http://198.51.100.69:9999/performer/215/image', 'stashdb_id': None}
+{'id': 216, 'name': 'Performer216', 'image': 'http://198.51.100.69:9999/performer/216/image', 'stashdb_id': None}
+{'id': 217, 'name': 'Performer217', 'image': 'http://198.51.100.69:9999/performer/217/image', 'stashdb_id': None}
+{'id': 218, 'name': 'Performer218', 'image': 'http://198.51.100.69:9999/performer/218/image', 'stashdb_id': None}
+{'id': 219, 'name': 'Performer219', 'image': 'http://198.51.100.69:9999/performer/219/image', 'stashdb_id': None}
+{'id': 220, 'name': 'Performer220', 'image': 'http://198.51.100.69:9999/performer/220/image', 'stashdb_id': None}
+{'id': 221, 'name': 'Performer221', 'image': 'http://198.51.100.69:9999/performer/221/image', 'stashdb_id': None}
+{'id': 222, 'name': 'Performer222', 'image': 'http://198.51.100.69:9999/performer/222/image', 'stashdb_id': None}
+{'id': 223, 'name': 'Performer223', 'image': 'http://198.51.100.69:9999/performer/223/image', 'stashdb_id': None}
+{'id': 224, 'name': 'Performer224', 'image': 'http://198.51.100.69:9999/performer/224/image', 'stashdb_id': None}
+{'id': 225, 'name': 'Performer225', 'image': 'http://198.51.100.69:9999/performer/225/image', 'stashdb_id': None}
+{'id': 226, 'name': 'Performer226', 'image': 'http://198.51.100.69:9999/performer/226/image', 'stashdb_id': None}
+{'id': 227, 'name': 'Performer227', 'image': 'http://198.51.100.69:9999/performer/227/image', 'stashdb_id': None}
+{'id': 228, 'name': 'Performer228', 'image': 'http://198.51.100.69:9999/performer/228/image', 'stashdb_id': None}
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+d = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+perfs = d['performers']
+from collections import Counter
+hostc = Counter()
+stashc = Counter()
+for p in perfs:
+    img = p['image']
+    h = re.sub(r'/performer/.*','', img)
+    hostc[h] += 1
+    sid = p['stashdb_id']
+    stashc['None' if sid is None else sid] += 1
+print('hosts:')
+for h,c in hostc.items():
+    print(' ', c, h)
+print('stashdb_id samples:')
+for k,c in list(stashc.items())[:10]:
+    print(' ', c, k)
+"
+
+hosts:
+  179 http://198.51.100.64:9999
+  2521 http://198.51.100.69:9999
+stashdb_id samples:
+  1 stashdb-0
+  1 stashdb-1
+  1 stashdb-2
+  1 stashdb-3
+  1 stashdb-4
+  1 stashdb-5
+  1 stashdb-6
+  1 stashdb-7
+  1 stashdb-8
+  1 stashdb-9
+[0m
+[0m$ [0mpython3 -c "
+import json
+d = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+perfs = d['performers']
+for i in [0,1,2,177,178,179,180,181,2698,2699]:
+    print(perfs[i])
+"
+
+{'id': 0, 'name': 'Performer0', 'image': 'http://198.51.100.64:9999/performer/0/image', 'stashdb_id': 'stashdb-0'}
+{'id': 1, 'name': 'Performer1', 'image': 'http://198.51.100.64:9999/performer/1/image', 'stashdb_id': 'stashdb-1'}
+{'id': 2, 'name': 'Performer2', 'image': 'http://198.51.100.64:9999/performer/2/image', 'stashdb_id': 'stashdb-2'}
+{'id': 177, 'name': 'Performer177', 'image': 'http://198.51.100.64:9999/performer/177/image', 'stashdb_id': None}
+{'id': 178, 'name': 'Performer178', 'image': 'http://198.51.100.64:9999/performer/178/image', 'stashdb_id': None}
+{'id': 179, 'name': 'Performer179', 'image': 'http://198.51.100.69:9999/performer/179/image', 'stashdb_id': None}
+{'id': 180, 'name': 'Performer180', 'image': 'http://198.51.100.69:9999/performer/180/image', 'stashdb_id': None}
+{'id': 181, 'name': 'Performer181', 'image': 'http://198.51.100.69:9999/performer/181/image', 'stashdb_id': None}
+{'id': 2698, 'name': 'Performer2698', 'image': 'http://198.51.100.69:9999/performer/2698/image', 'stashdb_id': None}
+{'id': 2699, 'name': 'Performer2699', 'image': 'http://198.51.100.69:9999/performer/2699/image', 'stashdb_id': None}
+[0m
+[0m$ [0mpython3 -c "
+import json
+d = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+perfs = d['performers']
+has_stash = [p['id'] for p in perfs if p['stashdb_id'] is not None]
+host64 = [p['id'] for p in perfs if '.64' in p['image']]
+print('count stash set', len(has_stash), 'first', has_stash[:5], 'last', has_stash[-5:])
+print('count host64', len(host64), 'first', host64[:5], 'last', host64[-5:])
+print('stash set == host64?', set(has_stash)==set(host64))
+print('stash - host64:', sorted(set(has_stash)-set(host64))[:20])
+print('host64 - stash:', sorted(set(host64)-set(has_stash))[:20])
+"
+
+count stash set 40 first [0, 1, 2, 3, 4] last [35, 36, 37, 38, 39]
+count host64 179 first [0, 1, 2, 3, 4] last [174, 175, 176, 177, 178]
+stash set == host64? False
+stash - host64: []
+host64 - stash: [40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59]
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+d = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+perfs = d['performers']
+pat = re.compile(r'^http://198\.51\.100\.(\d+):9999/performer/(\d+)/image$')
+from collections import Counter
+forms = Counter()
+for p in perfs:
+    m = pat.match(p['image'])
+    if m:
+        forms[('std', m.group(1))] += 1
+    else:
+        forms[('nonstd', p['image'][:60])] += 1
+for k,c in forms.items():
+    print(c, k)
+"
+
+179 ('std', '64')
+2521 ('std', '69')
+[0m
+[0m$ [0mpython3 -c "
+import json
+d = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+perfs = d['performers']
+with_sid = [(p['id'], p['stashdb_id'], p['image']) for p in perfs if p['stashdb_id'] is not None]
+for x in with_sid:
+    print(x)
+"
+
+(0, 'stashdb-0', 'http://198.51.100.64:9999/performer/0/image')
+(1, 'stashdb-1', 'http://198.51.100.64:9999/performer/1/image')
+(2, 'stashdb-2', 'http://198.51.100.64:9999/performer/2/image')
+(3, 'stashdb-3', 'http://198.51.100.64:9999/performer/3/image')
+(4, 'stashdb-4', 'http://198.51.100.64:9999/performer/4/image')
+(5, 'stashdb-5', 'http://198.51.100.64:9999/performer/5/image')
+(6, 'stashdb-6', 'http://198.51.100.64:9999/performer/6/image')
+(7, 'stashdb-7', 'http://198.51.100.64:9999/performer/7/image')
+(8, 'stashdb-8', 'http://198.51.100.64:9999/performer/8/image')
+(9, 'stashdb-9', 'http://198.51.100.64:9999/performer/9/image')
+(10, 'stashdb-10', 'http://198.51.100.64:9999/performer/10/image')
+(11, 'stashdb-11', 'http://198.51.100.64:9999/performer/11/image')
+(12, 'stashdb-12', 'http://198.51.100.64:9999/performer/12/image')
+(13, 'stashdb-13', 'http://198.51.100.64:9999/performer/13/image')
+(14, 'stashdb-14', 'http://198.51.100.64:9999/performer/14/image')
+(15, 'stashdb-15', 'http://198.51.100.64:9999/performer/15/image')
+(16, 'stashdb-16', 'http://198.51.100.64:9999/performer/16/image')
+(17, 'stashdb-17', 'http://198.51.100.64:9999/performer/17/image')
+(18, 'stashdb-18', 'http://198.51.100.64:9999/performer/18/image')
+(19, 'stashdb-19', 'http://198.51.100.64:9999/performer/19/image')
+(20, 'stashdb-20', 'http://198.51.100.64:9999/performer/20/image')
+(21, 'stashdb-21', 'http://198.51.100.64:9999/performer/21/image')
+(22, 'stashdb-22', 'http://198.51.100.64:9999/performer/22/image')
+(23, 'stashdb-23', 'http://198.51.100.64:9999/performer/23/image')
+(24, 'stashdb-24', 'http://198.51.100.64:9999/performer/24/image')
+(25, 'stashdb-25', 'http://198.51.100.64:9999/performer/25/image')
+(26, 'stashdb-26', 'http://198.51.100.64:9999/performer/26/image')
+(27, 'stashdb-27', 'http://198.51.100.64:9999/performer/27/image')
+(28, 'stashdb-28', 'http://198.51.100.64:9999/performer/28/image')
+(29, 'stashdb-29', 'http://198.51.100.64:9999/performer/29/image')
+(30, 'stashdb-30', 'http://198.51.100.64:9999/performer/30/image')
+(31, 'stashdb-31', 'http://198.51.100.64:9999/performer/31/image')
+(32, 'stashdb-32', 'http://198.51.100.64:9999/performer/32/image')
+(33, 'stashdb-33', 'http://198.51.100.64:9999/performer/33/image')
+(34, 'stashdb-34', 'http://198.51.100.64:9999/performer/34/image')
+(35, 'stashdb-35', 'http://198.51.100.64:9999/performer/35/image')
+(36, 'stashdb-36', 'http://198.51.100.64:9999/performer/36/image')
+(37, 'stashdb-37', 'http://198.51.100.64:9999/performer/37/image')
+(38, 'stashdb-38', 'http://198.51.100.64:9999/performer/38/image')
+(39, 'stashdb-39', 'http://198.51.100.64:9999/performer/39/image')
+[0m
+[0m$ [0mpython3 -c "
+import json
+d = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+perfs = d['performers']
+keysets = {}
+for p in perfs:
+    k = tuple(sorted(p.keys()))
+    keysets[k] = keysets.get(k,0)+1
+print(keysets)
+# check any missing image key
+missing = [p for p in perfs if 'image' not in p]
+print('missing image key', len(missing))
+# check null stashdb vs missing stashdb key
+import collections
+print('types of stashdb_id:', collections.Counter(type(p['stashdb_id']).__name__ for p in perfs))
+"
+
+{('id', 'image', 'name', 'stashdb_id'): 2700}
+missing image key 0
+types of stashdb_id: Counter({'NoneType': 2660, 'str': 40})
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+d = json.load(open('/root/ken-tasks/T-KEN-003/performers.json'))
+perfs = d['performers']
+mismatch = []
+for p in perfs:
+    m = re.search(r'/performer/(\d+)/image', p['image'])
+    if m and int(m.group(1)) != p['id']:
+        mismatch.append(p)
+print('id mismatch', len(mismatch))
+for p in mismatch[:10]: print(p)
+"
+
+id mismatch 0
+[0m

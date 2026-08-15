@@ -1,0 +1,41 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-131
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    34 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   589 Aug 15 05:20 title_translate_calls.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead title_translate_calls.json
+[0m
+[0m← [0mEdit title_translate_calls.json
+Index: /root/ken-tasks/T-KEN-131/title_translate_calls.json
+===================================================================
+--- /root/ken-tasks/T-KEN-131/title_translate_calls.json
++++ /root/ken-tasks/T-KEN-131/title_translate_calls.json
+@@ -1,16 +1,16 @@
+ [
+   {
+     "site": "call_0",
+-    "skip_translate": true
++    "skip_translate": false
+   },
+   {
+     "site": "call_1",
+-    "skip_translate": true
++    "skip_translate": false
+   },
+   {
+     "site": "call_2",
+-    "skip_translate": true
++    "skip_translate": false
+   },
+   {
+     "site": "call_3",
+     "skip_translate": false
+
+[0m
+Set `skip_translate` to `false` for `call_0`, `call_1`, and `call_2`, so those cards' titles get translated instead of remaining in Japanese.

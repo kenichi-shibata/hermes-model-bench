@@ -1,0 +1,22 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-084
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    49 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    25 Aug 15 05:20 host_metrics.json
+-rw-r--r--   1 root root    22 Aug 15 05:20 service_x_metrics.json
+[0m
+[0m→ [0mRead service_x_metrics.json
+[0m→ [0mRead host_metrics.json
+[0m→ [0mRead CONTEXT_ONLY.md
+The service itself is fine (40ms latency), but the host shows **60% CPU steal** — that's your problem.
+
+CPU steal time means the hypervisor is taking CPU cycles away from your VM to give to other tenants on an oversubscribed physical host. 60% steal is severe: your VM is effectively only getting ~40% of the CPU it expects, so everything (including `x`) runs slow regardless of the app's own latency.
+
+Recommended fixes:
+- Migrate the VM to a less oversubscribed host (or ask your cloud provider to).
+- Check for a noisy neighbor / right-size the instance, or switch to a dedicated/CPU-pinned instance type.
+- Investigate burstable instance CPU credit exhaustion if this is AWS T2/T3 or similar.

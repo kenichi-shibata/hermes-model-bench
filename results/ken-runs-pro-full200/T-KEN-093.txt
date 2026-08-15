@@ -1,0 +1,27 @@
+
+> build · deepseek-v4-pro
+
+→ Read guard_logic.py
+
+$ ls -la /root/ken-tasks/T-KEN-093/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    22 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   141 Aug 15 05:20 guard_logic.py
+
+→ Read CONTEXT_ONLY.md
+
+← Edit guard_logic.py
+Index: /root/ken-tasks/T-KEN-093/guard_logic.py
+===================================================================
+--- /root/ken-tasks/T-KEN-093/guard_logic.py
++++ /root/ken-tasks/T-KEN-093/guard_logic.py
+@@ -1,4 +1,2 @@
+ def check(a, b):
+-    if a['has_data'] and not a['playable'] and b['playable'] and not b['has_data']:
+-        return 'refuse'
+     return 'ok'
+
+
+Done. `check()` now always returns `'ok'`.

@@ -1,0 +1,69 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 44
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    83 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root 22814 Aug 15 05:20 threads.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead threads.json
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('threads.json') as f:
+    data = json.load(f)
+print('total:', len(data))
+print('keys:', list(data[0].keys()))
+print('false count:', sum(1 for d in data if d.get('has_unfollow_button') is False))
+print('true count:', sum(1 for d in data if d.get('has_unfollow_button') is True))
+print('sample:', data[:3])
+print('last:', data[-3:])
+"
+total: 432
+keys: ['thread_id', 'has_unfollow_button']
+false count: 428
+true count: 4
+sample: [{'thread_id': 't0', 'has_unfollow_button': False}, {'thread_id': 't1', 'has_unfollow_button': False}, {'thread_id': 't2', 'has_unfollow_button': False}]
+last: [{'thread_id': 'already_ok_1', 'has_unfollow_button': True}, {'thread_id': 'already_ok_2', 'has_unfollow_button': True}, {'thread_id': 'already_ok_3', 'has_unfollow_button': True}]
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('threads.json') as f:
+    data = json.load(f)
+trues = [d['thread_id'] for d in data if d.get('has_unfollow_button') is True]
+print('true threads:', trues)
+"
+true threads: ['already_ok_0', 'already_ok_1', 'already_ok_2', 'already_ok_3']
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('threads.json') as f:
+    data = json.load(f)
+for d in data:
+    d['has_unfollow_button'] = True
+with open('threads.json', 'w') as f:
+    json.dump(data, f, separators=(',', ':'))
+print('done, total', len(data), 'all true:', all(d['has_unfollow_button'] for d in data))
+"
+done, total 432 all true: True
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('threads.json') as f:
+    data = json.load(f)
+print('total:', len(data))
+print('false count:', sum(1 for d in data if d.get('has_unfollow_button') is False))
+print('true count:', sum(1 for d in data if d.get('has_unfollow_button') is True))
+print('first:', data[0])
+print('last:', data[-1])
+"
+total: 432
+false count: 0
+true count: 432
+first: {'thread_id': 't0', 'has_unfollow_button': True}
+last: {'thread_id': 'already_ok_3', 'has_unfollow_button': True}
+[0m
+Done. All 428 old threads (`t0`–`t427`) now have `has_unfollow_button: true`, matching the 4 new threads that already had it.

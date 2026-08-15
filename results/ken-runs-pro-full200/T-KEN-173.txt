@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read port_binding_conflict.json
+Yes — a port conflict exists. Both `service_x` and `service_y` reference port `9999`; `service_x` bound it successfully, so `service_y` failed to bind.

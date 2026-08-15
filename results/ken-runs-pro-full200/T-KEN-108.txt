@@ -1,0 +1,14 @@
+
+> build · deepseek-v4-pro
+
+→ Read retention_policy.json
+
+$ ls -la /root/ken-tasks/T-KEN-108
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    29 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    63 Aug 15 05:20 retention_policy.json
+
+→ Read CONTEXT_ONLY.md
+No. The policy says keep 30 days (`configured_days: 30`), but the oldest surviving file is only 5 days old (`actual_oldest_file_days_ago: 5`). With a correct 30-day retention, the oldest file should be ~30 days old; only 5 days suggests retention is deleting far more aggressively than configured (or a unit/config mismatch), not set up right.

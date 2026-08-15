@@ -1,0 +1,41 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-013/ && echo "---" && find /root/ken-tasks/T-KEN-013 -type f | head -100
+total 24
+drwxr-xr-x   3 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    58 Aug 15 05:20 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 pr_files
+---
+/root/ken-tasks/T-KEN-013/CONTEXT_ONLY.md
+/root/ken-tasks/T-KEN-013/pr_files/file3_serializer.py
+/root/ken-tasks/T-KEN-013/pr_files/file2_pagination.py
+/root/ken-tasks/T-KEN-013/pr_files/file1_models.py
+/root/ken-tasks/T-KEN-013/pr_files/file4_tests.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead pr_files/file1_models.py
+[0m→ [0mRead pr_files/file2_pagination.py
+[0m→ [0mRead pr_files/file3_serializer.py
+[0m→ [0mRead pr_files/file4_tests.py
+## Review
+
+**Critical bug** — `file2_pagination.py:4`
+
+```python
+offset = page * limit  # should be (page - 1) * limit
+return items[offset:offset + limit]
+```
+
+Off-by-one: for `page=1`, `offset = limit`, so the first `limit` items are skipped and page 1 returns items `[limit:2*limit]`. First page is empty when `items` has ≤ `limit` items. Fix:
+
+```python
+offset = (page - 1) * limit
+return items[offset:offset + limit]
+```
+
+**Other observations (minor / non-blocking):**
+- `file1_models.py` and `file3_serializer.py` look correct.
+- `file4_tests.py` only stubs `test_serialize` (`pass`); there's no test covering `paginate`, which is exactly why this bug slipped through. Add a test asserting `paginate(items, 1, 2) == items[0:2]`.
+- `paginate` doesn't guard `page < 1` or `limit <= 0`; with `page=0` it returns `items[:limit]` (silently treats 0 as page 1), and `limit=0` returns an empty list — worth validating or documenting.

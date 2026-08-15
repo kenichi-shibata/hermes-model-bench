@@ -1,0 +1,14 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-038
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    75 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    91 Aug 15 05:20 performer_bio_sync.py
+-rw-r--r--   1 root root   417 Aug 15 05:20 performers_bios.json
+[0m
+[0m→ [0mRead performer_bio_sync.py
+[0m→ [0mRead performers_bios.json
+[0m→ [0mRead CONTEXT_ONLY.md

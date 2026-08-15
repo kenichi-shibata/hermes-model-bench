@@ -1,0 +1,29 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-165
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    27 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   113 Aug 15 05:20 proxy_error_log.txt
+
+→ Read proxy_error_log.txt
+→ Read CONTEXT_ONLY.md
+The log shows the failure pattern clearly:
+
+- **10:00:00** backend restart begins
+- **10:00:02** 14 requests hit the proxy and get `502 Bad Gateway` (backend still down)
+- **10:00:08** backend becomes healthy
+- **10:00:09** traffic resumes with `200 OK`
+
+**Diagnosis:** This isn't a proxy crash — it's a proxy failing open during a backend restart. The backend took ~8s to come back, and during that window the reverse proxy immediately returned `502 Bad Gateway` to 14 real client requests instead of absorbing the outage.
+
+**Likely root causes (to fix):**
+1. No retry/timeout buffer — proxy has no `proxy_next_upstream`, retry, or request-buffering config, so in-flight requests fail instantly.
+2. No health-check gating — the proxy didn't mark the backend as down and route elsewhere (or queue requests) during the restart.
+3. Backend restart is not graceful — it drops connections instead of draining (connection is killed mid-request, not via `SIGTERM` + keepalive drain).
+
+**Fixes:** configure retries/`proxy_next_upstream`, add active health checks with failover or request queuing, and make the backend do graceful shutdown (drain connections before exiting).
+
+Do you want me to write the actual nginx (or other) config, or is there more of the codebase to inspect?

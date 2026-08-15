@@ -1,0 +1,18 @@
+
+> build · deepseek-v4-pro
+
+→ Read pr_diff_7.py
+
+$ ls -la /root/ken-tasks/T-KEN-190/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    20 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   121 Aug 15 05:20 pr_diff_7.py
+
+→ Read CONTEXT_ONLY.md
+Sketchy flags in `pr_diff_7.py`:
+
+1. **Hardcoded API key leak** (line 1) — `sk-live-abc123realkeyleaked` is a live-mode secret embedded in source. Should come from an env var/secret store.
+2. **Missing imports** — `requests` and `url` are referenced but never defined; code won't run.
+3. **No secret in logs concern aside**, the key is passed via `Authorization` header bare with no `Bearer` scheme (line 3), which may be wrong depending on the API.

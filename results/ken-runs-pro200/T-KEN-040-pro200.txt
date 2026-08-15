@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead r18_status_mock.json
+Yes, r18 is blocked. The breaker is open (`breaker_open: true`) with 6 consecutive failures, reason `cloudflare_block`, and 300s of cooldown remaining.

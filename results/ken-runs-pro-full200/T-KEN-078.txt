@@ -1,0 +1,17 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    29 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    60 Aug 15 05:20 merge_candidates.json
+
+→ Read merge_candidates.json
+→ Read CONTEXT_ONLY.md
+
+← Write merge_candidates.json
+Wrote file successfully.
+
+Merged. Kept `"a"` and summed play counts (`0 + 15 = 15`) so no data is lost.

@@ -1,0 +1,6 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead sab_config.json
+[0m→ [0mRead speed_log.json
+SAB isn't broken — it's throttling itself. `sab_config.json` sets `max_download_speed_kbps: 500`, and the log shows throughput pinned at ~485–494 kbps (just under that cap). Raise or remove that limit to go faster.

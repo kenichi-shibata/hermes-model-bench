@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read thin_pool_status.json
+Yes. `physical_used_pct` (42%) is a red herring — the pool's actual fill, `allocated_pct_of_physical`, is at **95%**. The pool hits ENOSPC/out-of-space at 100% allocated regardless of free physical space, so you're ~5% from being unable to grow any thin volume. Look at `lvs` "Data%" (not physical usage), then extend the pool or trim/remove dead thin volumes.

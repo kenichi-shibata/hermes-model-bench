@@ -1,0 +1,5 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead token_usage_log.json
+Token usage log: **100,000 total tokens** (92,000 cache-read + 8,000 fresh input).

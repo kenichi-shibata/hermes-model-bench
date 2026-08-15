@@ -1,0 +1,28 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la && cat restore_candidates.json 2>/dev/null | head -200
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    31 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   154 Aug 15 05:20 restore_candidates.json
+[
+  {
+    "day": "today",
+    "valid": false
+  },
+  {
+    "day": "yesterday",
+    "valid": false
+  },
+  {
+    "day": "2 days ago",
+    "valid": true
+  }
+]
+
+→ Read CONTEXT_ONLY.md
+Today is broken (`valid: false`), but yesterday is **also** broken (`valid: false`), so restoring from yesterday isn't safe. The only valid snapshot is **2 days ago** (`valid: true`).
+
+Restore from **"2 days ago"**.

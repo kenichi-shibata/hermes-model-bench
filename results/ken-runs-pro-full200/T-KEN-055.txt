@@ -1,0 +1,21 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root   113 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    16 Aug 15 05:20 vm_spec.json
+-rw-r--r--   1 root root    46 Aug 15 05:20 workload_profile.json
+
+→ Read vm_spec.json
+→ Read workload_profile.json
+→ Read CONTEXT_ONLY.md
+The VM has 2 cores = **200%** CPU capacity.
+
+Workload needs:
+- p50: 150% → fits (0.75 cores)
+- p95: 380% → **exceeds** 200% capacity by 180%
+
+**No, the VM doesn't have enough cores.** At p95 load it needs ~3.8 cores but only has 2, so it will be CPU-throttled/oversubscribed ~20% of the time. Recommend at least **4 cores**.

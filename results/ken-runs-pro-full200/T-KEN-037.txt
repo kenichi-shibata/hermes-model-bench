@@ -1,0 +1,18 @@
+
+> build · deepseek-v4-pro
+
+→ Read dedupe_merge.py
+
+$ ls -la /root/ken-tasks/T-KEN-037
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    46 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   150 Aug 15 05:20 dedupe_merge.py
+-rw-r--r--   1 root root    92 Aug 15 05:20 duplicate_groups.json
+
+→ Read duplicate_groups.json
+→ Read CONTEXT_ONLY.md
+It's just flagging, not merging.
+
+`dedupe_merge.py:1-5` sets `item['duplicate'] = True` on every element after the first, but never removes them, combines data, or writes results back. The comment on line 5 even confirms it.

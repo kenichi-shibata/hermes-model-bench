@@ -1,0 +1,13 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    71 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   296 Aug 15 05:20 pve2_ram_trend.json
+
+→ Read pve2_ram_trend.json
+→ Read CONTEXT_ONLY.md
+Yes. RAM usage is climbing steadily at ~2%/day (74% → 86% over the week). At this linear rate it will hit 100% in ~7 days, so pve2 is trending toward running out of RAM soon unless usage is freed or the trend breaks.

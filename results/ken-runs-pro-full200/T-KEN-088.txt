@@ -1,0 +1,5 @@
+
+> build · deepseek-v4-pro
+
+→ Read db_vs_app.json
+The app, not the DB. The DB query runs in 12ms, but app serialization takes 3800ms — that's 99.7% of the time. The bottleneck is serializing 50,000 rows in the application layer, not the database.

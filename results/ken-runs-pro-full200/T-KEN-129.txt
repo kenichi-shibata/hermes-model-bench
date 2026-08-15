@@ -1,0 +1,32 @@
+
+> build · deepseek-v4-pro
+
+→ Read name_translate.py
+→ Read name_data.json
+
+$ ls -la /root/ken-tasks/T-KEN-129/
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    41 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    49 Aug 15 05:20 name_data.json
+-rw-r--r--   1 root root   117 Aug 15 05:20 name_translate.py
+
+→ Read CONTEXT_ONLY.md
+
+← Edit name_translate.py
+Index: /root/ken-tasks/T-KEN-129/name_translate.py
+===================================================================
+--- /root/ken-tasks/T-KEN-129/name_translate.py
++++ /root/ken-tasks/T-KEN-129/name_translate.py
+@@ -1,3 +1,3 @@
+ def translate(record):
+-    return romanize(record.get('name_jp'))
++    return romanize(record.get('name_japanese'))
+ def romanize(s): return f'{s} (EN)' if s else None
+
+
+$ python3 -c "import json, name_translate; d=json.load(open('name_data.json')); print(name_translate.translate(d))"
+彩月七緒 (EN)
+
+Fixed. `name_translate.py:2` read the wrong key (`name_jp`) but the JSON uses `name_japanese`. Now outputs `彩月七緒 (EN)`.

@@ -1,0 +1,15 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    53 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   219 Aug 15 05:20 retry_engine_v2.py
+
+→ Read retry_engine_v2.py
+→ Read CONTEXT_ONLY.md
+It's just spinning, not retrying.
+
+`check_and_retry` in retry_engine_v2.py:3-4 only increments `attempts[item_id]` and returns a dict. It never calls a download/search function, never re-dispatches work, and never stops/limits retries — so repeated calls just count up indefinitely (an unbounded counter), achieving no actual retry.

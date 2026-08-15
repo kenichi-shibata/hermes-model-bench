@@ -1,0 +1,14 @@
+
+> build · deepseek-v4-pro
+
+→ Read monitoring_process_status.json
+
+$ ls -la /root/ken-tasks/T-KEN-144
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    38 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    75 Aug 15 05:20 monitoring_process_status.json
+
+→ Read CONTEXT_ONLY.md
+No. `process_alive` is true, but `last_loop_iteration_completed_hours_ago: 2` means the monitor hasn't completed a loop in 2 hours — it's effectively stalled/hung.

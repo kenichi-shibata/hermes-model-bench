@@ -1,0 +1,14 @@
+
+> build · deepseek-v4-pro
+
+→ Read performer_disambiguation.json
+
+$ ls -la /root/ken-tasks/T-KEN-124/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    37 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   142 Aug 15 05:20 performer_disambiguation.json
+
+→ Read CONTEXT_ONLY.md
+Cannot determine. Both entries are identically named "Jane Doe" with only `id` and `verified` fields — no distinguishing attributes (dates, roles, external IDs, etc.) exist to tell the real performer from a namesake.

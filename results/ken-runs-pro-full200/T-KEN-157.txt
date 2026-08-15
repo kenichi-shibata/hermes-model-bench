@@ -1,0 +1,9 @@
+
+> build · deepseek-v4-pro
+
+→ Read saved_fact_verification.json
+
+$ python3 -c "import json; d=json.load(open('saved_fact_verification.json')); print('valid json:', d)"
+valid json: {'exists': True, 'expected_date': '2026-08-13', 'actual_saved_date': '2026-08-31'}
+
+Valid JSON, but it did **not** save right: `expected_date` is `2026-08-13` while `actual_saved_date` is `2026-08-31`.

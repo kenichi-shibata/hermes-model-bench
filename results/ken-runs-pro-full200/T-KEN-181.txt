@@ -1,0 +1,25 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la /root/ken-tasks/T-KEN-181
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    28 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   112 Aug 15 05:20 dark_mode_styles.css
+
+→ Read dark_mode_styles.css
+→ Read CONTEXT_ONLY.md
+
+← Edit dark_mode_styles.css
+Index: /root/ken-tasks/T-KEN-181/dark_mode_styles.css
+===================================================================
+--- /root/ken-tasks/T-KEN-181/dark_mode_styles.css
++++ /root/ken-tasks/T-KEN-181/dark_mode_styles.css
+@@ -1,2 +1,2 @@
+-.sidebar { background: white; }
++.sidebar { background: white; } .dark .sidebar { background: black; }
+ .header { background-color: white; } .dark .header { background-color: black; }
+
+
+Done. The `.sidebar` lacked a dark-mode override, so it stayed white while the `.header` turned black. Added `.dark .sidebar { background: black; }` to match.

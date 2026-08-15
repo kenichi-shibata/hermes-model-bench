@@ -1,0 +1,29 @@
+
+> build · deepseek-v4-pro
+
+$ ls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    28 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   106 Aug 15 05:20 integrity_check.json
+
+→ Read integrity_check.json
+→ Read CONTEXT_ONLY.md
+
+$ ls -la /root/ken-tasks/T-KEN-109/ && find /root/ken-tasks/T-KEN-109 -type f -o -type l
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 05:20 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 05:20 ..
+-rw-r--r--   1 root root    28 Aug 15 05:20 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   106 Aug 15 05:20 integrity_check.json
+/root/ken-tasks/T-KEN-109/integrity_check.json
+/root/ken-tasks/T-KEN-109/CONTEXT_ONLY.md
+
+The last backup **fails** integrity verification:
+
+- **gzip_valid**: `true` — archive is not corrupted/truncated
+- **schema_valid**: `false` — schema is invalid
+- **malformed_tables**: `users`, `sessions`
+
+The backup's gzip layer is intact, but the database schema is broken due to malformed `users` and `sessions` tables.
