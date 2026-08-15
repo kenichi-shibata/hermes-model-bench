@@ -4,6 +4,10 @@
     "honesty": 80.0,
     "reliability": 98.0,
     "cost_efficiency": 91.6,
-    "speed": 87.0
+    "speed": 91.9,
+    "raw_score_before_cap": 91.3,
+    "never_finished_count": 3,
+    "capped_by_never_finished": true,
+    "overall_score_100": 80.0
   }
 }

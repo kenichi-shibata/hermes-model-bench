@@ -5,6 +5,9 @@
     "reliability": 100.0,
     "cost_efficiency": 15.8,
     "speed": 60.8,
+    "raw_score_before_cap": 87.7,
+    "never_finished_count": 0,
+    "capped_by_never_finished": false,
     "overall_score_100": 87.7
   },
   "claude-sonnet-5 (solo)": {
@@ -13,6 +16,9 @@
     "reliability": 100.0,
     "cost_efficiency": 0.0,
     "speed": 100.0,
+    "raw_score_before_cap": 90.0,
+    "never_finished_count": 0,
+    "capped_by_never_finished": false,
     "overall_score_100": 90.0
   },
   "deepseek-v4-flash (solo)": {
@@ -21,6 +27,9 @@
     "reliability": 99.5,
     "cost_efficiency": 100.0,
     "speed": 81.1,
+    "raw_score_before_cap": 88.9,
+    "never_finished_count": 0,
+    "capped_by_never_finished": false,
     "overall_score_100": 88.9
   },
   "deepseek-v4-pro (solo)": {
@@ -29,7 +38,10 @@
     "reliability": 98.0,
     "cost_efficiency": 91.6,
     "speed": 91.9,
-    "overall_score_100": 91.3
+    "raw_score_before_cap": 91.3,
+    "never_finished_count": 3,
+    "capped_by_never_finished": true,
+    "overall_score_100": 80.0
   },
   "gemini-3.7-flash (solo)": {
     "correctness": 95.5,
@@ -37,6 +49,9 @@
     "reliability": 95.5,
     "cost_efficiency": 32.6,
     "speed": 85.1,
+    "raw_score_before_cap": 86.5,
+    "never_finished_count": 0,
+    "capped_by_never_finished": false,
     "overall_score_100": 86.5
   },
   "kimi-k3 (solo)": {
@@ -45,6 +60,9 @@
     "reliability": 100.0,
     "cost_efficiency": 17.6,
     "speed": 40.5,
+    "raw_score_before_cap": 64.1,
+    "never_finished_count": 0,
+    "capped_by_never_finished": false,
     "overall_score_100": 64.1
   },
   "kimi-plans+gemini-works (split)": {
@@ -53,6 +71,9 @@
     "reliability": 90.0,
     "cost_efficiency": 5.6,
     "speed": 37.8,
+    "raw_score_before_cap": 55.3,
+    "never_finished_count": 1,
+    "capped_by_never_finished": true,
     "overall_score_100": 55.3
   },
   "gpt5.6-sol-plans+deepseek-works (split)": {
@@ -61,6 +82,9 @@
     "reliability": 100.0,
     "cost_efficiency": 8.5,
     "speed": 67.6,
+    "raw_score_before_cap": 87.6,
+    "never_finished_count": 0,
+    "capped_by_never_finished": false,
     "overall_score_100": 87.6
   },
   "gpt5.6-terra-plans+deepseek-works (split)": {
@@ -69,6 +93,9 @@
     "reliability": 100.0,
     "cost_efficiency": 11.8,
     "speed": 78.4,
+    "raw_score_before_cap": 89.0,
+    "never_finished_count": 0,
+    "capped_by_never_finished": false,
     "overall_score_100": 89.0
   },
   "sonnet5-plans+deepseek-works (split)": {
@@ -77,6 +104,9 @@
     "reliability": 100.0,
     "cost_efficiency": 14.3,
     "speed": 54.1,
+    "raw_score_before_cap": 86.8,
+    "never_finished_count": 0,
+    "capped_by_never_finished": false,
     "overall_score_100": 86.8
   },
   "deepseek-pro-plans+deepseek-flash-works (split)": {
@@ -85,6 +115,9 @@
     "reliability": 90.0,
     "cost_efficiency": 86.1,
     "speed": 70.3,
+    "raw_score_before_cap": 69.6,
+    "never_finished_count": 0,
+    "capped_by_never_finished": false,
     "overall_score_100": 69.6
   },
   "deepseek-v4-pro (solo, 10-task retest)": {
@@ -93,6 +126,9 @@
     "reliability": 80.0,
     "cost_efficiency": 91.6,
     "speed": 0.0,
+    "raw_score_before_cap": 67.2,
+    "never_finished_count": 1,
+    "capped_by_never_finished": true,
     "overall_score_100": 67.2
   }
 }

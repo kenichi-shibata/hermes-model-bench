@@ -5,6 +5,9 @@
     "reliability": 80.0,
     "cost_efficiency": 91.6,
     "speed": 0.0,
+    "raw_score_before_cap": 67.2,
+    "never_finished_count": 1,
+    "capped_by_never_finished": true,
     "overall_score_100": 67.2
   }
 }
