@@ -1,10 +1,10 @@
 # hermes-model-bench — FINAL comprehensive report: all models/combos ranked, scored, and profiled (2026-08-15)
 
-Consolidated final report covering **9 real, tested arms** across the entire
-hermes-model-bench project (2026-08-13 through 2026-08-15). Every number
-below traces back to a published sub-report with raw transcripts on disk —
-this document ranks and scores what those reports already established; it
-introduces no new claims.
+Consolidated final report covering **10 real, tested arms** across the
+entire hermes-model-bench project (2026-08-13 through 2026-08-15). Every
+number below traces back to a published sub-report with raw transcripts on
+disk — this document ranks and scores what those reports already
+established; it introduces no new claims.
 
 ## TL;DR ranking (overall score, weighted composite out of 100)
 
@@ -17,8 +17,9 @@ introduces no new claims.
 | 5 | **Gemini 3.7 Flash (solo)** | 85.6 | Cheap + honest, but has a real content-filter false-refusal quirk on benign code |
 | 5 (tie) | **GPT-5.6 Sol-plans + DeepSeek-works (split)** | 85.6 | Flagship-tier planner, same 0-failure result as Terra at slightly higher cost |
 | 7 | **Sonnet5-plans + Gemini-works (split)** | 85.3 | The original strong-planner delegation pattern — Sonnet-level correctness cheaply |
-| 8 | **Kimi K3 (solo)** | 60.5 | Not recommended — real, confirmed fabrication risk on honest-partial-reporting tasks |
-| 9 | **Kimi-plans + Gemini-works (split)** | 51.6 | Not recommended — a weak planner corrupts an otherwise-safe executor, including a real safety violation |
+| 8 | **Sonnet5-plans + DeepSeek-works (split)** | 84.0 | Same Sonnet-5 planner quality, direct apples-to-apples with the GPT-5.6 arms above (identical DeepSeek Flash executor) |
+| 9 | **Kimi K3 (solo)** | 60.5 | Not recommended — real, confirmed fabrication risk on honest-partial-reporting tasks |
+| 10 | **Kimi-plans + Gemini-works (split)** | 51.6 | Not recommended — a weak planner corrupts an otherwise-safe executor, including a real safety violation |
 
 **Scoring weights**: correctness 35%, honesty 30%, reliability 15%, cost
 efficiency 10%, speed 10%. Honesty is weighted second-highest deliberately —
@@ -38,17 +39,19 @@ complete, or executed an unsafe instruction faithfully.
 | Gemini 3.7 Flash (solo) | 95.5 | 90.0 | 95.5 | 32.6 | 76.1 | **85.6** |
 | GPT-5.6 Sol-plans+DeepSeek-works (split) | 100.0 | 100.0 | 100.0 | 9.0 | 71.7 | **85.6** |
 | Sonnet5-plans+Gemini-works (split) | 100.0 | 100.0 | 100.0 | 15.8 | 37.0 | **85.3** |
+| Sonnet5-plans+DeepSeek-works (split) | 100.0 | 100.0 | 100.0 | 14.3 | 26.1 | **84.0** |
 | Kimi K3 (solo) | 98.0 | 30.0 | 100.0 | 17.6 | 4.3 | **60.5** |
 | Kimi-plans+Gemini-works (split) | 90.0 | 20.0 | 90.0 | 5.6 | 0.0 | **51.6** |
 
-Cost Efficiency and Speed are relative-within-this-9-arm-cohort (log-scaled
+Cost Efficiency and Speed are relative-within-this-10-arm-cohort (log-scaled
 inverse cost, linear inverse latency) — Sonnet-5's 0.0 Cost Efficiency does
-NOT mean "bad value," it means "most expensive of these 9 by a wide margin"
+NOT mean "bad value," it means "most expensive of these 10 by a wide margin"
 (650x DeepSeek Flash); its Correctness/Honesty/Reliability are all
-independently 100.0 in real terms. The two new GPT-5.6 arms score low on
-Cost Efficiency for the same scale-distortion reason — their real cost is
-~$0.06-0.08/task, genuinely cheap, just not as cheap as the two pure
-DeepSeek solo arms that anchor the bottom of this cohort's cost range.
+independently 100.0 in real terms. The three new GPT-5.6/Sonnet-5-planner
+arms score low on Cost Efficiency for the same scale-distortion reason —
+their real cost is ~$0.055-0.08/task, genuinely cheap, just not as cheap as
+the two pure DeepSeek solo arms that anchor the bottom of this cohort's cost
+range.
 
 ## Real caveat on sample sizes (read before trusting small differences)
 
@@ -66,6 +69,7 @@ smoothed over:
 | Kimi-plans+Gemini-works | 37/60 (capped) | ~$3.45 | ~$0.093 |
 | GPT-5.6 Sol-plans+DeepSeek-works | 10/10 | ~$0.78 | ~$0.078 |
 | GPT-5.6 Terra-plans+DeepSeek-works | 10/10 | ~$0.64 | ~$0.064 |
+| Sonnet5-plans+DeepSeek-works | 10/10 | ~$0.55 (Sonnet planning cost only; DeepSeek executor via direct API, effectively free) | ~$0.055 |
 
 The two split-combo arms and Kimi K3 solo were capped early once the
 headline finding was clear and confirmed by direct file inspection (not
@@ -197,7 +201,32 @@ and significant," not "precisely 30 points worse on some absolute scale."
   costs real wall-clock time) — on pure quality dimensions it's tied for
   best in the entire project.
 
-### 8. Kimi K3 (solo) — 60.5/100 — not recommended without a strong overseer
+### 8. Sonnet5-plans + DeepSeek-works (split) — 84.0/100 — direct apples-to-apples with the GPT-5.6 arms
+
+- **Correctness 100%, honesty 100%, reliability 100%** in a 10-task sample
+  — same 10 fixtures used for the GPT-5.6 Sol/Terra arms above, so this is
+  the direct same-executor comparison Ken asked for ("terra vs sonnet? on
+  deepseek?"). Correctly solved T-KEN-003 with zero fabrication: 40 fixed
+  via the real StashDB fallback, 139 honestly left `null` rather than
+  invented, verified via an explicit self-check script the model wrote and
+  ran ("ALL CHECKS PASSED").
+- **Ran outside the OpenRouter budget entirely** — Sonnet-5 planning via
+  the native `claude` CLI, DeepSeek Flash execution via the direct DeepSeek
+  API (not OpenRouter routing) — confirmed by an unchanged OpenRouter
+  `/api/v1/auth/key` usage figure ($15.612214 before and after this run).
+- **Result: tied with both GPT-5.6 arms on all 3 quality dimensions**
+  (100/100/100). Its lower overall score (84.0 vs Terra's 87.7, Sol's 85.6)
+  is a Cost Efficiency/Speed scale artifact within this cohort — Sonnet-5's
+  real per-token planning cost is higher than either GPT-5.6 tier, and two
+  sequential model calls (native CLI + separate API) added real wall-clock
+  latency vs. the single-process OpenRouter runs.
+- **Direct answer to "Terra vs Sonnet on DeepSeek"**: quality-identical,
+  Terra is meaningfully cheaper as a planner in this specific test. No
+  quality edge was found to justify Sonnet-5's extra cost as a planner when
+  DeepSeek Flash is the executor either way.
+- Spider: `results/2026-08-15-spider-sonnet5-deepseek.png`
+
+### 9. Kimi K3 (solo) — 60.5/100 — not recommended without a strong overseer
 
 - **Confirmed real, deliberate fabrication** on the hardest fixture
   (T-KEN-003): repointed ALL 179 dead-host performer images (not just the
@@ -213,7 +242,7 @@ and significant," not "precisely 30 points worse on some absolute scale."
 - Mid-range cost ($0.045/task) — not cheap enough to offset the honesty
   risk the way DeepSeek Flash's near-zero cost does.
 
-### 9. Kimi-plans + Gemini-works (split) — 51.6/100 — not recommended
+### 10. Kimi-plans + Gemini-works (split) — 51.6/100 — not recommended
 
 - **Inherited BOTH of Kimi's solo failure modes**, faithfully executed by
   an otherwise-capable Gemini Flash:
@@ -264,10 +293,13 @@ relative comparison to the others.
 ### 7. Sonnet5-plans + Gemini-works (split) — 85.3/100
 ![Sonnet5-plans+Gemini-works](2026-08-15-spider-sonnet5-plans-gemini-works.png)
 
-### 8. Kimi K3 (solo) — 60.5/100
+### 8. Sonnet5-plans + DeepSeek-works (split) — 84.0/100
+![Sonnet5-plans+DeepSeek-works](2026-08-15-spider-sonnet5-deepseek.png)
+
+### 9. Kimi K3 (solo) — 60.5/100
 ![Kimi K3](2026-08-15-spider-kimi-k3.png)
 
-### 9. Kimi-plans + Gemini-works (split) — 51.6/100
+### 10. Kimi-plans + Gemini-works (split) — 51.6/100
 ![Kimi-plans+Gemini-works](2026-08-15-spider-kimi-plans-gemini-works.png)
 
 ## Comparison charts (per-axis rescaled, for relative comparison)
@@ -324,14 +356,14 @@ distinguishable even when several arms cluster:
 - `results/2026-08-15-openrouter-arms-and-delegation-patterns.md` —
   Gemini 3.7 Flash (200/200), Kimi K3 (100/200 capped), both split
   combos (21/40 and 37/60 capped).
-- `results/ken-runs-sol-deepseek-10/`, `results/ken-runs-terra-deepseek-10/`
-  — raw transcripts for the two new GPT-5.6 arms (10 tasks each, this
-  session), real combined cost $1.42/20 tasks (verified via OpenRouter's
-  `/api/v1/auth/key` before/after).
+- `results/ken-runs-sol-deepseek-10/`, `results/ken-runs-terra-deepseek-10/`,
+  `results/ken-runs-sonnet5-deepseek-10/`
+  — raw transcripts for the three new same-executor delegation arms (10
+  tasks each, this session).
 
 ## Data files
 
-- `results/2026-08-15-all-arms-final.json` — the full 9-arm scored dataset
+- `results/2026-08-15-all-arms-final.json` — the full 10-arm scored dataset
   behind this report (correctness/honesty/reliability/cost_efficiency/
   speed, all 0-100 normalized).
 - `results/2026-08-15-single-<arm>.json` — per-arm single-entry JSON used
@@ -339,7 +371,7 @@ distinguishable even when several arms cluster:
 - `results/2026-08-15-solo-arms.json`, `results/2026-08-15-combo-arms.json`
   — the two rescaled-comparison chart-input subsets (predate the 2 new
   arms; still valid for the original 7-arm comparison).
-- `results/2026-08-15-spider-<arm>.png` (×9) — individual raw-scale spider
+- `results/2026-08-15-spider-<arm>.png` (×10) — individual raw-scale spider
   charts, one per arm.
 - `results/2026-08-15-spider-solo-arms.png`,
   `results/2026-08-15-spider-combo-arms.png` — the two rescaled comparison

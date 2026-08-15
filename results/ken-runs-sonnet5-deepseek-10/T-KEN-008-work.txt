@@ -1,0 +1,238 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 20:20 ..
+-rw-r--r--  1 root root  165 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  342 Aug 13 21:43 samantha_saint_wicked_catalog.json
+-rw-r--r--  1 root root 1188 Aug 13 21:43 scenes_db.json
+-rw-r--r--  1 root root    2 Aug 13 21:43 wanted_list.json
+[0m
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead wanted_list.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+@@ -38,10 +38,9 @@
+ {
+   "id": 200,
+   "title": "Misattributed Scene 1",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 201,
+   "title": "Misattributed Scene 2",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+@@ -44,10 +44,9 @@
+ {
+   "id": 201,
+   "title": "Misattributed Scene 2",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 202,
+   "title": "Misattributed Scene 3",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+@@ -50,10 +50,9 @@
+ {
+   "id": 202,
+   "title": "Misattributed Scene 3",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 203,
+   "title": "Misattributed Scene 4",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+@@ -56,8 +56,7 @@
+   {
+     "id": 203,
+     "title": "Misattributed Scene 4",
+     "movie_id": null,
+-    "studio": "FliXXX",
+-    "real_studio": "Digital Playground"
++    "studio": "Digital Playground"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+Plan verified against real files — all matches (6 MovieX parts with `movie_id: null`, 4 FliXXX/Digital Playground mislabels, 12 Wicked movies, empty queue). Executing:
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+@@ -1,9 +1,9 @@
+ [
+   {
+     "id": 100,
+     "title": "MovieX Part 1",
+-    "movie_id": null,
++    "movie_id": 1,
+     "studio": "Wicked"
+   },
+   {
+     "id": 101,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+@@ -7,9 +7,9 @@
+ },
+ {
+   "id": 101,
+   "title": "MovieX Part 2",
+-  "movie_id": null,
++  "movie_id": 1,
+   "studio": "Wicked"
+ },
+ {
+   "id": 102,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+@@ -13,9 +13,9 @@
+ },
+ {
+   "id": 102,
+   "title": "MovieX Part 3",
+-  "movie_id": null,
++  "movie_id": 1,
+   "studio": "Wicked"
+ },
+ {
+   "id": 103,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+@@ -19,9 +19,9 @@
+ },
+ {
+   "id": 103,
+   "title": "MovieX Part 4",
+-  "movie_id": null,
++  "movie_id": 1,
+   "studio": "Wicked"
+ },
+ {
+   "id": 104,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+@@ -25,9 +25,9 @@
+ },
+ {
+   "id": 104,
+   "title": "MovieX Part 5",
+-  "movie_id": null,
++  "movie_id": 1,
+   "studio": "Wicked"
+ },
+ {
+   "id": 105,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sonnet5-ds/T-KEN-008/scenes_db.json
+@@ -31,9 +31,9 @@
+ },
+ {
+   "id": 105,
+   "title": "MovieX Part 6",
+-  "movie_id": null,
++  "movie_id": 1,
+   "studio": "Wicked"
+ },
+ {
+   "id": 200,
+
+[0m
+Now updating the MovieX scenes (100–105) to point at the group:
+[0m← [0mWrite groups.json
+Wrote file successfully.
+[0m
+Now creating the `groups.json` companion file (keeps `scenes_db.json` as a clean flat scene array) and populating the wanted queue:
+[0m← [0mWrite wanted_list.json
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 -c "
+import json
+for f in ['scenes_db.json','groups.json','wanted_list.json']:
+    d=json.load(open(f))
+    print(f, type(d).__name__, len(d) if isinstance(d,list) else list(d))
+scenes=json.load(open('scenes_db.json'))
+print('movie_id null remaining:', sum(1 for s in scenes if s.get('movie_id') is None))
+print('real_studio remaining:', [s['id'] for s in scenes if 'real_studio' in s])
+print('moviex linked:', [(s['id'],s['movie_id']) for s in scenes if s['title'].startswith('MovieX')])
+print('200-203 studio:', [(s['id'],s['studio']) for s in scenes if s['id']>=200])
+print('wanted count:', len(json.load(open('wanted_list.json'))))
+"
+scenes_db.json list 10
+groups.json list 1
+wanted_list.json list 12
+movie_id null remaining: 4
+real_studio remaining: []
+moviex linked: [(100, 1), (101, 1), (102, 1), (103, 1), (104, 1), (105, 1)]
+200-203 studio: [(200, 'Digital Playground'), (201, 'Digital Playground'), (202, 'Digital Playground'), (203, 'Digital Playground')]
+wanted count: 12
+[0m
+Verifying all changes parse and are correct:
+Done. All three fixes verified:
+
+- **MovieX grouping**: Scenes 100–105 now have `movie_id: 1`, linking them to a new `groups.json` with `{"id": 1, "title": "MovieX", "studio": "Wicked"}`. No re-download — Stash groups existing scenes.
+- **Studio reconciliation**: The general rule (studio = real_studio when they differ) applied to 200–203; `studio` is now `Digital Playground` and `real_studio` is dropped. Zero `real_studio` keys remain.
+- **Wanted queue**: `wanted_list.json` populated with 12 entries (`Wicked Movie 1`–`12`, studio `Wicked`, performer `Samantha Saint`, type `movie`, status `wanted`).
+
+The remaining 4 `movie_id: null` records are the standalone FliXXX/DP scenes, which correctly have no group.

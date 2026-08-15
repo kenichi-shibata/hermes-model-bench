@@ -1,0 +1,59 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead api.py
+[0m→ [0mRead scenes.json
+[0m
+[0m← [0mEdit api.py
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-005/api.py
++++ /root/ken-tasks-sonnet5-ds/T-KEN-005/api.py
+@@ -1,12 +1,8 @@
+ """Scene homepage sections."""
+ 
+ def _scene_out(scene, translate=False):
+-    """Builds a scene card payload.
+-    BUG: translate defaults to False, and _hydrate_code() below never
+-    passes translate=True, so performer names never get romanized on
+-    the resume/continue-watching section even though _home_trending
+-    correctly passes translate=True."""
++    """Builds a scene card payload."""
+     out = {"id": scene["id"], "title": scene["title"], "performers": []}
+     for p in scene["performers"]:
+         name_en = p.get("name_en")
+         if translate and not name_en:
+
+[0m
+[0m← [0mEdit api.py
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-005/api.py
++++ /root/ken-tasks-sonnet5-ds/T-KEN-005/api.py
+@@ -15,10 +15,10 @@
+     return [_scene_out(s, translate=True) for s in scenes]
+ 
+ 
+ def _hydrate_code(scene):
+-    """Used by the resume/continue-watching section. BUG: forgot translate=True."""
+-    return _scene_out(scene)  # missing translate=True
++    """Used by the resume/continue-watching section."""
++    return _scene_out(scene, translate=True)
+ 
+ 
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+
+[0m
+The plan matches the real files. Applying the fix.
+Now verifying with the reproduction:
+[0m$ [0mpython3 -c "
+import json, api
+scenes = json.load(open('scenes.json'))
+print('trending:', api._home_trending(scenes['trending']))
+print('resume:  ', [api._hydrate_code(s) for s in scenes['resume']])
+"
+trending: [{'id': 1, 'title': 'Trending Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+resume:   [{'id': 2, 'title': 'Resume Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+[0m
+Fixed. `_hydrate_code` now passes `translate=True`, so the resume/continue-watching section returns `name_en: 'Nanao Ayatsuki'`, matching trending. Removed the stale bug comments in the docstrings.

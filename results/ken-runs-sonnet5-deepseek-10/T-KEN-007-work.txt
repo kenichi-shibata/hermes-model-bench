@@ -1,0 +1,28 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead service_logs.txt
+[0m→ [0mRead upstream_status_mock.json
+[0m
+[0m$ [0mls -la /root/ken-tasks-sonnet5-ds/T-KEN-007/
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 20:20 ..
+-rw-r--r--  1 root root  101 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  262 Aug 13 21:43 service_logs.txt
+-rw-r--r--  1 root root  135 Aug 13 21:43 upstream_status_mock.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Verified against the actual files (and confirmed the dir holds only those two data files plus `CONTEXT_ONLY.md`). **Yes, the alert is broken — it's a false negative (masking bug), not a false positive.**
+
+**Timeline evidence**
+- `upstream_status_mock.json`: payments-api in `major_outage`, `started_at 2026-08-13T09:55:00Z`, "Active incident, provider-side, no ETA" — i.e. an ongoing, unresolved outage.
+- `service_logs.txt`: healthy at 10:00/10:01/10:02 → **WARN at 10:03:01** (`upstream dependency (payments-api) returned 503`) → **INFO healthy at 10:04:01** ("own health check green").
+- At 10:04:01, nothing about the upstream changed — still `major_outage`, no ETA — yet the service reverted to "healthy" on the very next cycle.
+
+**Root cause**
+The health/alert state reflects only the service's own liveness ("own health check green") and does not incorporate, weight, or latch upstream dependency status. A dependency 503 becomes a single transient WARN log line, never a sustained degraded/alerting state, so any alert wired to service-health would show green throughout the entire provider-side outage. The WARN appears never to escalate or gate the health status.
+
+**No fix possible in this directory** — there's no alerting code/config/rule file here, so I won't fabricate one. If you want the actual fix, the alert/health-check logic lives elsewhere (another repo/service); next step is to point me at it.
+
+Recommended direction for that owner: health status = `worst_of(self_liveness, dependency_status)`; when a dependency is down, hold the service in degraded/alerting state until the upstream status feed clears — don't reset to healthy on the next successful self-check.

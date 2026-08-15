@@ -1,0 +1,257 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 32
+drwxr-xr-x  2 root root  4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root  4096 Aug 15 20:20 ..
+-rw-r--r--  1 root root    89 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root   653 Aug 13 21:43 bot.py
+-rw-r--r--  1 root root 14651 Aug 13 21:43 follow_log.json
+[0m
+[0m→ [0mRead bot.py
+[0m→ [0mRead follow_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m# [0mTodos
+[•] Fix bot.py track_studio_or_performer to remove bundled follow_discord call
+[ ] Add db.unfollow_discord method
+[ ] Create cleanup_illegit_follows.py script
+[ ] Run cleanup script to reconcile follow_log.json
+[ ] Verify bot.py, db method, and post-cleanup follow_log.json
+[0m
+Plan verified against real files. The data matches: 142 `track_button_bug`/`legit: false` entries (perf_0–139, codey_steele, cherry_kiss) and 20 `manual_follow`/`legit: true` entries.
+[0m← [0mEdit bot.py
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-010/bot.py
++++ /root/ken-tasks-sonnet5-ds/T-KEN-010/bot.py
+@@ -1,11 +1,9 @@
+ """Discord bot track/follow handlers."""
+ 
+ def track_studio_or_performer(entity_id, entity_type):
+-    """BUG: bundles a follow action with tracking, which should be
+-    separate. Fix: remove the follow_discord() call from here."""
++    """Track an entity without implicitly following it on Discord."""
+     db.add_track(entity_id, entity_type)
+-    db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here
+     return {"tracked": True}
+ 
+ 
+ class db:
+
+[0m
+[0m← [0mEdit bot.py
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-010/bot.py
++++ /root/ken-tasks-sonnet5-ds/T-KEN-010/bot.py
+@@ -16,4 +16,8 @@
+ 
+ @staticmethod
+ def follow_discord(entity_id, entity_type):
+     db._follows.append((entity_id, entity_type))
++
++@staticmethod
++def unfollow_discord(entity_id, entity_type):
++    db._follows = [f for f in db._follows if f != (entity_id, entity_type)]
+
+[0m
+[0m# [0mTodos
+[✓] Fix bot.py track_studio_or_performer to remove bundled follow_discord call
+[✓] Add db.unfollow_discord method
+[•] Create cleanup_illegit_follows.py script
+[ ] Run cleanup script to reconcile follow_log.json
+[ ] Verify bot.py, db method, and post-cleanup follow_log.json
+[0m
+[0m← [0mWrite cleanup_illegit_follows.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 cleanup_illegit_follows.py
+Unfollowed 142 entities via db.unfollow_discord:
+  perf_0
+  perf_1
+  perf_2
+  perf_3
+  perf_4
+  perf_5
+  perf_6
+  perf_7
+  perf_8
+  perf_9
+  perf_10
+  perf_11
+  perf_12
+  perf_13
+  perf_14
+  perf_15
+  perf_16
+  perf_17
+  perf_18
+  perf_19
+  perf_20
+  perf_21
+  perf_22
+  perf_23
+  perf_24
+  perf_25
+  perf_26
+  perf_27
+  perf_28
+  perf_29
+  perf_30
+  perf_31
+  perf_32
+  perf_33
+  perf_34
+  perf_35
+  perf_36
+  perf_37
+  perf_38
+  perf_39
+  perf_40
+  perf_41
+  perf_42
+  perf_43
+  perf_44
+  perf_45
+  perf_46
+  perf_47
+  perf_48
+  perf_49
+  perf_50
+  perf_51
+  perf_52
+  perf_53
+  perf_54
+  perf_55
+  perf_56
+  perf_57
+  perf_58
+  perf_59
+  perf_60
+  perf_61
+  perf_62
+  perf_63
+  perf_64
+  perf_65
+  perf_66
+  perf_67
+  perf_68
+  perf_69
+  perf_70
+  perf_71
+  perf_72
+  perf_73
+  perf_74
+  perf_75
+  perf_76
+  perf_77
+  perf_78
+  perf_79
+  perf_80
+  perf_81
+  perf_82
+  perf_83
+  perf_84
+  perf_85
+  perf_86
+  perf_87
+  perf_88
+  perf_89
+  perf_90
+  perf_91
+  perf_92
+  perf_93
+  perf_94
+  perf_95
+  perf_96
+  perf_97
+  perf_98
+  perf_99
+  perf_100
+  perf_101
+  perf_102
+  perf_103
+  perf_104
+  perf_105
+  perf_106
+  perf_107
+  perf_108
+  perf_109
+  perf_110
+  perf_111
+  perf_112
+  perf_113
+  perf_114
+  perf_115
+  perf_116
+  perf_117
+  perf_118
+  perf_119
+  perf_120
+  perf_121
+  perf_122
+  perf_123
+  perf_124
+  perf_125
+  perf_126
+  perf_127
+  perf_128
+  perf_129
+  perf_130
+  perf_131
+  perf_132
+  perf_133
+  perf_134
+  perf_135
+  perf_136
+  perf_137
+  perf_138
+  perf_139
+  codey_steele
+  cherry_kiss
+Remaining legit entries: 20
+[0m
+[0m→ [0mRead bot.py
+[0m
+[0m$ [0mpython3 -c "
+import json
+log = json.load(open('follow_log.json'))
+ids = [e['entity_id'] for e in log]
+print('total entries:', len(log))
+print('all legit:', all(e['legit'] is True for e in log))
+print('all manual_follow:', all(e['source'] == 'manual_follow' for e in log))
+print('codey_steele present:', 'codey_steele' in ids)
+print('cherry_kiss present:', 'cherry_kiss' in ids)
+print('count perf_ prefixed:', sum(1 for i in ids if i.startswith('perf_') and not i.startswith('legit_perf_')))
+print('count legit_perf_:', sum(1 for i in ids if i.startswith('legit_perf_')))
+"
+total entries: 20
+all legit: True
+all manual_follow: True
+codey_steele present: False
+cherry_kiss present: False
+count perf_ prefixed: 0
+count legit_perf_: 20
+[0m
+Now verifying all three artifacts.
+[0m# [0mTodos
+[✓] Fix bot.py track_studio_or_performer to remove bundled follow_discord call
+[✓] Add db.unfollow_discord method
+[✓] Create cleanup_illegit_follows.py script
+[✓] Run cleanup script to reconcile follow_log.json
+[✓] Verify bot.py, db method, and post-cleanup follow_log.json
+[0m
+Done. Yes, it was a bug — `track_studio_or_performer` bundled a `db.follow_discord()` call into a track-only action, auto-following `codey_steele` and `cherry_kiss` (plus 140 `perf_*` entities) without your knowledge.
+
+**Fixed:**
+- `bot.py:3` — `track_studio_or_performer` now only calls `db.add_track`; docstring updated.
+- `bot.py:21` — added `db.unfollow_discord` to reverse follows.
+- `cleanup_illegit_follows.py` — reconciles the log; calls `db.unfollow_discord` per entry (the hook where the live bot would call the real Discord unfollow API).
+
+**Unfollowed (142):** `perf_0`–`perf_139`, **`codey_steele`**, **`cherry_kiss`**.
+
+**Verified:** `follow_log.json` now contains exactly the 20 legit entries (`legit_perf_0`–`legit_perf_19`, `manual_follow`); `codey_steele`/`cherry_kiss` are gone.
+
+Caveat: this repo is only the simulated in-memory `db` — there's no live Discord client here, so the actual unfollow on Discord must be done by running the same cleanup where the real bot/DB integration lives.

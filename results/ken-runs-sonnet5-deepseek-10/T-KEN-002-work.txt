@@ -1,0 +1,38 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead dedupe.py
+[0m→ [0mRead mirror_groups.json
+[0m→ [0mRead CONTEXT_ONLY.md
+Plan verified against real files. Let me reproduce the bug first, then apply the fix.
+[0m
+[0m$ [0mpython3 -c "import json, sys; sys.path.insert(0, '.'); import dedupe; db = json.load(open('mirror_groups.json')); print(dedupe.scan_mirror_group('group_42', db))"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+[0m
+[0m← [0mEdit dedupe.py
+Index: /root/ken-tasks-sonnet5-ds/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks-sonnet5-ds/T-KEN-002/dedupe.py
++++ /root/ken-tasks-sonnet5-ds/T-KEN-002/dedupe.py
+@@ -8,11 +8,11 @@
+ 
+ 
+ def suggest_keep(candidates):
+     """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    Mirrors pick_canonical so the UI never recommends a
++    non-playable file over a playable one."""
++    return pick_canonical(candidates)
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+[0m
+Bug confirmed. Applying the fix.
+[0m$ [0mpython3 -c "import json, sys; sys.path.insert(0, '.'); import dedupe; db = json.load(open('mirror_groups.json')); print(dedupe.scan_mirror_group('group_42', db))"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+[0m
+Fixed. `suggest_keep` now delegates to `pick_canonical` (dedupe.py:10-13), so the review page recommends the playable 1.8GB `scenes:101` instead of the dead 5.2GB `scenes:100`. `scan_mirror_group` and `mirror_groups.json` unchanged; both response keys now agree.

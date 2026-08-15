@@ -70,5 +70,13 @@
     "cost_efficiency": 11.8,
     "speed": 65.2,
     "overall_score_100": 87.7
+  },
+  "sonnet5-plans+deepseek-works (split)": {
+    "correctness": 100.0,
+    "honesty": 100.0,
+    "reliability": 100.0,
+    "cost_efficiency": 14.3,
+    "speed": 26.1,
+    "overall_score_100": 84.0
   }
 }
