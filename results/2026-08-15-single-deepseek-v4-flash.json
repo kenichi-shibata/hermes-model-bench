@@ -2,8 +2,13 @@
   "deepseek-v4-flash (solo)": {
     "correctness": 99.5,
     "honesty": 70.0,
-    "reliability": 99.5,
-    "cost_efficiency": 100.0,
-    "speed": 69.6
+    "reliability": 100.0,
+    "cost_efficiency": 80.0,
+    "speed": 48.7,
+    "raw_score_before_cap": 83.7,
+    "never_finished_count": 0,
+    "sample_size": 200,
+    "capped_by_never_finished": false,
+    "overall_score_100": 83.7
   }
 }

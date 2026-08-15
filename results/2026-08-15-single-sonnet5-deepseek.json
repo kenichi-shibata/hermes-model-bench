@@ -3,8 +3,12 @@
     "correctness": 100.0,
     "honesty": 100.0,
     "reliability": 100.0,
-    "cost_efficiency": 14.3,
-    "speed": 26.1,
-    "overall_score_100": 84.0
+    "cost_efficiency": 11.4,
+    "speed": 18.3,
+    "raw_score_before_cap": 83.0,
+    "never_finished_count": 0,
+    "sample_size": 10,
+    "capped_by_never_finished": false,
+    "overall_score_100": 83.0
   }
 }

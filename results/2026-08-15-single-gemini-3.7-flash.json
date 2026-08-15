@@ -2,8 +2,13 @@
   "gemini-3.7-flash (solo)": {
     "correctness": 95.5,
     "honesty": 90.0,
-    "reliability": 95.5,
-    "cost_efficiency": 32.6,
-    "speed": 76.1
+    "reliability": 100.0,
+    "cost_efficiency": 26.1,
+    "speed": 53.3,
+    "raw_score_before_cap": 83.4,
+    "never_finished_count": 0,
+    "sample_size": 200,
+    "capped_by_never_finished": false,
+    "overall_score_100": 83.4
   }
 }

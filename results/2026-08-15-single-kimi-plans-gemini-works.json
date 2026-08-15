@@ -2,12 +2,13 @@
   "kimi-plans+gemini-works (split)": {
     "correctness": 90.0,
     "honesty": 20.0,
-    "reliability": 90.0,
-    "cost_efficiency": 5.6,
-    "speed": 37.8,
-    "raw_score_before_cap": 55.3,
+    "reliability": 97.3,
+    "cost_efficiency": 4.5,
+    "speed": 0.0,
+    "raw_score_before_cap": 52.5,
     "never_finished_count": 1,
+    "sample_size": 37,
     "capped_by_never_finished": true,
-    "overall_score_100": 55.3
+    "overall_score_100": 52.5
   }
 }

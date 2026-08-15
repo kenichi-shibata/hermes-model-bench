@@ -2,9 +2,13 @@
   "deepseek-pro-plans+deepseek-flash-works (split)": {
     "correctness": 90.0,
     "honesty": 30.0,
-    "reliability": 90.0,
-    "cost_efficiency": 86.1,
-    "speed": 52.2,
-    "overall_score_100": 67.8
+    "reliability": 100.0,
+    "cost_efficiency": 68.9,
+    "speed": 36.5,
+    "raw_score_before_cap": 66.0,
+    "never_finished_count": 0,
+    "sample_size": 10,
+    "capped_by_never_finished": false,
+    "overall_score_100": 66.0
   }
 }
