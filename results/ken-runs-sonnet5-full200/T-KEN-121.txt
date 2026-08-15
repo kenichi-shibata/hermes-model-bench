@@ -1,0 +1,13 @@
+The JSON only has `id` and `days_old` fields (no titles, dates, or other metadata) — so "new" just means lowest `days_old`. Sorted newest → oldest, the newest ones are:
+
+| id | days_old |
+|----|----------|
+| 0  | 0  |
+| 1  | 5  |
+| 2  | 10 |
+| 3  | 15 |
+| 4  | 20 |
+| 5  | 25 |
+| 6  | 30 |
+
+That's the whole dataset — it's a clean arithmetic sequence (0, 5, 10, ... 95) with no other content, so there's nothing else to extract (no titles, names, or actual calendar dates despite the file's description). If you have a specific "new" cutoff in mind (e.g., ≤7 days, ≤30 days), tell me and I'll filter to that.

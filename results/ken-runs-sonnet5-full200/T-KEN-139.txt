@@ -1,0 +1,3 @@
+Timeline: tripped 10:00:00 → self-resolved 10:05:00 (just 5 min later) → cooldown window (900s = 15 min) would've run until 10:15:00 → watchdog didn't check until 10:20:00, a full 15 minutes after resolution and 5 minutes after the cooldown even expired.
+
+**Verdict: noise.** The condition cleared on its own well inside the cooldown window (5 of 15 min), and the watchdog's confirmation came long after resolution with no re-trip in between. That's the signature of a transient blip, not a sustained incident — a real problem would still have been active (or would've re-tripped) by the time the watchdog looked at 10:20.

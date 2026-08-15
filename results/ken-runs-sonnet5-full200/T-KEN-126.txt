@@ -1,0 +1,7 @@
+`series_metadata.json` only has 3 entries, and all three share `series_id: "S1"`:
+
+- Movie One
+- Totally Different Name
+- Another Name
+
+So by series grouping, both "Totally Different Name" and "Another Name" are linked to "Movie One" as part of the same series (S1) — there's no separate "sequel" field or flag, just the shared `series_id`. Worth noting: the titles don't read as sequel names at all (no "Movie Two", numbering, etc.), so I'd treat this as suspicious/incomplete data rather than confirmed sequel info — I wouldn't rely on it to assert a sequel relationship without corroborating the actual titles/source.

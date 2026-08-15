@@ -1,0 +1,3 @@
+Yes — `log_rotate.sh` is hogging the CPU: it's been running at **100% CPU for 6 hours straight**, which is way outside normal behavior for a log rotation script (those should run briefly and exit).
+
+That's the only process in the file, and it's clearly the culprit. Worth checking on the actual host: is it stuck in a loop (e.g., rotating a file that keeps growing, or a bad regex/glob causing repeated re-processing), or is a cron job re-spawning overlapping copies? I can't inspect the live system from here (this sandbox only has the JSON snapshot), but if you can get me the script itself or `ps`/`strace` output, I can dig into why it's stuck.

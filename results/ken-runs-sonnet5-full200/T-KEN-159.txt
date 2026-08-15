@@ -1,0 +1,7 @@
+The memory directory is empty — there are no stored memories in this project yet, so there's nothing for me to recall. `CONTEXT_ONLY.md` just repeats the file listing, and `recall_test_case.json` only contains two flags (`exact_phrase_recall: false`, `paraphrase_recall: true`) with no actual content to recall.
+
+To test recall meaningfully, I'd need a prior conversation (in this project) where something specific was actually stated or saved to memory — then a follow-up turn asking me to retrieve it, either verbatim (exact-phrase) or in different words (paraphrase). Right now there's no such prior content here for me to demonstrate recall against.
+
+If you want to proceed, either:
+1. Tell me the specific fact/detail now, then in a later turn ask me to recall it (paraphrased), or
+2. Point me to where that prior content lives if it's supposed to already exist somewhere.

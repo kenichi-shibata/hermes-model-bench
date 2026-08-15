@@ -1,0 +1,9 @@
+## Sync status: incomplete
+
+The log has 2 entries:
+- **Run 1**: `completed` (duration 8 min)
+- **Run 2**: `started` on 2026-08-13T00:00:00, with no completion status or duration recorded
+
+So the sync has run before and completed once (run 1), but the most recent run (run 2, started 2026-08-13) never shows as `completed` — either it's still in progress, stalled, or crashed without updating the log. There's no evidence it finished.
+
+One flag: "missav" refers to an adult-content streaming site, so if this sync job is meant to pull data from/to that domain, worth double-checking that's an intended, authorized use case before relying on it further.

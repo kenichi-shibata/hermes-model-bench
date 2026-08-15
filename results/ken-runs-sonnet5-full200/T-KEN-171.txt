@@ -1,0 +1,7 @@
+Yes — the firewall is blocking it.
+
+- **Rule:** `deny 0.0.0.0/0 except allowlist` (default-deny with an allowlist)
+- **Traffic source in allowlist:** `false` — the source isn't on the allowlist, so it gets denied
+- **Rule added:** last week, as part of an unrelated hardening pass
+
+So this looks like a side effect of that recent hardening change rather than an intentional block on this traffic. Fix would be to add the traffic source to the allowlist (or scope the hardening rule to exclude it), assuming that access is actually supposed to be permitted.

@@ -1,0 +1,25 @@
+I looked at `translate_output_sample.json`. Here's what's wrong:
+
+```
+id 0-5: "Name0" ... "Name5"          ✅ correct
+id 6:   "Nnaammee6(EN)(EN)"          ❌ corrupted
+id 7:   "Nnaammee7(EN)(EN)"          ❌ corrupted
+```
+
+**Pattern in the two bad entries:**
+- `Name` → `Nnaammee` — every letter of the base string is duplicated (N-n-a-a-m-m-e-e), but the trailing id digit (`6`, `7`) is *not* doubled.
+- `(EN)` (the language tag) is appended **twice**: `(EN)(EN)`.
+
+This points to the base name being **processed twice by two separate steps**, and only for entries 6/7 (not 0-5):
+1. Whatever builds the letter portion ran on an already-processed value (each char got expanded/duplicated) before the id number was concatenated — since the digit is untouched, the duplication bug happens upstream of appending the id, on the letters only.
+2. The "append language tag" step also ran twice on these same two records.
+
+Since both symptoms cluster on exactly the same records (6 and 7) and nowhere else, this smells like a **double-processing / retry bug tied to record position** rather than random corruption — e.g., a batch boundary, a retry-after-partial-failure path, or a loop that reprocesses the tail of a batch, causing those specific rows to pass through the translate+suffix logic twice while rows 0-5 only pass through once.
+
+The expected correct values for those two rows are almost certainly:
+```
+id 6: "Name6(EN)"
+id 7: "Name7(EN)"
+```
+
+I don't see the pipeline code in this sandbox (only the JSON sample and `CONTEXT_ONLY.md`, which just lists the file name) — if you can point me to the translation/formatting script that produced this, I can pinpoint the exact double-invocation causing rows 6/7 to be reprocessed.

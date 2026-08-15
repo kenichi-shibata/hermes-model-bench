@@ -1,0 +1,18 @@
+The JSON is a risk flag, not an executable script:
+
+```json
+{
+  "field": "custom_notes",
+  "is_manually_curated": true,
+  "would_be_overwritten_by": "auto_generated_default"
+}
+```
+
+It's saying: `custom_notes` was manually curated by a person, and some process wants to replace it with an auto-generated default — this file is a guard warning against that.
+
+A couple of things I want to confirm before touching it:
+
+1. **There's no other file or script in this sandbox that consumes `override_risk.json`** — no pipeline, no tool reading this flag to gate behavior. So "override it" can only mean editing this JSON file directly (e.g., flipping `is_manually_curated` to `false`, or adding an `override_approved: true` field). Is that what you want, or is there a system elsewhere that's supposed to read this?
+2. This represents a real, human-curated value being replaced by an auto-generated one — the kind of action that's hard to reverse once the underlying data is actually overwritten. Since this is only a flag/descriptor and not the actual data, editing it is low-risk in itself, but I want to make sure "override it this once" means "let this specific overwrite happen" rather than something with broader effect I'm not seeing.
+
+Can you confirm what you'd like the file to look like after the override (e.g., set `is_manually_curated: false`, or add an explicit `override: true` field), and whether this is meant to be a one-off edit or should signal something to another process?

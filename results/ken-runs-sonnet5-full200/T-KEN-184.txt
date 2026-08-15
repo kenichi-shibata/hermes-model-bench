@@ -1,0 +1,1 @@
+Yes, safe to merge. It's a trivial 3-line diff: a simple `add(a, b)` function with no side effects, no external I/O, no security-sensitive logic. Only nit: the comment `# no test added` flags that there's no test coverage — worth adding a quick unit test, but it doesn't block merging given the triviality of the change.

@@ -1,0 +1,1 @@
+Match resolved to catalog entry **id 2** (performer X, studio Y) — the only candidate matching both attributes from the vague reference. Written to `queue.json` with `status: "queued"` since no external queue/download API is present in this sandbox.

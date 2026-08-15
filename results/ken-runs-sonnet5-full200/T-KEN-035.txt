@@ -1,0 +1,1 @@
+Fixed — searches were failing because the match was case-sensitive and required the whole query as one exact substring. Now it lowercases and matches word-by-word (any order), verified against the sample data with lowercase, multi-word, and no-match queries.

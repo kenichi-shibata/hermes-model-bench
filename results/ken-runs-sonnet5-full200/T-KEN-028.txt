@@ -1,0 +1,5 @@
+It's just spinning, not actually retrying.
+
+`check_and_retry` (retry_engine_v2.py:1-5) only increments a counter in the `attempts` dict and returns it — there's no call to any download/search/fetch function, no backoff, and no success/failure check. Calling it repeatedly just bumps a number; the underlying operation it's supposed to retry never runs. The bug is flagged inline at line 5 too.
+
+To be an actual retry engine, it needs to: call the real operation, catch/check for failure, and only loop (with backoff/max-attempts) while it fails — none of which is present here.

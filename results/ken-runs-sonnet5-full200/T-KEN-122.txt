@@ -1,0 +1,8 @@
+Comparing the two files: the hash matches exactly (`same123`), even though the titles differ slightly ("Existing Scene" vs. "Existing Scene (Remux)").
+
+**Result: Yes, we already have this.**
+
+- `local_library.json` contains an entry with hash `same123` titled "Existing Scene".
+- `claimed_scene.json` (the incoming/candidate item) has the same hash `same123`, just labeled "Existing Scene (Remux)".
+
+Since the hash is identical, this is a duplicate (likely just a remux/repack of the same source) — it should be treated as already in the library, not added as new.

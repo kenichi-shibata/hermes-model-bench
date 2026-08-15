@@ -1,0 +1,12 @@
+Both files are valid JSON. Summary of what changed:
+
+**scenes_db.json**
+- Scenes 100–105 (`MovieX Part 1–6`) now share `movie_id: 900`, linking them as one group instead of leaving them as orphaned parts.
+- Scenes 200–203 had their `studio` corrected from `FliXXX` → `Digital Playground` (the actual source), and the now-redundant `real_studio` field was dropped.
+
+**wanted_list.json**
+- `groups`: defines Group 900 "MovieX" (Wicked) with the 6 parts in order — this is the Stash Group link-up, no re-download needed since you already have all 6 parts.
+- `metadata_fixes_applied`: records the FliXXX→Digital Playground correction so it doesn't get flagged as "still needs downloading" or re-fetched under the wrong studio.
+- `downloads`: all 12 Samantha Saint Wicked movies queued fresh, since none existed in the queue before.
+
+One thing worth double-checking on your end: verify scenes 200–203 are actually fully corrected in whatever tool ingested them originally (not just this JSON) — since the flip-flop was a scraper-level issue, it may re-introduce the wrong studio tag on the next scrape/refresh unless the scraper source itself is pinned to Digital Playground.

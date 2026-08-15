@@ -1,0 +1,11 @@
+Checked `post_merge_state.json` — the merge did **not** work correctly:
+
+```json
+{
+  "survivor_id": "a",
+  "play_count": null,
+  "expected_play_count": 15
+}
+```
+
+`play_count` is `null` when it should be `15`. The merge for survivor `"a"` failed to populate/aggregate the play count — it likely didn't pick up the source records, or the merge logic wrote a null instead of the summed/copied value. This needs to be re-run or debugged before it can be considered successful.

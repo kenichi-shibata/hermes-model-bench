@@ -1,0 +1,1 @@
+Merged: `a` is kept as the surviving record, but since `b` had all 15 plays and `a` had 0, I added `merged_play_count: 15` (sum of both) plus a note explaining why, so `b`'s play history isn't discarded when it's dropped. Original `a_play_count`/`b_play_count` fields are left intact as an audit trail.

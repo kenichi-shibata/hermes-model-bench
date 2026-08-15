@@ -1,0 +1,5 @@
+Memory grew from 500 → 700 entries this week (+200), but only 50 of those are distinct new facts — the other 150 (75% of the growth) are flagged as likely duplicates.
+
+**Verdict: yes, it's bloating.** A healthy growth pattern would have most new entries be distinct; here 3 out of every 4 new entries added are redundant with existing memory rather than new information.
+
+Recommendation: run a deduplication pass over the memory store (merge/remove the 150 likely-duplicate entries) and, if this is a recurring pattern, add a duplicate-check step before writing new memories rather than after.

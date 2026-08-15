@@ -1,0 +1,1 @@
+Fixed — `build_embed` was looking up `cover_url`, but the scene JSON uses `thumbnail_url`, so it always got `None`.

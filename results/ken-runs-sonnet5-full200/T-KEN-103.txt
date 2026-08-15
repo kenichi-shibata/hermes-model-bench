@@ -1,0 +1,8 @@
+The backup is bad — effectively empty.
+
+`backup_file_stats.json` reports:
+- `size_bytes: 12` — the backup file is only 12 bytes
+- `normal_size_mb: 90` — a healthy backup should be ~90 MB
+- `status: "completed"` — the job reported success, but that's misleading
+
+A 12-byte file is basically empty (probably just an empty archive header or `{}`), not a real backup. The job finished without erroring, but it captured essentially nothing — something like an empty source, a broken pipe, or a silent failure upstream produced a near-empty output while the process still exited cleanly. Worth checking the backup job logs/source to find why size collapsed from ~90MB to 12 bytes.

@@ -1,0 +1,7 @@
+It's a plain health/uptime check that only inspects the HTTP status code — nothing else. In this incident:
+
+- `http_status: 200` — looks healthy to that check
+- `body: "internal error occurred"` — the actual failure is in the response payload, not the status code
+- `check_examines: "status_code_only"` — confirms the monitor's logic never looks past the status line
+
+So the service returned a 200 while silently failing (an "OK-shaped error" — legit HTTP success wrapping an application-level error), and a status-code-only check has no way to detect that. It'd need to also assert on body content/schema (e.g., absence of error keywords, expected JSON shape, or an explicit success field) to catch this class of failure.

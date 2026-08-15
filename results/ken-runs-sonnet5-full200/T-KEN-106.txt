@@ -1,0 +1,16 @@
+`recovery_test.json` is a small integrity-check record:
+
+```json
+{
+  "file_exists": true,
+  "checksum_matches_manifest": false
+}
+```
+
+**No — recovery is not safe here.** The file exists, but its checksum does **not** match the manifest, which means its contents have diverged from the known-good version the manifest recorded (corruption, tampering, or a partial/failed write). Recovering from this file as-is would propagate bad data.
+
+To actually recover you'd need one of:
+- A backup/snapshot of the file from before the checksum mismatch occurred, or
+- The original source used to regenerate the manifest, so you can rebuild a version whose checksum matches.
+
+There's nothing else in this directory (just `CONTEXT_ONLY.md`, which only restates the file list) to recover from — so with what's here, recovery isn't possible; you'd need to locate a valid backup elsewhere.

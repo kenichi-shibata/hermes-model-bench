@@ -1,0 +1,5 @@
+Found it — it's a config problem, not a network problem.
+
+`sab_config.json` has `max_download_speed_kbps: 500` — SABnzbd's speed limiter is capped at ~500 kbps (that's ~62 KB/s, painfully slow). The `speed_log.json` samples (485–494 kbps) sit right up against that cap and never exceed it, confirming the throttle is what's actually limiting throughput, not a slow provider/connection.
+
+Fix: raise or disable `max_download_speed_kbps` in the config (e.g. set it to 0 for unlimited, or to whatever your actual line speed supports).

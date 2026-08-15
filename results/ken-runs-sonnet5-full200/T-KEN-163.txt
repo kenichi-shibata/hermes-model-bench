@@ -1,0 +1,8 @@
+Based on `single_fact_retrieval.json`:
+
+- `obvious_query_hits: 0` — the fact was **not** retrieved using the obvious/direct query phrasing.
+- `alternate_query_hits: 1` — the fact **was** retrieved using an alternate query phrasing.
+
+**Verification result: retrievable, but only via the alternate query — not the obvious one.** If the goal was for the fact to surface under a natural/obvious query, this fails that bar (0 hits); it only succeeds under the alternate formulation (1 hit).
+
+No other content (source documents, the fact's text, or query strings) is present in this sandbox to inspect further — just these two counters in `single_fact_retrieval.json` and the pointer note in `CONTEXT_ONLY.md`. Let me know if you have the underlying query/document files and want them checked too.

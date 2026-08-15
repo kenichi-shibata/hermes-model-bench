@@ -1,0 +1,11 @@
+Looked at `thin_pool_status.json` — two different numbers here, and they tell different stories:
+
+- **`physical_used_pct: 42`** — actual data blocks consumed in the pool. This is fine, over half the pool is still free.
+- **`allocated_pct_of_physical: 95`** — sum of the *virtual* sizes of all thin LVs/snapshots as a percentage of the pool's physical capacity. This is the tight one.
+
+So the pool itself isn't full — you're not at risk of an imminent out-of-space event on existing data. But you've *committed* 95% of physical capacity to thin volumes via over-provisioning. That means:
+
+- You have almost no headroom left to create new thin volumes or snapshots (LVM will refuse or warn once allocated commitments exceed physical, depending on your `thin_pool_autoextend`/policy settings).
+- If those existing volumes start actually writing into their allocated-but-unused space, physical usage could climb fast toward 100% with no chance to react — the 42% is a lagging indicator, not a safe buffer for what's promised.
+
+Bottom line: not tight on real usage, but tight on allocation headroom — the classic thin-provisioning squeeze. Worth extending the pool or reclaiming/reducing over-provisioned volumes before allocating anything new, rather than waiting for `physical_used_pct` to climb.

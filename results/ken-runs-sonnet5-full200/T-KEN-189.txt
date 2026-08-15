@@ -1,0 +1,3 @@
+Yes — significantly bigger than it needs to be. Of the 200 changed lines, only 15 (7.5%) are the actual fix; the remaining 185 (92.5%) are reformatting.
+
+That ratio makes the PR hard to review: the real change is buried in noise, and reformatting unrelated code inflates blast radius and risk of unrelated regressions. Recommend splitting into two PRs (pure reformat/style commit + the 15-line functional fix), or at minimum reverting the incidental reformatting so the diff isolates the actual fix.

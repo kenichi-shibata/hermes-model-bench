@@ -1,0 +1,8 @@
+**You're cooked.** Your "redundant" setup isn't actually redundant.
+
+- Primary: Eweka → backbone **Omicron**
+- Backup: Newshosting → backbone **Omicron**
+
+Both providers are just resellers/frontends sitting on the exact same backbone (Omicron). If Omicron has an outage, both your primary and backup go down simultaneously — the provider-level redundancy is cosmetic.
+
+For real redundancy, pick a backup on a different backbone. From the lookup table, `UsenetExpress` or `BlockNews` run on **Highwinds**, which is actually independent of Omicron. Swapping your backup to one of those (or adding a third leg on Highwinds) would give you genuine failover instead of two paths that fail together.

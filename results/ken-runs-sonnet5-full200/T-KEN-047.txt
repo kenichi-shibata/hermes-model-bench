@@ -1,0 +1,13 @@
+Old scenes show as "new" because `is_new()` in new_scene_flag.py:2-4 checks `ingested_at` (when the record was loaded into your system), not `release_date` (when the scene actually happened/was created).
+
+In scenes_flagged.json, the scene has `release_date: 2020-01-01` but `ingested_at: 2026-08-10` — only 5 days ago (today is 2026-08-15), so `days < 7` is true and it's flagged as new, even though the content itself is over 6 years old. Any backfilled or re-ingested old data will trigger the same false positive.
+
+Fix: base the check on `release_date` instead of (or in addition to) `ingested_at`, e.g.:
+
+```python
+def is_new(scene):
+    released = datetime.datetime.fromisoformat(scene['release_date'])
+    return (datetime.datetime.now() - released).days < 7
+```
+
+Want me to apply that change?

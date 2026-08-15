@@ -1,0 +1,1 @@
+Confirmed working. `get_studio` in `studio_page_api.py` now reads `child_studios` from the studio record and returns each sub group's `id`/`name`, instead of silently dropping them.

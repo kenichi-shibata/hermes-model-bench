@@ -1,0 +1,1 @@
+The bug: `get_similar` did `vectors[str(performer_id)]`, which raises a `KeyError` (crashing the caller) whenever a performer has no vector — matching the note that "some performers [are] missing vectors." I changed it to `vectors.get(...)` and return `[]` for those performers instead of raising, so the page loads (with no recommendations) rather than erroring out.

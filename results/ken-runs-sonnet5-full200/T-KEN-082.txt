@@ -1,0 +1,1 @@
+Confirmed: `a` and `b` in near_dup.json are duplicates — both share `hash: "xyz"`, and the titles ("Big Movie" vs "BigMovie") differ only by a space. Same record, entered twice.

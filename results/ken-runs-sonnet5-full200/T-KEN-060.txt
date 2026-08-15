@@ -1,0 +1,5 @@
+Checked `release_readiness.json`: `ci_status` is `"pass"` but `working_tree_clean` is `false`.
+
+**Not ready to tag.** A dirty working tree means there are uncommitted changes that wouldn't be captured in the tagged commit — tagging now risks shipping a release that doesn't match what's actually committed/reviewed. CI passing doesn't offset that.
+
+Recommend: commit or stash the outstanding changes (check `git status`/`git diff` to see what's pending) and re-run readiness checks before tagging. I won't create a tag in this state — let me know once the tree is clean and I can proceed.

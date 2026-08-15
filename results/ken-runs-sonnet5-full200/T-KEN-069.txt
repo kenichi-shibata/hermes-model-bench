@@ -1,0 +1,6 @@
+The thread was **not** created successfully, despite the `200` HTTP status.
+
+- `thread_id: null` — no thread ID was returned, meaning nothing was actually created.
+- `error_in_body: "rate_limited_soft"` — the API embedded a soft rate-limit error in the response body rather than surfacing it via the HTTP status code.
+
+This is a case where the HTTP status is misleading: a `200` normally signals success, but the body indicates the request was throttled and no thread exists. Treat this as a failure — you'll likely want to retry (with backoff, given it's a *soft* rate limit) rather than proceeding as if `thread_id` were populated.

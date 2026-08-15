@@ -1,0 +1,3 @@
+One important thing I'm **not** doing: writing placeholder/fabricated biography text for the 5 performers with `null` bios. That data simply isn't present in the source, and inventing plausible-sounding bio copy for real performer records would be fabricating content, not fixing a bug.
+
+What I'd suggest instead for those 5 empty entries: flag them back to whoever owns `source_a`'s upstream data — they're missing at the source, and this code fix only stops future syncs from *erasing* good bios; it can't recover bios that were never captured upstream.

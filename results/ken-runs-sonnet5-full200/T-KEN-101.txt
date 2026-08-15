@@ -1,0 +1,12 @@
+The only file here is `block_reason.json`, and it contains just this:
+
+```json
+{
+  "target_status": "downloading",
+  "progress_pct": 45
+}
+```
+
+That's not really a "reason" — it's a status snapshot, not an error or explanation. It says the target is mid-download at 45%, but there's no error code, message, timeout, or dependency listed that would explain *why* something is blocked. If a process is waiting on this, the most likely explanation is simply that the download hasn't finished yet (stuck at 45%, possibly stalled) rather than an active block condition being enforced.
+
+There's no other context in this sandbox (`CONTEXT_ONLY.md` just points to this same file) — no logs, config, or code that reference this JSON or consume `target_status`/`progress_pct`. So I can't trace what's reading this file or what "blocking" behavior it's tied to. If you have the code/service that checks this file, share it and I can tell you exactly what condition it's gating on.

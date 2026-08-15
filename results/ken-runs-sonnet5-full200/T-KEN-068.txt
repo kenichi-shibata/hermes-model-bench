@@ -1,0 +1,1 @@
+All 432 thread records in `thread_button_state.json` now have `has_unfollow_button: true`, so the old threads (t0–t427) match the newer ones (t428–t431) that already had it.

@@ -1,0 +1,12 @@
+I checked both files in the directory — that's all there is:
+
+- `collection_manifest.json`: `{"total_parts": 8, "already_queued": [1]}`
+- `CONTEXT_ONLY.md`: just repeats the same one-line description, no additional instructions.
+
+There's no download client, queue API, script, or tool definition anywhere in this directory that actually performs "queueing" — nothing that tells me what system originally queued part 1 or how to queue parts 2–8. I don't want to fabricate a mechanism (e.g., invent a fake API call or script) just to look productive.
+
+Could you clarify:
+1. What system/tool manages this queue (a specific API, CLI, or script I should be calling)?
+2. Is there another file or endpoint I'm missing that defines how "queuing" works here?
+
+Once I know the actual mechanism, I can queue parts 2–8 for you.

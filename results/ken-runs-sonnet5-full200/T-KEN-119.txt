@@ -1,0 +1,6 @@
+Audit of `today_spawns.json` — 12 spawn records total (ids 0–11):
+
+- **Duplicated task**: `task_A` was spawned 3 times (ids 0, 1, 2)
+- **Unique tasks**: `task_3` through `task_11`, one spawn each (ids 3–11)
+
+**Anomaly worth flagging**: every other entry follows a `task_N` naming convention matching its id, but ids 0–2 all share the literal label `task_A` instead of `task_0`/`task_1`/`task_2`. That's either a genuine 3x duplicate spawn of the same task, or a naming bug where those three entries didn't get their id-based label. Worth checking the spawner logic if `task_A` wasn't intentionally meant to run 3 times.

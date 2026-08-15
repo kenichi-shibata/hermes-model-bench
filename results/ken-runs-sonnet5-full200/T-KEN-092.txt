@@ -1,0 +1,1 @@
+Networking. Compute is only 2ms; network round-trip is 198ms — about 99% of total latency (200ms).

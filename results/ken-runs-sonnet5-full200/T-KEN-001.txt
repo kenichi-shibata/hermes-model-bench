@@ -1,0 +1,7 @@
+Looked at both files. Two things stand out:
+
+**Delegation runs** (`delegation_live/`): 5 manifests, all literally named `deleg_fake0`–`deleg_fake4` with goals like `"fake task 0"` — this is clearly mock/placeholder data, not a real delegation history. Taking it at face value anyway: 2 "completed", 3 "capped", and the capped ones cluster on the later dates (Aug 10: 1 completed/1 capped, Aug 11: 1 completed, Aug 12: 2 capped) — so if anything the trend in this sample data goes the wrong way, not "better." But I wouldn't draw real conclusions from it since it's fabricated test fixtures, not actual run logs.
+
+**New repo**: No. `gh_repo_list_mock.json` is also a mock file, listing two repos (`existing-repo-1`, `existing-repo-2`), both created back in June/July — nothing from today. I haven't created any repo in this session either.
+
+Want me to check your actual delegation/task history instead of this mock data — e.g. via `TaskList` or a connected repo host?

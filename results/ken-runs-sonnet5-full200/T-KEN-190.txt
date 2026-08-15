@@ -1,0 +1,9 @@
+This is a 3-line file, and it's a clear problem: a hardcoded, live-looking API key committed in source.
+
+**Sketchy findings:**
+
+1. **Hardcoded secret in source (`pr_diff_7.py:1`)** — `API_KEY = 'sk-live-abc123realkeyleaked'` is a live-style key (`sk-live-...`) committed directly in code. If this is a real credential, treat it as **already compromised** — anyone with repo access (or history access, since git never forgets) can read it. It needs to be revoked/rotated immediately regardless of what else changes.
+2. **No secrets management** — the key should be loaded from an environment variable or a secrets manager (e.g., `os.environ["API_KEY"]`), never a literal in a `.py` file.
+3. **Undefined names** — `requests` and `url` are used but never imported/defined, so this snippet won't even run as-is (likely just an illustrative diff fragment, but worth flagging if it's meant to be real code).
+
+**Recommendation:** rotate the key now, remove it from source and git history if it was ever pushed, and load it via env var instead.

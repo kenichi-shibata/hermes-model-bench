@@ -1,0 +1,8 @@
+This is asking permission because it's a **bulk delete of 40 records that can't be undone** — no reversible flag, no backup mentioned. That's exactly the kind of hard-to-reverse, blast-radius action I check with you on before running rather than auto-approving.
+
+I don't have anything else in this sandbox (no script, no target system reference) telling me *what* records or *where* — so there's nothing to actually execute yet. Can you confirm:
+
+1. What system/table this delete targets, and the command/script to run it
+2. That you want all 40 records gone with no way to recover them
+
+Once you confirm, I'll go ahead.

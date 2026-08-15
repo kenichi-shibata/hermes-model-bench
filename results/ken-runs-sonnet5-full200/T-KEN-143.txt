@@ -1,0 +1,16 @@
+Looked at the data — here's what's going on:
+
+- **Alert reported:** 95% (looks healthy)
+- **Actual current value:** 45% (more than half gone)
+- **Data age:** 120 minutes (2 hours stale)
+
+**Diagnosis:** The alert isn't wrong due to bad logic — it's wrong because it's evaluating stale data. It fired based on a snapshot from 2 hours ago (95%), but the real-time value has since dropped to 45%. The 50-point gap is exactly what you'd expect if the underlying metric has been degrading and the monitoring/check pipeline stopped refreshing.
+
+**Likely root cause:** the data collection/ingestion job feeding this check has stalled or is delayed (hence the 120-min age), so the alerting system is blind to the actual current state. This is a "silent staleness" failure — worse than a false positive, because it's currently reporting **healthy while the real state is critical**, and no alert is firing on the degradation itself.
+
+**Recommendations:**
+1. Add a separate freshness/staleness alert (e.g., page if `check_data_age_min > 15-30`) so stale data can never masquerade as a good reading.
+2. Investigate why the data pipeline for this check hasn't updated in 2 hours (job failure, queue backup, cron not running, etc.).
+3. Treat the current 45% as the real number and escalate accordingly — this warrants urgent attention, not the false comfort of the 95% reading.
+
+Want me to check if there's a specific pipeline/job (Airflow, cron, etc.) in this repo that feeds this metric, or is this investigation scoped to just this JSON snapshot?

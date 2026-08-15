@@ -1,0 +1,9 @@
+Both files serve correctly and the JSON fetch path works. The dashboard is done.
+
+**`dashboard.html`** — a KPI row of 3 stat tiles (Downloads today: 45, Errors today: 3, Queue depth: 12), fetched live from `raw_metrics.json` rather than hardcoded. Used a stat-tile layout since the data is just headline numbers with no time series to chart. Colors use the validated default categorical palette (blue/orange/aqua) as identity accents, with full light/dark mode support.
+
+To view it, serve the directory locally (fetch needs http, not `file://`), e.g.:
+```
+python3 -m http.server 8933
+```
+then open `http://localhost:8933/dashboard.html`.

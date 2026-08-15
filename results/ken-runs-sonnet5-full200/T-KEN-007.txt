@@ -1,0 +1,10 @@
+Checked both files. Verdict: the alert setup looks broken — here's the evidence.
+
+**Timeline:**
+- `upstream_status_mock.json`: `payments-api` has been in **major_outage** since `2026-08-13T09:55:00Z`, provider-side, no ETA.
+- `service_logs.txt`: at `10:03:01` the service correctly logs a `WARN` that `payments-api` returned 503 — so the dependency failure *was* observed.
+- But at `10:04:01`, right after that warning, the service logs `INFO service healthy (own health check green)`.
+
+**The problem:** the service's health check only evaluates itself, not its critical upstream dependency. So even during an active major outage with no ETA on `payments-api`, the overall status stays "healthy." If your alerting is keyed off that health-check signal (rather than the WARN log line directly), it will never fire during this incident — the alert is effectively masked by a health check that's blind to upstream state.
+
+**Recommendation:** the health check/alert should treat sustained upstream 5xx (or a `major_outage` upstream status) as a degraded/unhealthy condition for the service, not just log a warning while still reporting green.

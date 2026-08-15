@@ -1,0 +1,26 @@
+I checked the sandbox for container tooling — there's no `lxc`, `pct`, or `incus` binary available here, so I can't literally provision a container from within this environment. What I can do is make the placement call from `node_facts.json` and hand you the command to run on the actual host.
+
+**Recommendation: use node_A.**
+
+| | node_A | node_B |
+|---|---|---|
+| free RAM | 674 MB | 478 MB |
+| reclaimable cache | 8500 MB | 4500 MB |
+| thin pool free | 200 GB | 202 GB |
+| risk | — | runs `trading-stack` (financial system) |
+
+Node_A wins on every metric that matters — more free RAM, more reclaimable cache headroom, comparable disk — and carries no production risk. Node_B is marginally ahead only on disk (202 vs 200 GB, negligible) but hosts a live financial trading system; landing a new test LXC there risks memory/IO contention against production trading workloads for no benefit. This isn't a close tradeoff — A is strictly safer and has more headroom.
+
+Example provisioning command to run on node_A once you're on the actual host (adjust template/storage/network to your environment):
+
+```bash
+pct create 900 local:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst \
+  --hostname test-lxc \
+  --memory 512 --swap 512 \
+  --rootfs local-lvm:8 \
+  --net0 name=eth0,bridge=vmbr0,ip=dhcp \
+  --unprivileged 1
+pct start 900
+```
+
+Let me know if you want me to adjust sizing (RAM/disk allocation) or the template/distro used.

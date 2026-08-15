@@ -1,0 +1,8 @@
+Checked both entries in `verification_pairs.json` by comparing `romanized` to `verified_real`:
+
+| # | romanized | verified_real | Match? |
+|---|---|---|---|
+| 1 | Correct Name | Correct Name | ✅ Yes |
+| 2 | Wrong Nmae | Correct Name 2 | ❌ No |
+
+Entry 1 matches exactly. Entry 2 does not match — "Wrong Nmae" (also a likely typo for "Name") differs from "Correct Name 2".

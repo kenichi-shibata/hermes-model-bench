@@ -1,0 +1,15 @@
+Findings from `network_symptoms.json`:
+
+| Segment | Packet loss |
+|---|---|
+| `vlan_10.0.1.0/24` | 0% — healthy |
+| `vlan_10.0.2.0/24` | **50%** — severe |
+
+`vlan_10.0.2.0/24` is the problem: 50% loss is not jitter or noise, it's a coin-flip on every packet — consistent with a failing/flapping interface, a saturated or duplex-mismatched link, a bad cable/SFP, or an overloaded switch/router serving that subnet, rather than general congestion (congestion usually shows partial loss in the low single digits, not 50%).
+
+The file only has loss_pct per VLAN, no hop-by-hop traceroute data, so I can't tell you *where* in the path it's happening. To localize it I'd want, for the `10.0.2.0/24` segment:
+- traceroute/mtr output (hop-by-hop loss to isolate whether it's the gateway, an intermediate switch, or the destination)
+- interface counters on the VLAN's gateway/switch (errors, discards, CRC errors → points to physical layer)
+- whether loss is symmetric (also seen from the other side) or one-directional
+
+If you have more samples (e.g., traceroute hops or a time series) drop them in and I'll dig further.

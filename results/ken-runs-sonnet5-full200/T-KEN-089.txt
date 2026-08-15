@@ -1,0 +1,1 @@
+Swap stats show 0 MB used out of 4096 MB total — swap isn't a factor here. Whatever performance issue prompted this check (slowness, OOM-like behavior, latency spikes) isn't caused by swapping/thrashing, since the system isn't touching swap at all. The bottleneck is elsewhere — worth looking at the app's own memory usage, GC behavior, CPU, or I/O instead.

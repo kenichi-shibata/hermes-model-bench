@@ -1,0 +1,6 @@
+Based on `dependency_check.json`, record_id `5` is listed as referenced by:
+
+- `groups.member_ids`
+- `tag_map.scene_id`
+
+So deleting it would break those two references (dangling IDs) unless something else cascades the delete or cleans them up first. There's no other code/data in this sandbox to check whether such cascade logic exists — the JSON is the only source of truth here, and it says this record is still referenced. **I would not delete it without first removing/updating those two references.**

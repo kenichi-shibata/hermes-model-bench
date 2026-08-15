@@ -1,0 +1,8 @@
+Checked both files:
+
+- **service_x_metrics.json**: `latency_ms: 40` — on its own this isn't a bad number.
+- **host_metrics.json**: `cpu_steal_pct: 60` — this is the red flag.
+
+**CPU steal at 60% is severe.** Steal time is the % of time the VM's vCPU wants to run but the hypervisor gives the cycles to another tenant instead. Healthy steal is ~0-2%; anything above ~10% is considered a problem. 60% means the host is badly CPU-starved — the underlying physical CPU is oversubscribed/contended by other VMs (noisy-neighbor), so service X is effectively getting only a fraction of the CPU it thinks it has.
+
+**Verdict:** The 40ms latency figure alone doesn't scream "slow," but given the host's CPU steal is that high, actual observed latency/throughput is very likely being throttled by the hypervisor, not by anything in service X's own code path. I'd point at the infrastructure layer first — check the hypervisor/host for over-provisioning or a noisy neighbor, or move the workload to a less contended host, before digging into the application.

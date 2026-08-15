@@ -1,0 +1,1 @@
+Fixed `resume_section.py:2` to sort by `last_watched_at` instead of `added_at`, so the resume list now correctly puts the most recently watched scene first (scene 1, then scene 2).

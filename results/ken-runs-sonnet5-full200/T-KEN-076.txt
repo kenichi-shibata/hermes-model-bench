@@ -1,0 +1,5 @@
+That file's just a copy of the task context, nothing else to it.
+
+Both entries have `"hash": "abc"` — identical strings, so by this hash comparison, **a** and **b** are duplicates.
+
+One caveat: `"abc"` is a suspiciously short/trivial value for a real hash (e.g., MD5/SHA would be much longer hex strings), so if this data came from an actual hashing process, worth double-checking the hash was computed correctly rather than being a placeholder — but as given, the two records match.

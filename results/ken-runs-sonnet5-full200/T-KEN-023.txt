@@ -1,0 +1,10 @@
+Only single-snapshot files exist (no history), so I can't measure velocity over time — but comparing the two tells the real story:
+
+| | searching | found | total |
+|---|---|---|---|
+| **wanted_status_field** (lagging) | 40 | 10 | 50 |
+| **scenes_status_field** (truth) | 3 | 47 | 50 |
+
+The backlog **is** moving — in truth, 47/50 (94%) are found and only 3 remain. But the `wanted_status_field` hasn't caught up yet: it still shows 40 outstanding / only 10 found (20%). If you're reporting progress off `wanted_status_field`, it will look like the backlog is stuck near the start when it's actually almost drained — that's the "lag" doing its job of misleading.
+
+**Bottom line:** don't trust `wanted_status_field` for a "is it moving" check — it's stale by design. Use `scenes_status_field` (3 remaining) as current truth. If you need an actual movement/rate answer, you'd need snapshots over time, which aren't present here.

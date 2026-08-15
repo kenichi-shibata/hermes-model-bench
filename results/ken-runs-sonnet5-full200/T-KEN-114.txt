@@ -1,0 +1,1 @@
+The spawn failed because it hit the concurrency cap: `spawn_error.json` shows `max_concurrent_children exceeded` — 5 children were already running against a limit of 5. To fix it, either wait for a running child to finish before spawning another, or raise the `limit` (max_concurrent_children) if the system allows configuring it.

@@ -1,0 +1,6 @@
+Audit results from `orphan_scan.json`:
+
+- **Total scenes:** 50
+- **Orphaned records:** 3 scenes have broken performer references — IDs **12, 27, 41** (6% of the dataset)
+
+That's the full contents of the file — no other data to cross-reference in this sandbox. Those 3 scene IDs point to performer records that no longer exist (deleted/missing performer entity). Next steps would typically be either: (1) re-link them to correct performer IDs, or (2) null out/remove the dangling `performer_id` on those 3 scene records — but I don't have the source scene/performer tables here to do the actual repair, just this scan summary.

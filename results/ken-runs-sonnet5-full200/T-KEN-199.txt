@@ -1,0 +1,9 @@
+Built `stale_wanted_monitor.py` on top of `existing_related_code.get_wanted_items()`:
+
+- `get_stale_wanted_items(now=None)` — pure, testable filter: an item is stale if its status isn't `fulfilled`/`closed`/`cancelled` and `now - created_at > 48h`.
+- `flag_stale_items(now=None)` — runs the filter, then writes `flagged = TRUE` back via `db.execute` for each stale item, and returns them.
+- A `__main__` block so it can run standalone (e.g. as a cron job) and print what it flagged.
+
+Also added `db.py` (a stub with `query`/`execute` raising `NotImplementedError`) since `existing_related_code.py` referenced `db.query` without an importable `db` module in this sandbox — swap it for your real DB client.
+
+Assumptions baked in (adjust if your actual `wanted` table differs): rows have `id`, `status`, and `created_at`; a boolean `flagged` column exists to mark stuck items. I verified the logic manually (pytest isn't installed in this sandbox, so I ran the test scenarios by hand) — behavior matched `test_stale_wanted_monitor.py`, which is written in pytest style for your CI to pick up.

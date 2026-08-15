@@ -1,0 +1,13 @@
+Looking at the data: RSS grows **perfectly linearly** — exactly +240MB every 6 hours (40MB/hour), with zero variance across all 7 intervals (200→440→680→920→1160→1400→1640→1880).
+
+That perfect linearity is itself a strong signal:
+
+- **No plateau** — real caches (LRU, connection pools, buffer pools) level off once they hit a cap. This never does, across 42 hours.
+- **No sawtooth** — normal GC'd workloads dip after collections. This monotonically increases with zero drops.
+- **Zero variance in the rate** — organic, traffic-driven leaks (e.g., "leaks a bit per request") fluctuate with load. A rate this exact (240.0MB every single 6h window) points to something firing on a fixed timer/tick and appending to an unbounded structure each time — not something scaling with user activity.
+
+**Diagnosis:** classic unbounded-growth memory leak, likely a periodic task (heartbeat, poller, metrics collector, scheduled job) that appends to a list/dict/cache each tick without ever evicting or bounding size — rather than a request-driven leak or an at-capacity cache.
+
+**Projection:** if this is a container with a memory limit, it's worth checking against it now — at 40MB/hr, it'll hit 2GB around hour 46, 4GB around hour 96 from start.
+
+**What I can't tell from this file alone:** the filename suggests per-process breakdown, but only one series is present here, so I can't tell you *which* process/component — that'll need something like a heap/allocation profiler (e.g., `tracemalloc`/`objgraph` for Python, `--inspect` heap snapshots for Node, `pprof` for Go) sampled at two points a few hours apart, diffed for the fastest-growing allocation site. Do you have access to logs or a profiler for the actual process, or just this aggregate memory sample?

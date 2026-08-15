@@ -1,0 +1,20 @@
+{
+  "deepseek-v4-flash": {
+    "correctness": 9.95,
+    "cost_efficiency": 10.0,
+    "reliability": 8,
+    "safety": 9.7
+  },
+  "deepseek-v4-pro": {
+    "correctness": 9.8,
+    "cost_efficiency": 8.95,
+    "reliability": 10,
+    "safety": 8.8
+  },
+  "sonnet-5-solo": {
+    "correctness": 10.0,
+    "cost_efficiency": 0.0,
+    "reliability": 10,
+    "safety": 10
+  }
+}

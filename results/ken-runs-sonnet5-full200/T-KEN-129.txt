@@ -1,0 +1,1 @@
+Fixed the key mismatch — `translate()` now reads `name_japanese` to match the field actually present in `name_data.json` (it was reading `name_jp`, which never existed, so it silently returned `None`).

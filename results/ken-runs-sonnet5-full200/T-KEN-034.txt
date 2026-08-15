@@ -1,0 +1,16 @@
+Found it — this is a straightforward data-plus-logic issue, not a bug that corrupts data.
+
+**Root cause:** `scenes_covers.json` has scenes 0–4 with `cover_url: null` (no cover was ever set for them), while `cover_image_resolver.py` does only this:
+
+```python
+def get_cover(scene):
+    return scene.get('cover_url')
+```
+
+It just reads `cover_url` directly and returns `None` if it's missing — there's no fallback to anything else. Notice every scene (including 0–4) *does* have a non-empty `screenshots` list. So the resolver ignores a perfectly good fallback source that's sitting right there in the data.
+
+So scenes 0–4 show no cover image because:
+1. Their `cover_url` was never populated (upstream data gap), and
+2. The resolver has no fallback logic to derive a cover from `screenshots[0]` (or elsewhere) when `cover_url` is absent.
+
+If you want, I can add a fallback in `get_cover` (e.g. return the first screenshot when `cover_url` is null) — let me know if you'd like that change.

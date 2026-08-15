@@ -1,0 +1,9 @@
+The history just shows "is queue moving" asked manually 8 days in a row — but there's no info here about *which* queue or system (SQS, RabbitMQ, Kafka, a DB job table, CI queue, etc.), nor any connection details/credentials to check it.
+
+I can't write a working check script without knowing:
+1. What queue system this is (name/type, e.g., SQS queue name, RabbitMQ vhost/queue, Kafka topic, DB table)
+2. How to check "moving" — e.g., depth decreasing over time, oldest message age, consumer lag, last-processed timestamp
+3. What credentials/endpoint to use (and whether they're available in this sandbox, or as env vars)
+4. Where output should go (stdout, Slack alert, log file) and how often it should run (cron, loop)
+
+Could you fill in those details? Once I know the queue type and how to query it, I can write a small script (and wire it to cron via the `schedule` skill if you want it fully automatic).

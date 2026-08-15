@@ -1,0 +1,1 @@
+Yes — `svc_3` has an error rate of **0.12 (12%)**, roughly 100x higher than every other service in the fleet (all others sit at 0.001 / 0.1%). That's the one anomaly worth investigating.

@@ -1,0 +1,8 @@
+The backup failed due to a **broken pipe** during upload (`BrokenPipeError: [Errno 32] Broken pipe`), which killed the transfer of `backup.tar.gz` at 45% complete.
+
+This means the connection between the client and the remote/destination endpoint was interrupted mid-stream — the receiving end closed the connection (or a network hop dropped it) while data was still being written. Common causes:
+- The destination server/service closed the connection early (timeout, auth expiry, disk full/quota hit on the remote side, or the receiving process crashed)
+- A network interruption (VPN drop, load balancer idle-timeout, unstable connection) between client and server
+- A proxy/firewall terminating long-lived connections
+
+The log alone doesn't show which side caused it — you'd need the corresponding server-side log around the same timestamp to pin it down further.

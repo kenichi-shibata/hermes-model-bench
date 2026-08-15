@@ -1,0 +1,24 @@
+## Diagnosis
+
+The log shows a clean chain of failure:
+
+```
+Starting container 112...
+mount: /data: no such device
+failed to mount rootfs overlay
+container boot aborted
+```
+
+**Root cause:** LXC container 112 is configured with a mount point (`/data`) that points to a block device or storage volume that doesn't exist (or isn't visible) on the host. Because that mount fails, the rootfs overlay can't be assembled (overlay needs its lower/upper dirs, which live under that mount), so the whole boot aborts.
+
+This is almost always one of:
+1. **Storage volume missing/detached** — the underlying disk/LV/ZFS dataset backing `/data` was removed, renamed, or is on storage that isn't attached to this host (e.g., a Proxmox storage pool that's offline, or an LV that didn't survive a host reboot).
+2. **Wrong/stale device path in config** — the container's config (e.g., `/etc/pve/lxc/112.conf` on Proxmox, or `/var/lib/lxc/112/config`) references a device (`/dev/...`) that no longer exists — common after disk renumbering or a storage migration.
+3. **Storage not mounted on host yet** — if `/data`'s backing storage is itself a mount (NFS, iSCSI, another disk) that hasn't come up before LXC tries to start (race on boot).
+
+**Next steps to confirm** (I can't check further — only the log file is in this sandbox):
+- Check the container's mount config for the `/data` entry (`mp0`/`rootfs` line in the `.conf` file) and verify the referenced device/path exists on the host: `lsblk`, `pvs`/`lvs`, or `zfs list` depending on storage backend.
+- Check `pct config 112` (Proxmox) or the raw LXC config to see exactly what device/path is expected.
+- Confirm the host-side storage (disk, LV, NFS share, etc.) is actually present and mounted before container start.
+
+Since I don't have access to the host filesystem or LXC configs here (only this log), you'll need to run those checks on the actual host to pin down which of the three it is.

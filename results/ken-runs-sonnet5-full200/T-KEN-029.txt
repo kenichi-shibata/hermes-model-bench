@@ -1,0 +1,13 @@
+I checked both files in the sandbox — that's all the data available here:
+
+**What the log shows** (`sab_config_history.json`):
+- 2026-08-10: `connections: 20` (source: `manual`)
+- 2026-08-11: `connections: 5` (source: `nightly-sync`, `reason: null`)
+
+So the drop from 20→5 happened via the automated `nightly-sync` process, not a manual change. However, the `reason` field for that entry is explicitly `null` — the log captured *that* the sync changed it, but not *why* the sync picked 5.
+
+I don't have enough here to say why it happened "again" — there's no earlier history in this file showing a prior drop-to-5 incident, and no sync/application logs in this sandbox to explain the nightly-sync's decision. To find the actual root cause you'd need:
+- The `nightly-sync` job's source config or logs for 2026-08-11 (wherever that job reads its target connection count from)
+- Any prior config history entries before 2026-08-10, if they exist outside this sandbox
+
+I don't want to guess at a root cause without that data — let me know if you can point me to the nightly-sync source/logs and I'll dig further.

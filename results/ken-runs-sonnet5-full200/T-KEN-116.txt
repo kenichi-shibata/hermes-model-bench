@@ -1,0 +1,14 @@
+Yes — that config is describing exactly that failure mode. Reading `resource_contention.json`:
+
+- `concurrent_writers: 5` — five agents/processes writing at once
+- `shared_resource: "shared.log"` — all writing to the same single file
+- `has_lock: false` — no synchronization at all
+
+With 5 writers and no lock on a shared file, you'll get interleaved/torn writes and lost data (classic race condition) — each writer's `write()` can be preempted mid-line by another, corrupting the log.
+
+Fix options, in order of preference:
+1. **File locking** — wrap each write in `flock` (or `fcntl.flock` in Python) so writers serialize access to `shared.log`.
+2. **Single-writer queue** — have the 5 agents send log lines to one dedicated writer process/thread via a queue instead of touching the file directly.
+3. **Per-writer files + merge** — each writer gets its own file (`shared.log.1`...`shared.log.5`), merged later if a unified log is needed.
+
+Given it's just this one JSON file with no actual code in the sandbox, there's nothing to patch here — but if you point me to the writer code, I can add the locking.

@@ -1,0 +1,19 @@
+Both files updated. Here's what changed and further ideas:
+
+**`PerformerDetailPage.jsx` (bug fix)**
+- The rank badge now links to `/performers/${performer.id}` via the already-imported `Link` (was a raw `<a href="/leaderboard">`).
+- Added a guard for a missing `performer` prop and a back-link to the grid, since a detail page with no way back is a dead end.
+
+**`PerformersGrid.jsx` (bug fix + missing feature)**
+- The comment claimed "Load more" pagination, but none existed — it silently truncated to 60 with 2640 performers unreachable. Added real `useState`-driven pagination with a "Load more" button.
+- Each item is now a `Link` to `/performers/:id` (previously just inert `<div>`s — you couldn't actually navigate to a performer from the grid).
+- Switched to a semantic `<ul>/<li>` grid layout and added `alt`/`loading="lazy"` on images for accessibility/perf.
+- Added an empty-state message.
+
+**Further improvements worth considering (not done, since they need product/API decisions):**
+- Grid: replace client-side `.slice()` pagination with server-side pagination/infinite scroll (`IntersectionObserver`) once the dataset is fetched from an API rather than passed in fully — right now all 2700 records must already be in memory client-side.
+- Grid: add a search/filter/sort control bar — a 2700-item grid without filtering is hard to use.
+- Detail page: it only renders a name and a rating badge; likely missing bio, stats, media, and loading/error states for async fetch (currently assumes `performer` is always synchronously available).
+- Both: no loading skeleton or error boundary if `performers`/`performer` come from a data-fetching hook.
+
+Want me to go further on any of these (e.g., wire up search/sort on the grid, or flesh out the detail page fields)?

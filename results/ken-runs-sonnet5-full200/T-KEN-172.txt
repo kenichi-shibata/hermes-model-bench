@@ -1,0 +1,8 @@
+Found it: the config has a port mismatch.
+
+- `forward_rule_target_port` is `8080` — the port the forward rule sends traffic to.
+- `service_actual_listen_port` is `8081` — the port your service actually listens on.
+
+The forward rule is targeting 8080, but nothing is listening there since the service binds to 8081. That's why the port forward isn't working — traffic arrives and gets forwarded to a port with no listener.
+
+Fix: change `forward_rule_target_port` to `8081` to match the service's actual listen port (or reconfigure the service to listen on 8080, whichever is intended). Want me to update the JSON file?

@@ -1,0 +1,16 @@
+That trace tells a clear story:
+
+- **DNS resolution: OK** — the hostname resolves correctly, so it's not a naming/discovery issue.
+- **TCP connect: OK** — a socket connection to the port succeeds, so networking/firewall/routing/load-balancer are fine, and something is listening on that port.
+- **App health check: timeout** — the connection is accepted, but the application never responds to the health check request in time.
+
+This points to an **application-layer problem, not a network problem**. Likely causes:
+
+1. **Service is hung/deadlocked** — process accepts connections (TCP backlog) but can't service requests (e.g., stuck on a lock, exhausted thread pool, blocked on a slow dependency like a DB/downstream call).
+2. **Overloaded/saturated** — request queue is backed up (e.g., CPU pegged, GC pauses, connection pool exhaustion) so the health endpoint response is too slow.
+3. **Health check endpoint itself is broken** — e.g., it does a deep check (DB ping, dependency call) that's hanging, while the app otherwise could be fine.
+4. **Reverse proxy/load balancer in front** — accepting the TCP connection but the actual backend app isn't started or is unresponsive behind it.
+
+Next steps to narrow it down: check the service's process/thread state (is it CPU-pinned, deadlocked?), look at recent logs around the health-check timeout, check what the health endpoint does internally (does it call a DB/downstream that might itself be down), and check connection/thread pool metrics for exhaustion.
+
+Do you have logs or metrics from the service itself (not just the trace) that I could look at to pinpoint which of these it is?

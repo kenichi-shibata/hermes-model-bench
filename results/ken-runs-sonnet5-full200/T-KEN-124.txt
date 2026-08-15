@@ -1,0 +1,17 @@
+The file only contains this:
+
+```json
+[
+  { "id": "p1", "name": "Jane Doe", "verified": true },
+  { "id": "p2", "name": "Jane Doe", "verified": true }
+]
+```
+
+There's no way to tell from this alone whether `p1` and `p2` are the same performer or two different people who happen to share a name. The record has no disambiguating data at all — no birth date, discography/filmography, external IDs (IMDb, MusicBrainz, Wikidata), bio, or source links. Both being marked `verified: true` just means each entry individually was verified as *a* real "Jane Doe" — it says nothing about whether they're the *same* Jane Doe.
+
+To answer "same performer or namesake," I'd need at least one of:
+- A shared external identifier (e.g., same IMDb/MusicBrainz ID)
+- Overlapping biographical details (birth year, nationality, known works)
+- A source/reference field showing where each entry came from
+
+Do you have a richer version of this record, or another file/source with metadata for `p1` and `p2`? Without that, this JSON can't support a disambiguation conclusion either way.

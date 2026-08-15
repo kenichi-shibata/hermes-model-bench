@@ -1,0 +1,19 @@
+It's stuck open — not working correctly.
+
+`breaker_logic.py:2` `is_open()` just returns `state['open']` verbatim; the comment on line 3 even flags it: it never checks `opened_at` + `cooldown_sec` against the current time. The breaker was opened `2026-08-13T00:00:00` with a 900s (15 min) cooldown, so it should have auto-reset to closed within 15 minutes. It's now 2026-08-15 — over 2 days later — and it will still report `open: true` forever, because nothing ever re-evaluates the cooldown or flips `open` back to `false`.
+
+Fix would be something like:
+
+```python
+from datetime import datetime, timedelta
+
+def is_open(state):
+    if not state['open']:
+        return False
+    opened_at = datetime.fromisoformat(state['opened_at'])
+    if datetime.utcnow() >= opened_at + timedelta(seconds=state['cooldown_sec']):
+        return False  # cooldown expired, breaker should close (or go half-open)
+    return True
+```
+
+Want me to apply that fix to `breaker_logic.py`?

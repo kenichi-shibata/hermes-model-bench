@@ -1,0 +1,12 @@
+Left `old_broken_approach.py` in place as reference since it wasn't asked to be deleted, but it's fully superseded.
+
+**New implementation in `watcher.py`:**
+- `ItemWatcher` tracks a cursor (last seen `id`) instead of scanning the whole table each tick — queries `WHERE id > ? ORDER BY id ASC LIMIT ?`, an indexed range scan that costs O(new rows), not O(table size).
+- On startup with no prior cursor, it initializes to the current max `id` so it doesn't alert on the entire existing backlog.
+- `CursorStore` is pluggable: `InMemoryCursorStore` (default) or `FileCursorStore` for persistence across restarts, so a crash/restart resumes from where it left off instead of re-scanning or missing rows.
+- When a full batch is returned, it loops immediately instead of sleeping, so it drains backlog fast; otherwise it sleeps `poll_interval` between checks.
+- `stop()` uses a `threading.Event` so it can actually be shut down, unlike the old unconditional `while True`.
+
+`test_watcher.py` verifies against real sqlite: no alert on pre-existing rows, backlog drains in batches without waiting a full poll interval, and cursor persistence survives a simulated restart. All three pass.
+
+One assumption worth flagging since `requirements_recap.md` gave no schema: I assumed an auto-incrementing/indexed `id` column on an append-only table — if your actual "everything" table doesn't have that shape (e.g., updates matter, not just inserts), the cursor strategy needs adjusting (e.g., an indexed `updated_at` + `id` tiebreaker instead).

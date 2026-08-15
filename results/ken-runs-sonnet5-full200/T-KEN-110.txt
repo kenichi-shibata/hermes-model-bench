@@ -1,0 +1,3 @@
+Yes — the manifest shows a discrepancy: **48 files were detected as changed but only 45 were included** in the delta backup, meaning **3 files were skipped**.
+
+That's all the detail available, though — `delta_manifest.json` only contains these two summary counts (`changed_files_detected` and `files_included`), with no list of file names or skip reasons. To identify which 3 files were dropped and why, you'd need a more detailed log (e.g., a per-file manifest or backup tool log), which isn't present in this directory.

@@ -1,0 +1,9 @@
+Not worth it.
+
+**$2.90 for a 5% accuracy gain on a low-stakes task** — that's a poor trade:
+
+- Low stakes means errors are cheap to tolerate, so marginal accuracy has little value here.
+- $2.90 is a real per-task cost that compounds if this runs repeatedly (e.g., 1,000 runs = $2,900 for a 5% bump nobody critical needs).
+- There's no indication of a threshold or downstream cost where that 5% matters.
+
+**Recommendation:** skip the extra spend for this task. Reconsider only if stakes rise (e.g., output feeds something high-consequence) or the cost scales down significantly.

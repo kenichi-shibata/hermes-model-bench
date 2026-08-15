@@ -1,0 +1,3 @@
+That's expected, not a bug. The scene is on `site_c`, and site_c's indexer last ran 2h ago on a 6h interval — so it isn't due to run again until ~4h from now. Sites a and b index far more frequently (10min/1h), but site_c is just slow by design.
+
+Nothing to fix here: it'll show up once the next site_c indexer cycle completes (in ~4h), or sooner if someone triggers a manual reindex for that site.

@@ -1,0 +1,14 @@
+Looked at the full file — it's only 4 samples, not the fuller time series I'd want for a "dying again" verdict:
+
+```
+t=0  cpu_pct=15
+t=1  cpu_pct=180   ← spike
+t=2  cpu_pct=18
+t=3  cpu_pct=16
+```
+
+Findings:
+- There's one CPU spike to 180% at t=1 (multi-core burst, likely a Chrome/challenge-solve spawn), but it drops right back to baseline (~15-18%) at t=2-3 and stays there. That's not a crash pattern — no sustained high usage, no zero/flatline that would indicate the process died.
+- The file is described as having "CPU/memory samples" but there's no memory field at all, and only 4 data points total — not enough to say anything conclusive about periodic dying/restarting (which usually shows up as repeated OOM spikes or gaps/resets in the timeline).
+
+Verdict: nothing here shows FlareSolverr is currently dying — just one transient CPU spike that recovered. If you're seeing actual crashes/restarts, this snapshot is too short/incomplete to confirm it; you'd want a longer window with memory included and ideally container restart-count/exit-code data alongside it.

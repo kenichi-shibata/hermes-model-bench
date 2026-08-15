@@ -1,0 +1,1 @@
+Yes — the process itself is alive (`process_alive: true`), but its last loop iteration completed **2 hours ago**, which is a stale heartbeat depending on the expected loop interval. If the loop is supposed to run more frequently than every 2 hours, it's likely hung or stuck despite the process still being up.

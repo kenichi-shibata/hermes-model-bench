@@ -1,0 +1,9 @@
+No — it's mostly holding up, but not clean. From `migration_integrity_check.json`:
+
+- **10,000** total records
+- **9,950** migrated OK (**99.5%**)
+- **50** records (0.5%) failed, all with the same `corruption_pattern`: **`truncated_at_255_chars`**
+
+That's not random noise — a single consistent failure pattern affecting exactly the records whose content exceeds 255 characters strongly points to a schema/field-length mismatch (e.g., source data wider than a `VARCHAR(255)` target column, or a fixed-length buffer in the migration script silently truncating instead of erroring).
+
+Since it's a systematic pattern rather than scattered corruption, it's very likely reproducible: any row with content >255 chars in that field will hit it. Worth checking the target schema for that column's length constraint before considering the migration done.

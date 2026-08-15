@@ -1,0 +1,1 @@
+Added an undo path: `bulk_delete` now snapshots each record via `db.get(i)` before deleting and returns the backup list; a new `undo_bulk_delete(backup, db)` restores those records via `db.insert(record)`. This assumes `db` exposes `get`/`insert` — if your db object uses different method names, let me know and I'll adjust.

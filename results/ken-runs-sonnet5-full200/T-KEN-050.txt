@@ -1,0 +1,12 @@
+Yes — pve2's RAM usage is climbing steadily and heading toward capacity.
+
+**The data** (7 daily samples): 74% → 76% → 78% → 80% → 82% → 84% → 86%, a near-perfectly linear increase of **+2 percentage points/day**.
+
+**Projection:** at that rate, it hits:
+- 90% in ~2 days (day 8)
+- 95% in ~4.5 days (day 10-11)
+- 100% in ~7 days (day 13)
+
+So pve2 isn't out of RAM yet, but if this trend continues unchecked it will be critically low (>90%) within about **2 days** and fully saturated within about **a week**.
+
+**Recommendation:** treat this as a near-term capacity issue — worth investigating what's driving the steady climb (memory leak in a VM/container, growing workload, ballooning not reclaiming) and either add RAM, migrate/reduce VMs on the host, or set an alert threshold (e.g., 90%) now rather than waiting for it to hit 100%.

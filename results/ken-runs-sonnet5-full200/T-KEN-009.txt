@@ -1,0 +1,11 @@
+Fleet disk check across 5 hosts:
+
+| Host | Used % | Thin-provisioned | Status |
+|---|---|---|---|
+| host1 | 45% | no | OK |
+| host2 | 38% | no | OK |
+| host3 (media-pool) | **92%** | **yes** | ⚠️ Critical |
+| host4 | 22% | no | OK |
+| host5 | 30% | no | OK |
+
+**host3 needs attention**: 92% used and it's thin-provisioned — with thin provisioning, actual physical capacity can run out before the logical volume shows 100%, so this is more urgent than the number alone suggests. Worth checking underlying pool free space and either freeing space or expanding the pool soon. Everything else is comfortably under 50%.

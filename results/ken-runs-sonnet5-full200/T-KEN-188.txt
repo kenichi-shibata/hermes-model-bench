@@ -1,0 +1,10 @@
+Yes — this breaks one of the three callers.
+
+**The change:** `def process(data)` → `def process(data, verbose)`. `verbose` has no default value, so it's now a required second positional argument.
+
+**Impact on callers:**
+- `a.py`: `process(x)` — **breaks**. Missing required argument `verbose` → `TypeError: process() missing 1 required positional argument: 'verbose'`.
+- `b.py`: `process(x, True)` — fine, already passes both args.
+- `c.py`: `process(x, True)` — fine, same as above.
+
+**Fix:** give `verbose` a default (e.g. `def process(data, verbose=False)`) to preserve backward compatibility with `a.py`, or update `a.py` to pass the new argument explicitly if the intent is to force all callers to specify it.

@@ -1,0 +1,11 @@
+Not necessarily — the numbers don't match up in a way you'd want to just wave through.
+
+- **Configured retention:** 30 days
+- **Actual oldest file:** only 5 days old
+
+If retention were working as intended, you'd expect to see files spread out close to the 30-day boundary (oldest file ≈ 25-30 days old) before they get purged. Seeing an oldest file of just 5 days is a red flag for one of two things:
+
+1. **Over-aggressive deletion** — something is purging files well before the 30-day window is up (e.g., a cleanup job with the wrong interval/threshold, or a second job cleaning more aggressively than this policy).
+2. **Benign explanation** — the system/dataset is simply new (started ~5 days ago), so there's no older data yet to prove retention is working correctly either way.
+
+So: the policy is *configured*, but there's no evidence yet that 30-day retention is actually being honored — either it's silently over-deleting, or it just hasn't been tested by time. I'd check job/deletion logs or the data source's start date to tell which case this is before calling it "set up right."

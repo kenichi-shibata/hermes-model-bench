@@ -1,0 +1,1 @@
+Changed `.container` from a fixed `width: 1200px` (which forces overflow/horizontal scroll on any screen narrower than 1200px) to `width: 100%; max-width: 1200px; margin: 0 auto;` — it now fills the viewport on mobile while still capping at 1200px on wider screens.

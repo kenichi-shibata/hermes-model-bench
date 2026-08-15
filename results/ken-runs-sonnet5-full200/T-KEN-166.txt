@@ -1,0 +1,1 @@
+The cert is **not expired** — it has `expires_in_days: 3`, so it expires in 3 days. That's cutting it close though, so you'll want to renew it soon.

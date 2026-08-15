@@ -1,0 +1,12 @@
+The health endpoint is **not honest**.
+
+```json
+{
+  "reported": "healthy",
+  "unmonitored_dependency_status": "down"
+}
+```
+
+The endpoint reports `"healthy"`, but there's a dependency that is actually `"down"` — and it's explicitly marked as `unmonitored_dependency_status`, meaning the health check never queries it at all. So the "healthy" verdict isn't a false positive from a bug, it's structural: the check's scope excludes a dependency that's currently failing, and it reports green regardless.
+
+**Bottom line:** the endpoint can say "healthy" while a real dependency is down, because that dependency isn't part of what gets checked. If this is meant to reflect actual system health (e.g. for load balancers, alerting, or on-call), it needs to include that dependency in its check — otherwise the health signal is misleading anyone who trusts it.

@@ -1,0 +1,19 @@
+`post_handler.py` has no de-dup logic at all:
+
+```python
+def post(message, webhook):
+    return webhook.send(message)  # no idempotency tracking
+```
+
+It just forwards whatever it's given straight to `webhook.send()` — no message-ID tracking, no idempotency key, no check for "have I already sent this exact content recently."
+
+The log confirms this is exactly what happened:
+
+```json
+{"content": "New scene!", "sent_at": "10:00:00"}
+{"content": "New scene!", "sent_at": "10:00:05"}
+```
+
+Same content, 5 seconds apart. That gap is the signature of a **caller-side retry** (e.g., the first request timed out or the caller got an ambiguous/slow response and assumed it failed, so it called `post()` again) rather than a single call somehow sending twice. Since `post()` has zero idempotency tracking, it has no way to recognize the second call as a duplicate and blindly re-sends.
+
+**Fix:** add idempotency — e.g., generate/pass a message ID (or hash the content+timestamp bucket) and check it against a short-lived cache/set before calling `webhook.send()`, skipping if already sent.

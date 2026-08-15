@@ -1,0 +1,11 @@
+No, the grab didn't actually work — despite the API reporting success, the item never made it into the queue.
+
+`grab_result.json`:
+```json
+{
+  "api_response": { "success": true },
+  "actual_queue_contains_item": false
+}
+```
+
+The API call returned `success: true`, but the ground-truth check (`actual_queue_contains_item`) shows the item isn't actually in the queue. That's a classic false-positive success response — the request was accepted/acknowledged, but the underlying effect didn't happen (e.g. silently dropped, wrong queue, race condition, or the success flag just reflects HTTP-level acceptance rather than actual processing). I'd treat this as failed and worth investigating the grab service's write path rather than trusting the API's success flag.

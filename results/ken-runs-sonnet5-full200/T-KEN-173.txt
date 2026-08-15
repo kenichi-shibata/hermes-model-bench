@@ -1,0 +1,7 @@
+Yes — both processes are contending for the same port.
+
+- **Port:** 9999
+- **service_x** successfully bound to it
+- **service_y** attempted to bind to it and failed
+
+This is a classic port-binding conflict: `service_y` couldn't start (or lost its listener) because `service_x` already had port 9999 held. To fix it, either stop/reconfigure `service_x` to free the port, or change `service_y`'s configured port to something unused.

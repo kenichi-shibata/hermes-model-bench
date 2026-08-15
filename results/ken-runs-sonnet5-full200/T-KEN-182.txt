@@ -1,0 +1,5 @@
+All cases sort correctly now: numeric fields, numeric-string fields (like `'price'` values that arrive as strings), plain string fields, and equal values (previously always returned `-1` even when equal, which broke stability).
+
+**Root causes fixed in `sort_function.js`:**
+1. Numeric-looking strings (e.g. `"100"` vs `"5"`) were compared lexicographically via `>`, so `"100" < "5"`. Now both sides are coerced to numbers when they parse cleanly and compared numerically.
+2. The old comparator never returned `0` — equal elements were treated as `b < a`, corrupting sort order/stability. Now equal values correctly return `0`.

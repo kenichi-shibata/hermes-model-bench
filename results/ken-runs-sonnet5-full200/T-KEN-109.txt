@@ -1,0 +1,7 @@
+Backup integrity check result: **FAILED**
+
+- `gzip_valid: true` — the archive itself is not corrupted, decompresses fine.
+- `schema_valid: false` — the restored schema doesn't match expectations.
+- `malformed_tables: ["users", "sessions"]` — these two tables specifically failed validation.
+
+So while the backup file isn't corrupted at the compression level, it can't be trusted as a full restore point — the `users` and `sessions` tables are malformed. I'd recommend re-running the backup job and treating this one as unsafe to restore from until those two tables are investigated (likely worth diffing their schema against the current production schema to see what drifted).

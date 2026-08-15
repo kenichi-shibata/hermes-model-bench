@@ -1,0 +1,16 @@
+The log tells a clean, self-contained story:
+
+```
+10:00:00  backend restart initiated
+10:00:02  502 Bad Gateway x14      <- 14 failed requests while backend was down
+10:00:08  backend healthy
+10:00:09  200 OK resumed           <- traffic recovered
+```
+
+This isn't the proxy misbehaving — it's expected behavior during a backend restart. The sequence is: restart triggered → backend is briefly unreachable → proxy correctly returns 502s to the 14 requests that came in during that ~6-second gap → backend comes back healthy → proxy resumes serving 200s normally.
+
+So there's no proxy bug here; the "acting up" was a ~6s window of 502s caused by a backend restart, and it self-resolved. If this is recurring or the outage window matters, the actionable next step would be to either:
+- add retry/queueing at the proxy so client-facing requests during a backend restart don't surface as 502s, or
+- confirm whether this restart was intentional (deploy) — if unplanned, that's the actual thing to investigate (look at backend crash logs, not the proxy).
+
+Do you have backend logs from that same window (10:00:00–10:00:08), or was this restart planned (deploy/rollout)?

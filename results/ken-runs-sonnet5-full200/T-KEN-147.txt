@@ -1,0 +1,1 @@
+This is a simple, single-field lookup with no reasoning required — a good fit for **Haiku 4.5** (`claude-haiku-4-5-20251001`). No need for Sonnet or Opus here.

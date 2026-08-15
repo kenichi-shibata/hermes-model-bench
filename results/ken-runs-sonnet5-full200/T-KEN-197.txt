@@ -1,0 +1,8 @@
+Built two scripts:
+
+- **`track_snapshot.py`** — reads the `current` block from `point_in_time_snapshots.json` and appends it with a UTC timestamp to `snapshot_history.jsonl` (append-only log). Run it each time you want to capture a snapshot.
+- **`view_history.py`** — prints every recorded snapshot plus the delta for any numeric field between the first and latest entry.
+
+Tested both — they work correctly, and I've left `snapshot_history.jsonl` unwritten (no fake data) so it starts clean on first real run.
+
+One thing I didn't do since it's a bigger, more invasive step: actually scheduling `track_snapshot.py` to run automatically (e.g. hourly/daily via cron). If you want that, tell me the interval and I'll set it up with the `schedule` skill — right now nothing will populate the history unless you run the script yourself.

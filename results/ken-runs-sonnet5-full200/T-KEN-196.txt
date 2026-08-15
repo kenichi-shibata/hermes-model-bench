@@ -1,0 +1,5 @@
+I added retry logic to `call_flaky_api` with exponential backoff, but scoped to what the failure log actually shows:
+
+- **Retries** on `ConnectionError`/`Timeout` (the transient 60%), up to 3 attempts with exponential backoff (0.5s, 1s, 2s).
+- **No retries** on HTTP errors like 404 (the other 40%) — those are permanent, so it fails fast via `raise_for_status()` + immediate re-raise instead of wasting attempts.
+- Also added a `timeout=5` to the request itself (it had none, so it could hang indefinitely) and made `url` a parameter instead of an undefined global.

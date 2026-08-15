@@ -1,0 +1,10 @@
+## Diagnosis: host-wide swap thrashing, not your service
+
+The service's own metrics look fine (45ms latency, 0.1% errors) — so the slowness isn't coming from that service's code path. The host tells a different story:
+
+- **Swap is essentially full: 7800/8192 MB (95% used)**. When swap is nearly saturated, the kernel is constantly paging memory in/out to disk, which stalls *every* process on the box, not just the noisy one — this produces exactly the "slow across the board" symptom regardless of which service you're profiling.
+- **`unrelated_batch_job.py` is pegging a CPU at 95%**, almost certainly the memory hog driving the swap pressure in the first place.
+
+So the "healthy" per-service dashboard is misleading: it measures the service's request-handling logic, not the shared host resources (memory/swap/CPU) it's competing for. A batch job on the same host is starving everyone else of RAM, forcing swap thrashing that adds latency at the OS/scheduler level — outside what any single service's metrics would ever show.
+
+**Recommended fix:** kill or throttle/reschedule `unrelated_batch_job.py` (move it off this host, cgroup-limit its memory, or run it at a lower priority/off-peak), then confirm swap usage drops and host-wide latency recovers. If it's not supposed to be on this host at all, that's the real root cause to chase down.

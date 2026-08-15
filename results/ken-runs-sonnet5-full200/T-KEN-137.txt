@@ -1,0 +1,7 @@
+Found double-translation garbage in `garbage_scan.json`: out of 50 entries, 47 have a single `(EN)` tag as expected, but **3 entries show the tag doubled** (`x(EN)(EN)`), indicating the value was translation-tagged twice:
+
+- id 5
+- id 22
+- id 41
+
+All other entries (ids 0–49 except these three) are clean `x(EN)`.

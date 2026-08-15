@@ -1,0 +1,1 @@
+No — despite `merged_flag: true`, the target branch does not actually contain the commit, so it isn't really merged. That flag is misleading/stale; the commit-presence check is the authoritative signal here, and it says the merge didn't land.

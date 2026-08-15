@@ -1,0 +1,14 @@
+Looking at the data:
+
+```json
+{
+  "a": {"title": "X", "res": "1080p"},
+  "b": {"title": "X", "res": "480p"}
+}
+```
+
+Dedupe isn't doing anything because **`a` and `b` aren't identical records** — they share `title: "X"` but differ on `res` (1080p vs 480p). Any dedupe that compares full-object equality (or a hash of the whole record) will see these as two distinct objects and keep both.
+
+If the intent is "same title = duplicate, keep the better one," the dedupe logic needs to key off `title` alone (not the whole object), then apply a tie-breaker to pick the higher `res` and drop the other. As written, whatever key the dedupe step is using must include `res`, which is exactly why no merge happens.
+
+There's no dedupe code in this sandbox to inspect — just the two files (`CONTEXT_ONLY.md`, `dedupe_check.json`) — so this is based purely on the data shape. If you have the actual dedupe function/script, point me to it and I can pinpoint the exact line.

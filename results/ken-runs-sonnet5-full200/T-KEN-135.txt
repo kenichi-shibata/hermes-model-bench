@@ -1,0 +1,16 @@
+This file only contains a single record:
+
+```json
+{
+  "name_jp": null,
+  "name_en": null
+}
+```
+
+There's nothing here to answer "why's this one untranslated but not others" — the file has no `name_en` at all (it's `null`), and there are no other case records in this sandbox to compare against. The "others" you're referring to must live in a different dataset/file that isn't present here (only `single_case_data.json` and `CONTEXT_ONLY.md` exist in this directory).
+
+A couple of possibilities depending on what you're actually looking at:
+- If this is meant to be one row from a larger case list, the comparison file wasn't included in this task's sandbox — I'd need that file added here to explain why this particular case lacks a translation while others don't.
+- If `name_jp` is also `null`, there's no source name to translate at all — it's not that translation was skipped, there's no input data for this case.
+
+Can you add the file/dataset with the other cases (or confirm whether `name_jp: null` here is itself the reason — no source text means no translation)?

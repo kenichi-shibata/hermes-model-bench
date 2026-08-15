@@ -1,0 +1,1 @@
+Fixed: added `e.preventDefault()` in `handleSubmit` so the browser stops doing its default full-page form submission/reload, letting the `api.post` call actually complete.

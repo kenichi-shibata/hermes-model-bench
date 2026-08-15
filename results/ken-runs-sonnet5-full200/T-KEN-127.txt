@@ -1,0 +1,1 @@
+Created `queue.json` with the 3 missing items (`item_7`, `item_8`, `item_9`) — the difference between the 10-item manifest and the 7 owned items.

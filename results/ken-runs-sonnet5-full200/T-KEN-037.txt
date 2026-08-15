@@ -1,0 +1,3 @@
+It's just flagging, not merging.
+
+`dedupe_merge.py` (despite the name) only marks non-first items in a group with `item['duplicate'] = True` and returns the same list unchanged — line 5 even says so explicitly. It never removes, combines, or writes back records; `duplicate_groups.json` still has both id 1 and id 2 present. So no actual deduplication/merge happens anywhere — this is flag-only, not merge.

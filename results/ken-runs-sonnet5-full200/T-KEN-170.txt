@@ -1,0 +1,12 @@
+Found it. In `routing_table_diff.json`:
+
+```json
+{
+  "intended_route": "0.0.0.0/0 via gw1",
+  "shadowing_route": "10.0.0.0/8 via gw2 (added by mistake)"
+}
+```
+
+**Diagnosis:** Routers use longest-prefix-match, so a more specific route always wins over the default route — this isn't a bug, it's how routing is supposed to work. The problem is that `10.0.0.0/8 via gw2` was added by mistake, so it silently intercepts *all* traffic to any `10.x.x.x` address (the entire private Class A block) and sends it to `gw2` instead of letting it fall through to the intended default route via `gw1`. Any hosts/services in `10.0.0.0/8` are now unreachable via the correct path — that's your "something's routing wrong" symptom.
+
+**Fix:** Remove the stray `10.0.0.0/8 via gw2` entry from the routing table. If gw2 legitimately needs a specific subnet routed to it, replace the blanket `/8` with the actual narrower prefix that was intended — but as written, this entry looks like a fat-fingered supernet and should just be deleted.

@@ -1,0 +1,11 @@
+Based on `memory_write_read_test.json`, the answer is **mostly, but not reliably** — there's one failure:
+
+| id | written | retrievable |
+|----|---------|-------------|
+| 0–4 | true | true |
+| **5** | true | **false** |
+| 6–9 | true | true |
+
+9 of 10 writes were successfully written *and* retrieved. Entry **id 5** was written but came back non-retrievable — a write succeeded while the corresponding read failed, which is the signature of a partial/inconsistent failure rather than a total outage (if memory were completely broken, you'd expect all 10 to fail, not just one).
+
+So: memory is functioning for the large majority of cases, but it's not 100% reliable — there's at least one dropped/lost write in this test batch. If you want, I can dig into what's distinct about entry 5 (timing, size, key format, etc.) if you have logs or more detail on how this test file was generated.

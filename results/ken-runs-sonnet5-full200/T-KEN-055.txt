@@ -1,0 +1,6 @@
+**Not sufficient at peak load.**
+
+- VM has **2 cores** → max available capacity = 200% CPU.
+- Workload: p50 = 150% (1.5 cores, fine — under the 200% cap), but **p95 = 380%** (3.8 cores) — nearly double the VM's 200% ceiling.
+
+At the 95th percentile, the workload demands ~1.8 cores more than the VM can supply. Since CPU is a hard ceiling (unlike memory, it can't be "borrowed"), this workload would be throttled/queued during peak periods. Recommend sizing up to at least 4 cores to give headroom above the 380% p95 mark.

@@ -1,0 +1,6 @@
+The workflow file exists in the repo, but it is **not running**.
+
+- `runs_last_30_days: 0` — zero executions in the last 30 days
+- `qualifying_commits: 15` — 15 commits in that window that should have triggered it (e.g., matched its `on:` path/branch filters)
+
+That combination (file present, trigger-eligible commits present, zero runs) points to the workflow being effectively dead — likely disabled, misconfigured trigger conditions (wrong branch/path/event filters), or removed from the default branch where GitHub evaluates triggers. It is not simply "no relevant activity happened."

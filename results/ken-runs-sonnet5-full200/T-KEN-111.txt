@@ -1,0 +1,1 @@
+Delegation completion is trending sharply downward: 90% (day 1) → 70% (day 2) → 40% (day 3) — a 50-point drop over 3 days. Worth digging into what changed on days 2-3 before it slides further.

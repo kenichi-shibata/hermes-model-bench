@@ -1,0 +1,1 @@
+Added `export_scenes_to_csv(scenes, path)` to `existing_data_model.py:11`, using the `csv` module and joining the `performers` list with `"; "` so it flattens cleanly into a single CSV field. Verified it works with a quick test run.

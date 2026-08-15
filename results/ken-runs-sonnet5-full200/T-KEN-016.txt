@@ -1,0 +1,1 @@
+Set `has_unfollow_button` to `true` for all 428 old threads that were missing it in threads.json (the 4 `already_ok_*` records were untouched since they already had it).

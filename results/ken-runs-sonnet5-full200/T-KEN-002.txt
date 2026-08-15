@@ -1,0 +1,1 @@
+Now `suggested_keep` and `canonical_would_be` agree — both correctly pick the playable `scenes:101` instead of the dead 5.2GB `scenes:100`. The two ranking functions can no longer diverge since the display path just delegates to the real write-path logic.

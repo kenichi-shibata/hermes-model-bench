@@ -1,0 +1,1 @@
+All 200 items resolved. I capped concurrency at 5 to match the mock API's `Semaphore(5)` capacity (firing all 200 at once would've just meant nearly everything bounces off the 429 rate limit) and added exponential backoff with jitter for retries. `errored_backlog.json` now has `"status": "resolved"` for every item; the script is at `resolve_backlog.py` if you want to rerun it.

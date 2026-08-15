@@ -1,0 +1,7 @@
+No, they're not in sync.
+
+- **Deployed SHA:** `e4f5g6h`
+- **Repo HEAD SHA:** `h7i8j9k`
+- **Commits between:** 3
+
+The deployed environment is 3 commits behind the current repo HEAD, so whatever changes are in those 3 commits are not live yet.

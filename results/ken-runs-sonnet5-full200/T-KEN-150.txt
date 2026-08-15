@@ -1,0 +1,1 @@
+No — the file itself says so: `"routing_rule": "always_expensive_tier"` combined with `"task_complexity_considered": false`. Delegation is routing every task to the expensive tier regardless of complexity, so it's not tier-matching to the task — it's a flat rule that ignores complexity, meaning cheap/simple tasks are needlessly paying for the expensive tier.

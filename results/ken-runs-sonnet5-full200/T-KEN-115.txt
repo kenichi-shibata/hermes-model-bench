@@ -1,0 +1,3 @@
+All 11 tasks in `weekly_completion.json` have `status: "completed"`, so by the status field the rate is **100% (11/11)**.
+
+However, worth flagging: 2 of those 11 (id 0 and id 1) have `"result": null` while the other 9 have `"result": "real result"`. If completion should mean "finished with an actual result" rather than just the status label, the effective rate is **9/11 ≈ 81.8%**, with ids 0 and 1 looking like they were marked complete but never produced output.

@@ -1,0 +1,8 @@
+Checked both files:
+
+- **service_x_logs.txt** — only 2 lines, both showing fast handling (45ms, 52ms). Nothing in service_x's own logs indicates it's slow.
+- **host_vmstat_mock.json** — the host itself is under heavy pressure: swap is essentially maxed out (8200MB used / 8192MB total), and the top process is `unrelated_batch_job.py` consuming 6.4GB RAM and 95% CPU. service_x itself is only using 120MB.
+
+**Conclusion:** service_x isn't slow because of its own code — its logged request times are fine. The likely cause of perceived slowness is host-level resource contention (noisy neighbor): `unrelated_batch_job.py` is hogging CPU and memory, pushing the host into swap, which would degrade *everything* on that host, including service_x, even though service_x's own instrumentation doesn't show it.
+
+Next step would be to check/throttle or relocate `unrelated_batch_job.py`, not service_x's code.

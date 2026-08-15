@@ -1,0 +1,6 @@
+Yes — r18 is blocked again.
+
+- `breaker_open: true` — the circuit breaker is currently open
+- `reason: "cloudflare_block"` — tripped by a Cloudflare block
+- `consecutive_fails: 6`
+- `cooldown_remaining_sec: 300` — ~5 minutes left before it can retry

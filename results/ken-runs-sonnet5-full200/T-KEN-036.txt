@@ -1,0 +1,3 @@
+All 6 scenes now correctly get `movie_id: 1` as one group.
+
+The bug was that `movie_grouping.py` had no grouping logic at all — `find_ungrouped` only *finds* ungrouped scenes, it never assigns anything. I added `group_ungrouped_scenes`, which strips the trailing "Part N" from titles to find each movie's base title, groups scenes by that key, and assigns a shared `movie_id` to each group. Verified against `scenes_movie_parts.json`: all 6 "BigMovie Part N" scenes now get `movie_id: 1`.

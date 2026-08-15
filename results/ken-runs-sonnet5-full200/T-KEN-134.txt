@@ -1,0 +1,12 @@
+The log is small but conclusive: **it's failing silently, not calling the LLM.**
+
+```json
+{
+  "requests_24h": 40,
+  "actual_llm_calls_logged": 0
+}
+```
+
+40 requests came in over the last 24 hours, but 0 of them resulted in a logged LLM call. If it were actually calling the LLM, `actual_llm_calls_logged` would track close to `requests_24h` (allowing for some legitimate errors). A 40-vs-0 split means every single request is being short-circuited before it reaches the LLM call — e.g. an exception being swallowed, a early-return/fallback path, or a misconfigured client that never fires — rather than the LLM itself rejecting or erroring out (which would still typically get logged as an attempted call).
+
+That's the whole content of this sandbox (just these two files), so I can't point you to the actual call-site code to pinpoint *why* it's swallowing the calls — if you share the source for whatever produces this log, I can dig into the root cause.

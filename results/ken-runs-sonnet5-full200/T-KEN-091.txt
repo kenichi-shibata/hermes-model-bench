@@ -1,0 +1,6 @@
+This points to a **code problem**, not infra:
+
+- `infra_metrics_stable: true` — infrastructure (CPU/memory/network/etc.) showed no anomaly.
+- The error spike hit at `10:01`, just **1 minute after** the `10:00` deploy — a tight enough window to indicate the deploy introduced the fault rather than coincidence.
+
+Infra staying stable while errors spike right after a deploy is the classic signature of a bad code change (bug, config/schema mismatch, breaking API change) shipped in that deploy, not a resource/environment issue. I'd recommend checking the diff/changelog for the 10:00 deploy and rolling it back or hotfixing, rather than chasing infra metrics.

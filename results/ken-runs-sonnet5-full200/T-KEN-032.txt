@@ -1,0 +1,30 @@
+The engine runs without crashing, but it isn't actually implementing Elo — it's a fixed ±32 win/loss counter that ignores rating difference entirely.
+
+**`elo_engine.py:1-4`**
+```python
+def update(winner, loser, ratings):
+    ratings[winner] = ratings.get(winner, 1500) + 32
+    ratings[loser] = ratings.get(loser, 1500) - 32
+    return ratings
+```
+
+The defining property of Elo is that the point swing depends on the *expected* score, computed from the pre-match rating gap:
+
+```
+expected_winner = 1 / (1 + 10**((loser_rating - winner_rating) / 400))
+delta = K * (1 - expected_winner)
+```
+
+This code has no such calculation — every match moves both ratings by exactly 32, whether it's a 1500 vs 1500 toss-up or a 2400 beating a 1000. Concretely: a huge favorite beating a heavy underdog should gain almost nothing (expected win), and the underdog should lose almost nothing. Here they'd both move the full 32, same as an even match. That's a flat scoring system, not Elo — ratings won't converge to reflect actual skill differences the way Elo is supposed to.
+
+Confirmed by running it on `match_history.json` (a beats b, a beats c):
+```
+{'a': 1564, 'b': 1468, 'c': 1468}
+```
+a gained 64 total (32 per win) regardless of who b/c were — expected under a naive counter, not under real Elo.
+
+Other gaps worth flagging:
+- No draw handling (only `winner`/`loser` args — a tie can't be recorded).
+- Mutates the `ratings` dict in place and also returns it, which is harmless here but easy to misuse.
+
+**Bottom line:** if the goal is genuine Elo, the update function needs the expected-score formula wired in; right now it's a placeholder that happens to run cleanly on the sample data.

@@ -1,0 +1,8 @@
+`follow_log.json` now only contains your 20 real, manually-initiated follows — `codey_steele`, `cherry_kiss`, and the other 141 bug-caused follows are gone.
+
+Two things:
+
+1. **Bug fixed** in `bot.py` — tracking a performer/studio no longer triggers a Discord follow as a side effect.
+2. **`follow_log.json` cleaned up** — trimmed from 162 to 20 entries, keeping only the ones you actually followed manually.
+
+One caveat: this sandbox only has the log file and a mock `db` class — there's no live Discord API connection here, so I can't push actual unfollow calls to Discord. You'll need to either run this against your real bot instance or manually unfollow the 142 affected accounts on Discord itself — I'd suggest diffing your current Discord follow list against these 20 `legit_perf_*`/real IDs to find them.

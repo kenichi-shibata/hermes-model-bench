@@ -1,0 +1,5 @@
+No — your home router peer is offline.
+
+- `home_router_peer.online: false`, last seen **8 days ago**, and it advertises `192.168.1.0/24` (your home subnet route).
+
+Since the peer that exposes your home network isn't currently connected to the tailnet, your phone can't reach anything behind it. You'd need to get that router/device back online (check power/internet at home) before the route becomes usable again.

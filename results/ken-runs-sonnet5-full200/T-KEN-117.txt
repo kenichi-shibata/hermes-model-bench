@@ -1,0 +1,9 @@
+Yes — the cheap model is still saving money, even after accounting for retries.
+
+**Cost per successful task:**
+- Cheap model: $0.002 × 3 retries = **$0.006**
+- Expensive model: $0.08 × 1 retry = **$0.08**
+
+The cheap model comes out **~13x cheaper** despite needing 3 attempts vs. 1. The expensive model would need to cost less than ~$0.002 per call (or the cheap model would need ~40 retries) before the "just use the expensive model to avoid retries" argument would break even.
+
+One caveat: this is pure dollar cost per call — it doesn't account for latency (3 sequential/retried calls take longer than 1) or any quality difference in the final output. If retries are cheap and fast (e.g., parallelized) and output quality is equivalent, the cheap model is the clear win.

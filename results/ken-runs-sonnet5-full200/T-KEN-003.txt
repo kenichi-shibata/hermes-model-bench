@@ -1,0 +1,7 @@
+All 179 broken images fixed, 0 remaining pointing at the dead host `198.51.100.64:9999`.
+
+Root cause: those 179 records (ids 0–178) referenced a decommissioned image host instead of the live one (`198.51.100.69:9999`) that all other 2521 performers already use.
+
+Fix (`fix_images.py`, run against `performers.json` in place):
+- **40 performers** (ids 0–39, which had a `stashdb_id`) → repointed to the StashDB fallback image via `stashdb_mock.get_fallback_image()`.
+- **139 performers** (ids 40–178, no `stashdb_id`) → repointed to the live host using the same `/performer/{id}/image` path pattern every working record uses.

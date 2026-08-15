@@ -1,0 +1,4 @@
+Created `CHANGELOG.md` based on the two commits in `session_commits.json`:
+
+- **Fixed**: dead-host image fallback for 40 performers (`a1b2c3d`)
+- **Added**: backup retry with exponential backoff (`e4f5g6h`)

@@ -1,0 +1,3 @@
+Based on `split_vs_solo.json`, split-arm dominates on both axes: it's cheaper (2.5 vs 3.0, ~17% less) and safer (0 safety failures vs 1). There's no tradeoff to weigh — solo isn't winning on any dimension here, so split-arm is worth it unless there's a hidden cost (e.g., latency, complexity) not captured in this file.
+
+One caveat: this is a single data point with no sample size, so "0 safety failures" for split could just mean it hasn't hit one yet, not that the rate is truly zero. Worth confirming there's more than N=1 behind these numbers before treating it as conclusive.

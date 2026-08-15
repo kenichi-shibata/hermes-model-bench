@@ -1,0 +1,7 @@
+Based on `check_history.json` (40 trigger events):
+
+- **False positives:** 10
+- **True positives:** 30
+- **False positive rate: 25%** (10/40)
+
+The false positives occur regularly, every 4th trigger (indices 0, 4, 8, ... 36) — a suspiciously perfect pattern, suggesting either a systematic trigger condition (e.g., something that fires on a fixed cadence and is usually benign) or synthetic/test data rather than organic noise.

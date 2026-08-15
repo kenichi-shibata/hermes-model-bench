@@ -1,0 +1,5 @@
+Yes, this looks like spam, not normal activity.
+
+The data has 18 time buckets (t=0–17), and **15 of them (83%) are flagged `burst: true`** — every single bucket from t=0 through t=14 in a row — before it drops to `false` for the last 3. That's a long, unbroken stretch of elevated posting rate right from the start, not an occasional spike mixed into otherwise quiet activity. Normal channel chatter tends to be bursty in short irregular pulses (a few consecutive `true`s surrounded by `false`s); a sustained run of 15 straight "burst" flags followed by an abrupt stop is the classic signature of a flood/spam pattern (e.g., a bot or script firing rapidly, then getting rate-limited or stopping).
+
+If you want more confidence, it'd help to see the actual message counts/timestamps behind each `burst` flag rather than just the boolean — but based on what's here, this reads as spam activity that tapered off toward the end of the window.

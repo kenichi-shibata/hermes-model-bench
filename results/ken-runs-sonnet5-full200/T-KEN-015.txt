@@ -1,0 +1,8 @@
+Both groups trip the exact "playability vs user-data conflict" guard in `auto_canonicalize_plan` (dedupe_auto.py:12-14), so `auto_canonicalize_plan` returns `refuse` instead of merging for each:
+
+- **group_1**: `s1` has data (`play_count=12`) but isn't playable; `s2` is playable but has no data (`play_count=0`) → matches the first condition → refuse.
+- **group_2**: `s3` has data (`play_count=3`) but isn't playable; `s4` is playable but has no data → same pattern → refuse.
+
+This isn't a bug — it's the deliberate safety check documented in the docstring (dedupe_auto.py:4-6): when one duplicate holds real listening history but can't be played, and the other can be played but has no history, the tool won't guess which one to keep/merge, since auto-picking either side would either silently discard play history or keep a broken track. That's flagged for human review by design.
+
+If you actually want these two groups merged automatically, you'd need to change the policy (e.g., decide that the playable copy always wins and its `play_count` gets carried over from the unplayable one) — that's a product decision, not a code fix. Want me to implement a specific resolution rule, or leave the refusal as-is?

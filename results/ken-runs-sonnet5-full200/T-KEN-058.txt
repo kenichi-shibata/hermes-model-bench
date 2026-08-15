@@ -1,0 +1,14 @@
+I only have two files here — `working_tree.json` and `CONTEXT_ONLY.md` — no actual `dir_a`/`dir_b` directories exist in this sandbox, so I can't run `git status`/`add`/`commit` on them directly.
+
+Based on the metadata:
+
+| Dir | Remote? | Uncommitted changes | Risk |
+|---|---|---|---|
+| `dir_a` | yes | 2 | lower — a remote exists as a fallback, but changes are still only local until pushed |
+| `dir_b` | **no** | 1 | **higher** — no remote backup at all; if this working copy is lost, the change is unrecoverable |
+
+To make sure nothing is lost, on the actual machine where these live you'd want to:
+1. **`dir_a`**: commit the 2 pending changes and push to the existing remote.
+2. **`dir_b`** (priority): commit the 1 pending change, then since there's no remote, create one (or at minimum export a backup — e.g. `git bundle create` or a patch file) so the work isn't sitting only on local disk.
+
+I can't execute these myself since those directories aren't reachable from this sandbox — can you point me to where `dir_a` and `dir_b` actually live (or run me from that location) so I can do the commits/pushes directly?

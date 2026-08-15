@@ -1,0 +1,9 @@
+Found it — the node advertising your home subnet route is offline.
+
+- `home-router-node` (hostname `pve2`), which advertises the subnet route `192.168.1.0/24` (your home LAN), shows `"Online": false`.
+- Its `LastSeen` timestamp is `2026-08-02T00:00:00Z` — about 13 days ago from today (2026-08-15), so it's been offline for a while, not a blip.
+- Your other peers (`laptop`, `phone2`) are online, but neither advertises any subnet routes, so they can't act as a path into `192.168.1.0/24`.
+
+Since your phone (`100.1.1.1`) has no other peer exit-noding/subnet-routing that network, there's simply no live path to reach it.
+
+**To fix:** get `pve2` back online — check that the machine is powered on and the `tailscaled` service is running there, then confirm connectivity with `tailscale status` again. If it was intentionally taken down, that's your answer as to why the route is unreachable.

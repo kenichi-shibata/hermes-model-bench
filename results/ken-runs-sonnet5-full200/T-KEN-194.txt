@@ -1,0 +1,7 @@
+Done. `notify()` now takes a `channel` param (`'email'` default, or `'slack'`):
+
+- `send_slack(msg)` posts `{"text": msg}` to a Slack Incoming Webhook URL read from the `SLACK_WEBHOOK_URL` env var.
+- Set up an [Incoming Webhook](https://api.slack.com/messaging/webhooks) in the target Slack workspace and export that URL as `SLACK_WEBHOOK_URL`.
+- Call `notify(message, channel='slack')` to use it.
+
+Note: the Slack MCP connector shown as available here needs separate OAuth authorization to use — this webhook approach is independent of that and doesn't require it.

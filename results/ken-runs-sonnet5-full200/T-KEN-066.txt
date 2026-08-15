@@ -1,0 +1,5 @@
+Diagnosis: the bot process itself is alive (`process_alive: true`), but it's **not actually responding** because its gateway connection is down — `gateway_connected: false`, and it's been disconnected for **20 minutes**.
+
+So this isn't a crashed process — it's a zombie/stuck-connection state: the process is running but has lost its connection to the gateway (chat platform / message broker), so it can't receive or send messages. That matches the "not responding" symptom exactly.
+
+Recommended fix: restart the bot process (or trigger its reconnect routine) to force it to re-establish the gateway connection, since 20 minutes of disconnection suggests it's not auto-recovering. I don't have a process manager, PID, or restart script available in this sandbox — if you want me to actually restart it, point me to the relevant command/script and I'll run it.

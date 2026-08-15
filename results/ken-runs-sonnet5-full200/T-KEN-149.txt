@@ -1,0 +1,16 @@
+Overspending: **yes** — 80% of your total cost ($8 of $10) comes from a repeated subtask that's marked cacheable, meaning it's an ideal candidate for prompt caching but isn't clearly benefiting from it.
+
+The math: if that subtask is being re-run identically each time (same prefix each call) without a cache hit, you're paying full input price on every repeat. With Claude's prompt caching, cache reads cost roughly **0.1× the base input price**, while cache writes cost ~1.25× (5-min TTL). So if the repeated content is genuinely constant, you should see something closer to:
+
+- 1st call: ~1.25× the write cost (small premium)
+- every repeat: ~0.1× the base cost
+
+That would shrink the $8 repeated-subtask line to a fraction of a dollar after the first call — turning your $10 total into closer to $2–3, assuming most of the $8 is repeats past the first.
+
+**Likely causes if caching isn't kicking in** (check these):
+1. Something non-deterministic sits *before* the cache breakpoint — a timestamp, request ID, or unsorted JSON in the repeated prompt content, which busts the prefix match on every call.
+2. No `cache_control` breakpoint is actually set on the repeated block, or it's on the wrong content block.
+3. The prefix is below the model's minimum cacheable length (512–4096 tokens depending on model) — short repeated prompts silently don't cache.
+4. Requests are firing in parallel before the first one's cache write completes — concurrent identical calls can't read each other's cache.
+
+Do you have logs or code for that repeated subtask? If you show me the call site, I can check for the actual invalidator rather than guessing.

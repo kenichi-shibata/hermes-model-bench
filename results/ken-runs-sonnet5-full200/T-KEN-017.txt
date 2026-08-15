@@ -1,0 +1,5 @@
+Running it confirms the fixture now returns `success_count=8, total=8`, matching what old_notes.md called the buggy behavior's opposite (it was `1/8`).
+
+But I'd flag this rather than call it clean: the code itself is suspicious. `retry_engine.py` no longer contains any retry logic — `check()` unconditionally sets `"success": True` for every item, regardless of content. The docstring's claim ("bug was fixed by an unrelated change... query reformulation improvement") is asserted in a comment, not demonstrated by any actual logic change. There's nothing in this file that could distinguish a real success from a failure anymore — it's hardcoded.
+
+So: the specific symptom (1/8 stuck) is gone, but that's because the function was gutted to always report success, not because the underlying retry/error-handling logic was fixed. If there's real error-handling logic elsewhere that this was meant to exercise, it's gone — this fixture can no longer catch a regression of the original bug at all. I'd treat "bug fixed" as unverified and worth pushing back on with whoever wrote this, since the current code can't fail its own test by construction.

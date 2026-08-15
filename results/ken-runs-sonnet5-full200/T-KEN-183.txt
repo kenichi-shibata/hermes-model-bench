@@ -1,0 +1,21 @@
+This is a straightforward but critical bug.
+
+## SQL Injection (critical)
+
+```python
+query = f"SELECT * FROM users WHERE name = '{username}'"
+```
+
+`username` is interpolated directly into the SQL string, so it's fully attacker-controlled if this ever receives external input. Classic SQL injection — an input like `' OR '1'='1` returns all rows, and something like `'; DROP TABLE users; --` (depending on driver/multi-statement support) can be destructive.
+
+**Fix:** use parameterized queries instead of string interpolation:
+
+```python
+def get_user(username):
+    query = "SELECT * FROM users WHERE name = %s"  # or ? depending on DB driver
+    return db.execute(query, (username,))
+```
+
+The exact placeholder syntax (`%s`, `?`, `:name`) depends on the DB driver (psycopg2, sqlite3, MySQLdb, etc.) — let me know which one is in use if you want the exact fix applied.
+
+**Also worth checking:** `SELECT *` returns all columns — if the `users` table has a password hash or other sensitive fields, consider selecting only the needed columns before this return value is serialized/exposed elsewhere.

@@ -1,0 +1,12 @@
+Checked both files in the sandbox. Results from `disk_fleet_v2.json`:
+
+| Host | Used % | Thin-provisioned | Pool data |
+|------|--------|-------------------|-----------|
+| host1 | 45% | No | — |
+| host2 | 60% | Yes | **null (missing)** |
+
+**Summary:**
+- **host1**: 45% used, standard provisioning — healthy, no concerns.
+- **host2**: 60% used, but it's thin-provisioned and `pool_data` is `null`. For thin-provisioned volumes, `used_pct` reflects logical/allocated usage, not actual physical backing-pool consumption — the pool could be much fuller (or even over-committed) than 60% suggests. Since `pool_data` is missing, there's no way to verify the real physical utilization or over-commitment ratio from this file alone.
+
+**Bottom line:** host1 is fine. host2's number can't be trusted at face value — you'd need the actual storage pool's physical usage/capacity (missing here) to know if it's actually at risk. I'd flag host2 for follow-up with whoever owns the storage backend rather than treating 60% as ground truth.

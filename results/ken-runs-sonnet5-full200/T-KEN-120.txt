@@ -1,0 +1,1 @@
+`wanted_list.json` now contains all 22 entries from `performer_catalog.json` (ids 0–21 across studios A/B/C).

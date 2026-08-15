@@ -1,0 +1,3 @@
+Yeah, it's stuck. All 5 items in the queue (ids 0–4) are `downloading` but sitting at 0% progress and each has been stalled for exactly 47 minutes — that's a hung queue, not just one bad item.
+
+Since every entry is stalled identically, this looks like a queue-level issue (e.g., the connection/client feeding all downloads died, or a lock/semaphore is stuck) rather than 5 independent unlucky downloads. Typical SABnzbd-style fix would be to pause/restart the queue or restart the downloader service. I don't have execution access to the actual SAB instance here (just this JSON snapshot), so I can't restart it directly — want me to draft the restart/repair steps, or is there a specific tool/API you want me to hit to clear it?

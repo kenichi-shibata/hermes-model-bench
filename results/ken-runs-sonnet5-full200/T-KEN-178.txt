@@ -1,0 +1,14 @@
+The sandbox only contains `flex_layout.css`, and its entire content is:
+
+```css
+.row { display: flex; }
+```
+
+That's one line, syntactically valid, and there's no accompanying HTML or other CSS to show how `.row` is used — so there's nothing here I can point to as "broken." A single `display: flex` rule with no children markup, no flex-direction/wrap/alignment properties, and no conflicting rules can't itself cause a layout bug.
+
+To actually debug this I'd need one of:
+- The HTML that uses `.row` (and its child elements/classes)
+- Any other CSS files affecting the same elements (specificity/override conflicts)
+- A description or screenshot of what's visually wrong (e.g., "items wrap when they shouldn't," "children aren't centering," "overflow instead of shrink")
+
+Can you share the relevant HTML or describe the visual symptom?

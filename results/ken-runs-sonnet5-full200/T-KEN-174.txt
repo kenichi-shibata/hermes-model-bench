@@ -1,0 +1,1 @@
+Fixed: added `onClick={handleClick}` to the `<button>` so the existing handler actually fires on click.

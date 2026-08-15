@@ -1,0 +1,9 @@
+`token_usage_log.json` contents:
+
+| Metric | Tokens |
+|---|---|
+| Cache read tokens | 92,000 |
+| Fresh input tokens | 8,000 |
+| **Total** | **100,000** |
+
+So actual usage is 100k tokens, with 92% served from cache and only 8k freshly processed. `CONTEXT_ONLY.md` just restates the file list — no additional data there.

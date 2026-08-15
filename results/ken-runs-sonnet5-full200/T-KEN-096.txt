@@ -1,0 +1,5 @@
+Looking at the data: `a` and `b` are identical objects (`{"data": "x"}` in both), yet the guard refused the merge with a generic `"generic_merge_guard"` reason.
+
+That's overly cautious, not correct. A merge guard exists to prevent silent data loss or conflicting-value clobbering — but here there's no conflict: both sides have the exact same key and the exact same value. Merging them deterministically yields `{"data": "x"}` with zero ambiguity. A guard that blocks *any* merge regardless of whether the inputs actually conflict is a blanket rule, not a risk-based one — it's optimizing for "never merge" rather than "never merge unsafely."
+
+If this guard is meant to catch real cases (diverging values, missing keys, type mismatches), it should compare the objects first and only refuse when there's an actual discrepancy. As written, it flags a no-op merge as if it were dangerous, which will generate false-positive refusals on trivial, safe operations.

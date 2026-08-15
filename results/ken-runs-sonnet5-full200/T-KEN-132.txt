@@ -1,0 +1,1 @@
+Yes — stale. Cached 95 days ago, but TTL is 90 days (exceeded by 5 days).

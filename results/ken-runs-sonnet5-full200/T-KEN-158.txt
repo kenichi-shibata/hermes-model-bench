@@ -1,0 +1,7 @@
+That file is the whole picture — no bug here. It expired on schedule:
+
+- `saved_correctly: true` — it was stored fine, no write-path error.
+- `valid_until: "2026-08-12"` — it carried an explicit expiry/TTL.
+- `today: "2026-08-13"` — the check ran one day past that expiry (and today is actually 2026-08-15, so it's now 3 days stale).
+
+It "forgot" because the entry passed its `valid_until` date, not because of a save failure or bug — this looks like intended TTL-based expiration behavior, not a defect to fix.

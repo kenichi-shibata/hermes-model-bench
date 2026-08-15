@@ -1,0 +1,6 @@
+The file did not save right — there's a date mismatch:
+
+- **Expected date:** 2026-08-13
+- **Actually saved date:** 2026-08-31
+
+The record exists, but the saved date doesn't match what was expected.

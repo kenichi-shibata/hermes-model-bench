@@ -1,0 +1,1 @@
+Added the missing `.dark .sidebar` override (and switched `.sidebar` to `background-color` for consistency with `.header`), so the sidebar now goes black in dark mode instead of staying white.

@@ -1,0 +1,10 @@
+Comparing the two options from `self_vs_delegate.json`:
+
+| | Self | Delegate |
+|---|---|---|
+| Dollar cost | $0.00 | $0.05 |
+| Hidden opportunity cost | Yes | Not indicated |
+
+Doing it yourself looks "free" but isn't — the hidden opportunity cost (your time/attention pulled from other work) is real, just unpriced. Delegating has an explicit, trivial cost ($0.05) but no listed opportunity cost, since it doesn't consume your time.
+
+At $0.05, delegating wins unless the task is so trivial that your own opportunity cost is effectively zero (e.g., it takes you 10 seconds). For anything nontrivial, the $0.05 is cheap insurance against burning your own time — delegate.

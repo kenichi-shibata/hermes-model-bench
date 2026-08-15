@@ -1,0 +1,1 @@
+No, this was a real outage — `page_analysis.json` shows `was_real_outage: true`, lasting 5 minutes and affecting 340 requests. Not a false page this time.

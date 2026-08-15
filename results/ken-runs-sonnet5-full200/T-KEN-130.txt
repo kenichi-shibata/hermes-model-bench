@@ -1,0 +1,8 @@
+Checked `romanize_test.json` — it has 10 test cases comparing `expected` vs `actual` output for a romanization function.
+
+**Result: mostly working, but broken on one case.**
+
+- `name0` through `name8`: `actual` matches `expected` (e.g. `"name0"` → `"Name0"`) — pass.
+- `name9`: `expected` is `"Name9"` but `actual` is `null` — **fail**.
+
+So romanization works for 9/10 inputs but returns `null` instead of the expected output for `"name9"`. That's the one case worth investigating (likely an edge case at the last index/element, or something specific to that input value triggering a null/error path in the romanizer).

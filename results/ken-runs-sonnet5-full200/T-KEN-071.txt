@@ -1,0 +1,1 @@
+Removed `target_performer` from `follow_targets.json`. Left `perf_0` and `perf_1` in place since those are the separate bug-caused follows, not the one you'd specifically asked to stop tracking.

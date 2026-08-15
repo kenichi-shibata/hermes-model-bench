@@ -1,0 +1,28 @@
+This has the classic **mutable default argument** gotcha:
+
+```python
+def add_item(item, items=[]):
+    items.append(item)
+    return items
+```
+
+`items=[]` is evaluated **once**, at function definition time — not on each call. That single list object is shared and mutated across every call that doesn't pass its own `items` explicitly.
+
+```python
+add_item(1)        # [1]
+add_item(2)        # [1, 2]   <- not [2]! previous call's list leaked in
+add_item(3, [])    # [3]      fine, caller passed its own list
+add_item(4)        # [1, 2, 4]  <- still accumulating from earlier calls
+```
+
+**Fix:**
+
+```python
+def add_item(item, items=None):
+    if items is None:
+        items = []
+    items.append(item)
+    return items
+```
+
+No other issues in this 3-line snippet (no type errors, no side effects beyond the intended append).

@@ -1,0 +1,1 @@
+Found it — `svc_3` is the outlier at 300ms while every other service sits at 40ms, a 7.5x spike that's almost certainly what's making things feel sluggish. Worth checking `svc_3` for recent deploys, resource saturation, or a slow dependency/query it's calling into.

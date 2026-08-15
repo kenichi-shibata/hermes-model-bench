@@ -1,0 +1,3 @@
+500 queries × 8ms each = 4000ms of the 4500ms total — that's an N+1 query problem. Something is looping and firing a separate DB query per item (e.g., fetching a list, then querying once per row) instead of batching into one query with a JOIN or `WHERE id IN (...)`.
+
+**Fix:** batch those 500 queries into one (or a handful), which should cut total time roughly 10x, down near ~500ms or less.

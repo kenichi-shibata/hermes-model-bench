@@ -1,0 +1,7 @@
+Found it. The `romanize_lib` function is a stub — it never actually romanizes/translates anything. It just appends `" (EN)"` to whatever string it's given, so `いいタイトル` (a valid, non-garbled title) comes out as `いいタイトル (EN)` — still all-Japanese, just with an English-looking suffix tacked on. That's why titles 0–7 "still Japanese only" even though they're perfectly valid text (unlike 8–9, which contain `\ufffd` replacement characters and are genuinely garbled/unrecoverable, correctly returning `None`).
+
+So there are two distinct categories here:
+- **ids 8–9**: genuinely corrupted source (`\ufffd`), correctly returns `None` — nothing to fix.
+- **ids 0–7**: valid Japanese text (`いいタイトル` = "good title") that never gets translated at all — this is the actual bug.
+
+`romanize_lib` has no real translation logic (no library call, no dictionary, no romanization table). Do you want me to wire in an actual translation/romanization (e.g., using a library like `pykakasi` for romanization, or a translation API/dictionary), or is there a specific translation source you intend this to call that I should hook up?

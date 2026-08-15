@@ -1,0 +1,1 @@
+Root cause: `setLoading(false)` only ran in the `catch` branch, so successful fetches left `loading` `true` forever. Moved it into a `finally` block so it resets regardless of success or failure.
