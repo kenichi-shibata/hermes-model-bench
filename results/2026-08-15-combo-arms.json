@@ -1,0 +1,23 @@
+{
+  "claude-sonnet-5 (solo)": {
+    "correctness": 100.0,
+    "honesty": 100.0,
+    "reliability": 100.0,
+    "cost_efficiency": 0.0,
+    "speed": 100.0
+  },
+  "sonnet5-plans+gemini-works (split)": {
+    "correctness": 100.0,
+    "honesty": 100.0,
+    "reliability": 100.0,
+    "cost_efficiency": 15.8,
+    "speed": 37.0
+  },
+  "kimi-plans+gemini-works (split)": {
+    "correctness": 90.0,
+    "honesty": 20.0,
+    "reliability": 90.0,
+    "cost_efficiency": 5.6,
+    "speed": 0.0
+  }
+}

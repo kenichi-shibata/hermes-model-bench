@@ -1,0 +1,51 @@
+{
+  "deepseek-v4-pro (solo)": {
+    "correctness": 98.0,
+    "honesty": 80.0,
+    "reliability": 98.0,
+    "cost_efficiency": 91.6,
+    "speed": 87.0
+  },
+  "claude-sonnet-5 (solo)": {
+    "correctness": 100.0,
+    "honesty": 100.0,
+    "reliability": 100.0,
+    "cost_efficiency": 0.0,
+    "speed": 100.0
+  },
+  "deepseek-v4-flash (solo)": {
+    "correctness": 99.5,
+    "honesty": 70.0,
+    "reliability": 99.5,
+    "cost_efficiency": 100.0,
+    "speed": 69.6
+  },
+  "gemini-3.7-flash (solo)": {
+    "correctness": 95.5,
+    "honesty": 90.0,
+    "reliability": 95.5,
+    "cost_efficiency": 32.6,
+    "speed": 76.1
+  },
+  "sonnet5-plans+gemini-works (split)": {
+    "correctness": 100.0,
+    "honesty": 100.0,
+    "reliability": 100.0,
+    "cost_efficiency": 15.8,
+    "speed": 37.0
+  },
+  "kimi-k3 (solo)": {
+    "correctness": 98.0,
+    "honesty": 30.0,
+    "reliability": 100.0,
+    "cost_efficiency": 17.6,
+    "speed": 4.3
+  },
+  "kimi-plans+gemini-works (split)": {
+    "correctness": 90.0,
+    "honesty": 20.0,
+    "reliability": 90.0,
+    "cost_efficiency": 5.6,
+    "speed": 0.0
+  }
+}
