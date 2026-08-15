@@ -1,0 +1,54 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mls -la
+total 32
+drwxr-xr-x   2 root root  4096 Aug 15 13:21 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:22 ..
+-rw-r--r--   1 root root   165 Aug 15 13:21 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   342 Aug 15 13:21 samantha_saint_wicked_catalog.json
+-rw-r--r--   1 root root  1188 Aug 15 13:21 scenes_db.json
+-rw-r--r--   1 root root     2 Aug 15 13:21 wanted_list.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead wanted_list.json
+[0m
+[0m← [0mWrite scenes_db.json
+Wrote file successfully.
+[0m
+[0m← [0mWrite wanted_list.json
+Wrote file successfully.
+[0m
+The files tell the whole story. Let me break down what's going on and fix it:
+
+**Analysis:**
+1. **MovieX Parts 1–6** (ids 100–105) — yes, Stash *does* have "Groups" (formerly "Movies"), and your `scenes_db.json` already has a `movie_id` field that's sitting `null`. Since all 6 parts are already present and together compose the full movie, we group them — no need to re-download the whole movie. (Whole-movie download would only be the fallback if parts were missing.)
+2. **FliXXX scenes** (ids 200–203) — confirmed misattribution. They're flagged `real_studio: "Digital Playground"` but filed under `FliXXX`. That's why studio matching keeps flip-flopping. FliXXX is just re-branding DP content, so I'll correct the studio field to the real one and drop the flag.
+3. **Samantha Saint @ Wicked** — all 12 catalog movies go into the empty wanted list.
+
+Applying all three fixes:
+[0m$ [0mpython3 -c "
+import json
+db = json.load(open('scenes_db.json'))
+wl = json.load(open('wanted_list.json'))
+moviex = [s for s in db if s['title'].startswith('MovieX')]
+assert len(moviex) == 6 and all(s['movie_id'] == 'MovieX' for s in moviex), 'grouping failed'
+flix = [s for s in db if 'Misattributed' in s['title']]
+assert len(flix) == 4 and all(s['studio'] == 'Digital Playground' and 'real_studio' not in s for s in flix), 'studio fix failed'
+assert len(wl) == 12 and all(w['studio'] == 'Wicked' and w['performer'] == 'Samantha Saint' for w in wl), 'wanted list failed'
+print('OK: 6 MovieX parts grouped, 4 scenes fixed to Digital Playground, 12 SS/Wicked movies queued')
+"
+OK: 6 MovieX parts grouped, 4 scenes fixed to Digital Playground, 12 SS/Wicked movies queued
+[0m
+All done and verified. Here's the rundown:
+
+**1. Movie parts → Stash group ✅ (we can group, no full-movie download needed)**
+Stash supports grouping scenes under a Group (formerly "Movies") — and since parts 1–6 already cover the full movie, re-downloading the whole thing would just burn bandwidth on duplicate content. I grouped them by assigning all six scenes (ids 100–105) a shared `movie_id: "MovieX"` in `scenes_db.json`. They'll now show up in Stash as one MovieX group with scenes 1–6 attached. *If any part were missing, that'd be the case where we queue the full movie instead — but here we're complete.*
+
+**2. FliXXX / Digital Playground flip-flopping ✅ fixed**
+You called it — those 4 scenes were misattributed. They're labeled `studio: "FliXXX"` but flagged `real_studio: "Digital Playground"`. FliXXX is just re-branding DP content, which is exactly why your scraper keeps bouncing between the two studios. I corrected all four (ids 200–203) to `studio: "Digital Playground"` and removed the now-redundant `real_studio` flag, so stash-box matching will resolve to the right studio going forward.
+
+**3. Samantha Saint — all Wicked movies queued ✅**
+`wanted_list.json` (was empty) now has all **12** entries from the catalog — "Wicked Movie 1" through "Wicked Movie 12", each tagged with `studio: "Wicked"` and `performer: "Samantha Saint"` so the queue stays self-describing.

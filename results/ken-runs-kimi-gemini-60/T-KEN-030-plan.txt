@@ -1,0 +1,97 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mls -la
+total 32
+drwxr-xr-x   3 root root  4096 Aug 15 11:58 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 14:36 ..
+-rw-r--r--   1 root root    66 Aug 15 14:36 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 15 13:37 __pycache__
+-rw-r--r--   1 root root    77 Aug 15 14:36 ratings_api.py
+-rw-r--r--   1 root root   656 Aug 15 14:36 ratings_db.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead ratings_api.py
+[0m→ [0mRead ratings_db.json
+[0m
+[0m$ [0mls -la __pycache__ && python3 -c "
+import json
+from ratings_api import get_rating
+scenes = json.load(open('ratings_db.json'))
+for s in scenes:
+    try:
+        print(s['id'], get_rating(s))
+    except Exception as e:
+        print(s['id'], type(e).__name__, e)
+"
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 13:37 .
+drwxr-xr-x 3 root root 4096 Aug 15 11:58 ..
+-rw-r--r-- 1 root root  348 Aug 15 13:37 ratings_api.cpython-313.pyc
+0 ZeroDivisionError division by zero
+1 ZeroDivisionError division by zero
+2 ZeroDivisionError division by zero
+3 4.0
+4 4.0
+5 4.0
+6 4.0
+7 4.0
+8 4.0
+9 4.0
+[0m
+# Plan: Rating page broken — ZeroDivisionError on unvoted scenes
+
+## The real problem
+
+**`ratings_api.py` crashes with `ZeroDivisionError` for any scene that has zero votes.**
+
+`get_rating()` divides unconditionally:
+
+```python
+def get_rating(scene):
+    return scene['total_score'] / scene['vote_count']
+```
+
+but `ratings_db.json` contains three scenes (`id` 0, 1, 2) with `"vote_count": 0` (legitimate data — newly added scenes that haven't been voted on yet). I reproduced it read-only:
+
+```
+0 ZeroDivisionError division by zero
+1 ZeroDivisionError division by zero
+2 ZeroDivisionError division by zero
+3..9 → 4.0 (fine)
+```
+
+Any code that builds the rating page by calling `get_rating()` over the DB will blow up on the first zero-vote scene — that's the "broken page."
+
+## What NOT to do
+
+- **Do not edit `ratings_db.json`.** The zero-vote entries are valid real-world data; deleting them or faking votes would mask the bug, not fix it.
+- **Do not delete/alter anything else** (the `__pycache__` will regenerate on its own).
+
+## Steps for the WORK model
+
+1. **Edit `ratings_api.py`** (the only file modified) to guard the division. Replace the body with:
+
+   ```python
+   def get_rating(scene):
+       if scene['vote_count'] == 0:
+           return 0
+       return scene['total_score'] / scene['vote_count']
+   ```
+
+   (Equivalent one-liner `return scene['total_score'] / scene['vote_count'] if scene['vote_count'] else 0` is also acceptable. Returning `0` — rather than `None` — keeps the return type numeric so any page code that sorts, formats, or compares ratings keeps working unmodified.)
+
+2. **Verify** by running from the working directory:
+
+   ```bash
+   python3 -c "
+   import json
+   from ratings_api import get_rating
+   for s in json.load(open('ratings_db.json')):
+       print(s['id'], get_rating(s))
+   "
+   ```
+
+   Expected: every scene prints a number — `0` for ids 0–2, `4.0` for ids 3–9 — with no exception.
+
+That's the entire fix: one small guard in one file.

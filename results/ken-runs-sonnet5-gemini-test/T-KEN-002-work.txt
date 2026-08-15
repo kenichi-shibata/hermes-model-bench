@@ -1,0 +1,165 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dedupe.py
+[0m→ [0mRead mirror_groups.json
+[0m✱ [0mGlob "*"[90m in . · 4 matches[0m
+[0m
+[0m← [0mEdit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -8,11 +8,13 @@
+ 
+ 
+ def suggest_keep(candidates):
+     """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    Applies the same playability-first rule as pick_canonical so the
++    review page never recommends a dead file over a playable one."""
++    playable = [c for c in candidates if c["playable"]]
++    pool = playable if playable else candidates
++    return max(pool, key=lambda c: c["size_gb"])
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+[0m
+[0m→ [0mRead dedupe.py
+[0m
+[0m$ [0mpython3 -c "
+import json, dedupe
+db = json.load(open('mirror_groups.json'))
+for gid in db:
+    print(dedupe.scan_mirror_group(gid, db))
+"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+[0m
+[0m← [0mWrite test_dedupe.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 test_dedupe.py
+All tests passed!
+[0m
+[0m$ [0mpytest
+/bin/bash: line 1: pytest: command not found
+[0m
+[0m$ [0mpython3 -m unittest test_dedupe.py
+----------------------------------------------------------------------
+Ran 0 tests in 0.000s
+
+NO TESTS RAN
+[0m
+[0m← [0mEdit test_dedupe.py
+Index: /root/ken-tasks/T-KEN-002/test_dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/test_dedupe.py
++++ /root/ken-tasks/T-KEN-002/test_dedupe.py
+@@ -1,51 +1,49 @@
++import unittest
+ import dedupe
+ 
+ 
+-def test_mixed_playability():
+-    candidates = [
+-        {"id": "scenes:100", "playable": False, "size_gb": 5.2},
+-        {"id": "scenes:101", "playable": True, "size_gb": 1.8},
+-    ]
+-    assert dedupe.suggest_keep(candidates)["id"] == "scenes:101"
+-    assert dedupe.pick_canonical(candidates)["id"] == "scenes:101"
++class TestDedupe(unittest.TestCase):
++    def test_mixed_playability(self):
++        candidates = [
++            {"id": "scenes:100", "playable": False, "size_gb": 5.2},
++            {"id": "scenes:101", "playable": True, "size_gb": 1.8},
++        ]
++        self.assertEqual(dedupe.suggest_keep(candidates)["id"], "scenes:101")
++        self.assertEqual(dedupe.pick_canonical(candidates)["id"], "scenes:101")
+ 
++    def test_all_playable(self):
++        candidates = [
++            {"id": "scenes:100", "playable": True, "size_gb": 2.2},
++            {"id": "scenes:101", "playable": True, "size_gb": 3.8},
++        ]
++        self.assertEqual(dedupe.suggest_keep(candidates)["id"], "scenes:101")
++        self.assertEqual(dedupe.pick_canonical(candidates)["id"], "scenes:101")
+ 
+-def test_all_playable():
+-    candidates = [
+-        {"id": "scenes:100", "playable": True, "size_gb": 2.2},
+-        {"id": "scenes:101", "playable": True, "size_gb": 3.8},
+-    ]
+-    assert dedupe.suggest_keep(candidates)["id"] == "scenes:101"
+-    assert dedupe.pick_canonical(candidates)["id"] == "scenes:101"
+-
+-
+-def test_all_unplayable():
+-    candidates = [
+-        {"id": "scenes:100", "playable": False, "size_gb": 5.2},
+-        {"id": "scenes:101", "playable": False, "size_gb": 1.8},
+-    ]
+-    assert dedupe.suggest_keep(candidates)["id"] == "scenes:100"
+-    assert dedupe.pick_canonical(candidates)["id"] == "scenes:100"
+-
+-
+-def test_scan_mirror_group():
+-    db = {
+-        "group_42": [
++    def test_all_unplayable(self):
++        candidates = [
+             {"id": "scenes:100", "playable": False, "size_gb": 5.2},
+-            {"id": "scenes:101", "playable": True, "size_gb": 1.8},
++            {"id": "scenes:101", "playable": False, "size_gb": 1.8},
+         ]
+-    }
+-    result = dedupe.scan_mirror_group("group_42", db)
+-    assert result == {
+-        "group_id": "group_42",
+-        "suggested_keep": "scenes:101",
+-        "canonical_would_be": "scenes:101",
+-    }
++        self.assertEqual(dedupe.suggest_keep(candidates)["id"], "scenes:100")
++        self.assertEqual(dedupe.pick_canonical(candidates)["id"], "scenes:100")
+ 
++    def test_scan_mirror_group(self):
++        db = {
++            "group_42": [
++                {"id": "scenes:100", "playable": False, "size_gb": 5.2},
++                {"id": "scenes:101", "playable": True, "size_gb": 1.8},
++            ]
++        }
++        result = dedupe.scan_mirror_group("group_42", db)
++        self.assertEqual(
++            result,
++            {
++                "group_id": "group_42",
++                "suggested_keep": "scenes:101",
++                "canonical_would_be": "scenes:101",
++            },
++        )
+ 
++
+ if __name__ == "__main__":
+-    test_mixed_playability()
+-    test_all_playable()
+-    test_all_unplayable()
+-    test_scan_mirror_group()
+-    print("All tests passed!")
++    unittest.main()
+
+[0m
+[0m$ [0mpython3 -m unittest test_dedupe.py
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK
+[0m
+[0m✱ [0mGlob "*"[90m in . · 6 matches[0m
+[0m→ [0mRead dedupe.py
+Fixed `suggest_keep` in `dedupe.py` to prioritize playable candidates over unplayable ones matching `pick_canonical` logic, and added regression tests in `test_dedupe.py`.

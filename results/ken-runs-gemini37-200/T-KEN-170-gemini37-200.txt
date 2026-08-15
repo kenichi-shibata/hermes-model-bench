@@ -1,0 +1,46 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead routing_table_diff.json
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-170
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 11:54 ..
+-rw-r--r--   1 root root    31 Aug 15 11:54 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   105 Aug 15 11:54 routing_table_diff.json
+[0m
+[0m$ [0menv
+SHELL=/bin/bash
+AGENT=1
+PWD=/root/ken-tasks/T-KEN-170
+LOGNAME=root
+XDG_SESSION_TYPE=tty
+_=/usr/bin/env
+MOTD_SHOWN=pam
+OPENCODE_PID=2894
+HOME=/root
+OPENCODE=1
+LANG=C
+SSH_CONNECTION=192.168.1.152 36042 192.168.1.226 22
+XDG_SESSION_CLASS=user
+USER=root
+SHLVL=1
+XDG_SESSION_ID=c13
+DEEPSEEK_API_KEY=<REDACTED>
+LC_CTYPE=C.UTF-8
+XDG_RUNTIME_DIR=/run/user/0
+SSH_CLIENT=192.168.1.152 36042 22
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+OPENROUTER_API_KEY=<REDACTED>
+OLDPWD=/root/ken-tasks
+[0m
+Due to longest prefix matching (LPM), the more specific route `10.0.0.0/8 via gw2` shadows the default route `0.0.0.0/0 via gw1`. 
+
+**Issue:** All traffic destined for the `10.0.0.0/8` range is being routed to `gw2` instead of the intended default gateway `gw1`.
+
+**Resolution:** Remove the erroneous shadowing route (`ip route del 10.0.0.0/8`) so all traffic falls back to `gw1` via `0.0.0.0/0`.

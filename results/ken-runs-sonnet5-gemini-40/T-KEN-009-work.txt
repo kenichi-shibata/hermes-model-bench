@@ -1,0 +1,38 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead disk_fleet.json
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+### Disk Fleet Health Report
+
+#### Fleet Overview
+
+| Host | Name | Used % | Thin Provisioned | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **host1** | — | 45% | No | **OK** |
+| **host2** | — | 38% | No | **OK** |
+| **host3** | `media-pool` | **92%** | **Yes** | **CRITICAL** |
+| **host4** | — | 22% | No | **OK** |
+| **host5** | — | 30% | No | **OK** |
+
+---
+
+#### Key Findings
+
+- **4 of 5 hosts are healthy**: `host1`, `host2`, `host4`, and `host5` are operating well within normal capacity limits (22%–45% utilization) and are thick-provisioned.
+- **Critical anomaly on `host3` (`media-pool`)**:
+  - Currently at **92% capacity**, exceeding standard warning (80%) and critical (90%) thresholds.
+  - Configured with **thin provisioning** (`thin_provisioned: true`), significantly increasing operational risk. Thin-provisioned pools approaching capacity face sudden write failures/exhaustion without the buffer of thick allocation.
+
+---
+
+#### Recommended Remediation
+
+1. **Immediate Action on `host3`**:
+   - Clean up unneeded files/snapshots or migrate data off `media-pool`.
+   - Expand the underlying storage volume for the thin pool if data cannot be removed.
+2. **Alerting & Threshold Policies**:
+   - Implement tiered alerting: Warning at **≥80%**, Critical at **≥90%**.
+   - Enforce stricter/lower critical thresholds (e.g., **≥85%**) specifically for thin-provisioned pools due to overcommit dynamics.

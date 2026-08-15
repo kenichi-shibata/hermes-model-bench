@@ -1,0 +1,40 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead follow_targets.json
+[0m
+[0m← [0mEdit follow_targets.json
+Index: /root/ken-tasks/T-KEN-071/follow_targets.json
+===================================================================
+--- /root/ken-tasks/T-KEN-071/follow_targets.json
++++ /root/ken-tasks/T-KEN-071/follow_targets.json
+@@ -1,10 +1,6 @@
+ [
+   {
+-    "id": "target_performer",
+-    "reason": "manual"
+-  },
+-  {
+     "id": "perf_0",
+     "reason": "track_button_bug"
+   },
+   {
+
+[0m
+[0m$ [0mpython3 -m json.tool follow_targets.json
+[
+    {
+        "id": "perf_0",
+        "reason": "track_button_bug"
+    },
+    {
+        "id": "perf_1",
+        "reason": "track_button_bug"
+    }
+]
+[0m
+Done. Removed `target_performer` (the manual follow you said to stop tracking) from `follow_targets.json`.
+
+The two `track_button_bug` entries (`perf_0`, `perf_1`) were left as-is since you only asked about the one — let me know if you want those cleaned out too.

@@ -1,0 +1,21 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead service_logs.txt
+[0m→ [0mRead upstream_status_mock.json
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+**Verdict: Yes, the alerting/health-check behavior is broken.**
+
+### Diagnosis & Evidence
+
+1. **Active Upstream Outage (`upstream_status_mock.json`)**:
+   - `payments-api` entered `major_outage` at `2026-08-13T09:55:00Z` with `"Active incident, provider-side, no ETA"`. The incident is ongoing and has no resolution timestamp.
+
+2. **Premature Alert Clearing (`service_logs.txt`)**:
+   - `10:03:01 WARN upstream dependency (payments-api) returned 503` (Line 4): The warning accurately detected the upstream failure.
+   - `10:04:01 INFO service healthy (own health check green)` (Line 5): One cycle (60s) later, the service reverted to reporting "healthy" and silenced the dependency alert without confirming recovery.
+
+### Root Cause
+The health-check/alerting mechanism suffers from **missing state persistence and rollup failure**: it treats the alert as a one-shot event and clears back to healthy based solely on its own process health check, masking an active, unresolved dependency outage.

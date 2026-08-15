@@ -1,0 +1,10 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead subagent_runs.json
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Based on `subagent_runs.json`, **only some subagents are actually finishing**:
+
+- **Completed (4/10):** IDs `6`, `7`, `8`, `9` finished with status `"completed"`.
+- **Capped / Incomplete (6/10):** IDs `0`, `1`, `2`, `3`, `4`, `5` ended with status `"capped"`.

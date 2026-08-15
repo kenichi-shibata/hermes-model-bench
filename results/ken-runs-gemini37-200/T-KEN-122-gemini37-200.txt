@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead claimed_scene.json
+[0m→ [0mRead local_library.json
+Yes, we already have this. The scene matches an entry in `local_library.json` by hash (`same123` / "Existing Scene").

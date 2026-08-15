@@ -1,0 +1,21 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead tailscale_status_mock.json
+**Cause: your home subnet router is offline.**
+
+From `tailscale_status_mock.json`:
+
+- Your home network (`192.168.1.0/24`) is advertised by exactly one node: `home-router-node` (hostname **pve2**).
+- That node shows `"Online": false` with `LastSeen: 2026-08-02` — it hasn't checked in with the Tailscale coordination server in ~13 days (today is 2026-08-15).
+
+Since the only device with the route into your home LAN is down, your phone (`100.1.1.1`) has no path to `192.168.1.0/24`. Your other peers (laptop, phone2) are online but advertise no routes, so they can't help.
+
+**How to fix — on pve2:**
+
+1. Check the machine itself is up and has internet.
+2. Check the Tailscale daemon: `systemctl status tailscaled` — restart with `systemctl restart tailscaled` if it's dead.
+3. Run `tailscale status` on pve2 — if it says `Logged out` / key expired, re-authenticate with `tailscale up --advertise-routes=192.168.1.0/24`.
+4. Once it's back online, confirm the route still appears under its `PrimaryRoutes` (it does now, so no re-approval should be needed unless the key expired — in that case re-approve the route and consider disabling key expiry for pve2 in the admin console).
+
+If pve2 is a VM/container on a host that rebooted or lost network around Aug 2, that's your root cause — get that back up and routing will resume automatically.

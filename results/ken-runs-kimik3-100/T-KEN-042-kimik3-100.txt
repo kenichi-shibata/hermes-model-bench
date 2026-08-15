@@ -1,0 +1,38 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead breaker_state.json
+[0m→ [0mRead breaker_logic.py
+[0m
+[0m$ [0mpython3 -c "
+import json, datetime
+s = json.load(open('breaker_state.json'))
+opened = datetime.datetime.fromisoformat(s['opened_at'])
+now = datetime.datetime.now()
+elapsed = (now - opened).total_seconds()
+print('open flag      :', s['open'])
+print('opened_at      :', opened)
+print('now            :', now)
+print('elapsed_sec    :', int(elapsed))
+print('cooldown_sec   :', s['cooldown_sec'])
+print('cooldown expired?', elapsed > s['cooldown_sec'])
+print('is_open(state) returns:', s['open'])
+"
+open flag      : True
+opened_at      : 2026-08-13 00:00:00
+now            : 2026-08-15 13:45:40.808186
+elapsed_sec    : 222340
+cooldown_sec   : 900
+cooldown expired? True
+is_open(state) returns: True
+[0m
+Quick check of the math to be concrete:
+**Just stuck open — it's not actually "working."**
+
+Evidence:
+
+1. **The state is stale.** The breaker opened at `2026-08-13T00:00:00`. That was ~222,340 seconds ago (~2.6 days), but the cooldown is only **900 seconds (15 min)**. The cooldown expired over 2 days ago.
+2. **The logic never checks the cooldown.** `is_open()` in `breaker_logic.py` just returns the raw `state['open']` boolean and ignores `opened_at` / `cooldown_sec` entirely (the file even has the comment `# BUG: never checks if cooldown has expired`).
+3. **Nothing ever resets it.** No code path flips `open` back to `false` after the cooldown elapses, so the breaker will report "open" (and presumably block traffic) forever unless someone edits the JSON by hand.
+
+So: the breaker tripped correctly once, but it has no recovery path — it's effectively a permanent outage switch right now, not a circuit breaker. The fix would be to compute elapsed time in `is_open()` and close the breaker once `elapsed >= cooldown_sec`. Want me to apply that fix?

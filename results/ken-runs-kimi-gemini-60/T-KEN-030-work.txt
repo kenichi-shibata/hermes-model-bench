@@ -1,0 +1,38 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead ratings_api.py
+[0m→ [0mRead ratings_db.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit ratings_api.py
+Index: /root/ken-tasks/T-KEN-030/ratings_api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-030/ratings_api.py
++++ /root/ken-tasks/T-KEN-030/ratings_api.py
+@@ -1,2 +1,4 @@
+ def get_rating(scene):
++    if scene['vote_count'] == 0:
++        return 0
+     return scene['total_score'] / scene['vote_count']
+
+[0m
+[0m$ [0mpython3 -c "
+import json
+from ratings_api import get_rating
+for s in json.load(open('ratings_db.json')):
+    print(s['id'], get_rating(s))
+"
+0 0
+1 0
+2 0
+3 4.0
+4 4.0
+5 4.0
+6 4.0
+7 4.0
+8 4.0
+9 4.0
+[0m
+[0m→ [0mRead ratings_api.py
+I have updated `ratings_api.py` to handle zero-vote scenes by returning `0` when `scene['vote_count'] == 0`, avoiding the `ZeroDivisionError`. The fix has been verified against `ratings_db.json`.

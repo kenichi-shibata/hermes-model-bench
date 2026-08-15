@@ -1,0 +1,43 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead near_dup.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m
+[0m$ [0mgit status
+fatal: not a git repository (or any of the parent directories): .git
+[0m
+[0m← [0mEdit near_dup.json
+Index: /root/ken-tasks/T-KEN-082/near_dup.json
+===================================================================
+--- /root/ken-tasks/T-KEN-082/near_dup.json
++++ /root/ken-tasks/T-KEN-082/near_dup.json
+@@ -1,10 +1,6 @@
+ {
+   "a": {
+     "title": "Big Movie",
+     "hash": "xyz"
+-  },
+-  "b": {
+-    "title": "BigMovie",
+-    "hash": "xyz"
+   }
+-}
+\ No newline at end of file
++}
+
+[0m
+[0m→ [0mRead near_dup.json
+[0m
+[0m$ [0mpython3 -m json.tool near_dup.json
+{
+    "a": {
+        "title": "Big Movie",
+        "hash": "xyz"
+    }
+}
+[0m
+I have removed the duplicate record (`"b"`) from `near_dup.json`, retaining the canonical record (`"a"`).

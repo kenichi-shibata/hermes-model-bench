@@ -1,0 +1,16 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead alert_dispatch_log.json
+**No — the alert did not actually go out.**
+
+The log shows a discrepancy:
+
+| Field | Value | Meaning |
+|---|---|---|
+| `dispatched_flag` | `true` | A dispatch was *attempted* / marked as sent internally |
+| `outbound_call_result` | `"timeout"` | The actual outbound call **timed out** |
+
+The `dispatched_flag` being `true` is misleading on its own — it only indicates the dispatch process was initiated, not that it succeeded. The `outbound_call_result: "timeout"` is the ground truth of what happened on the wire: the call never completed, so the alert never reached its destination.
+
+**Verdict:** Dispatch attempted, but delivery failed (timeout). The alert should be treated as **not sent** and likely needs to be re-dispatched or escalated.

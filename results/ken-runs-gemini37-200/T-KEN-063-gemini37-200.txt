@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead workflow_runs.json[90m [limit=100][0m
+No, the workflow is not running. While the workflow file exists, there have been 0 runs in the last 30 days despite 15 qualifying commits.

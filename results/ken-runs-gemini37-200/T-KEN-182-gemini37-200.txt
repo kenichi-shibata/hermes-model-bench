@@ -1,0 +1,6 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead sort_function.js
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[91m[1mError: [0m{"code":400,"message":"Corrupted thought signature.","metadata":{"error_type":"invalid_request"}}

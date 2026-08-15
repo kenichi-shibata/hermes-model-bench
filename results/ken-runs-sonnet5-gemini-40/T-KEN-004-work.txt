@@ -1,0 +1,21 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead node_facts.json
+### Recommendation: Target **`node_A`**
+
+The new test LXC container should be provisioned on **`node_A`**.
+
+#### Justification:
+1. **Workload & Risk Isolation (Primary Factor)**:
+   - **`node_B` is disqualified**: It runs a production financial system (`trading-stack`). Colocating test workloads with latency-sensitive, critical financial services introduces unacceptable risks (noisy neighbor contention, IO/CPU latency spikes, stability concerns).
+   - **`node_A`** does not run any financial or critical production workloads (`runs_financial_system: false`).
+
+2. **Memory Headroom**:
+   - **`node_A`**: 674 MB free + 8,500 MB reclaimable cache = **9,174 MB** effective memory headroom.
+   - **`node_B`**: 478 MB free + 4,500 MB reclaimable cache = **4,978 MB** effective memory headroom.
+
+3. **Disk Capacity**:
+   - Negligible difference across candidate nodes (200 GB on `node_A` vs. 202 GB on `node_B`).

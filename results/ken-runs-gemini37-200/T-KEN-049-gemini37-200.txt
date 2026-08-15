@@ -1,0 +1,15 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead disk_fleet_v2.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+Disk usage breakdown across the fleet from `disk_fleet_v2.json`:
+
+* **`host1`**: **45%** used (standard provisioning / non-thin)
+* **`host2`**: **60%** used (thin-provisioned; thin pool data is `null`/unavailable)
+
+### Summary
+* **Average Usage**: 52.5% across reported host volumes.
+* **Status**: Both hosts are within standard capacity limits (<80% usage), though `host2` requires thin pool metrics (`pool_data`) to verify actual backing storage allocation.

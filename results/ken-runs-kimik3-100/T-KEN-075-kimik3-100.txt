@@ -1,0 +1,50 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead dedupe_check.json
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root    25 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   103 Aug 15 13:35 dedupe_check.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+There's no dedupe script in this directory — just the data — so let me demonstrate what a standard dedupe would do with this data:
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import json
+
+data = json.load(open('dedupe_check.json'))
+
+# 1) Exact-match dedupe (whole record must be identical)
+seen = {}
+for k, v in data.items():
+    fingerprint = json.dumps(v, sort_keys=True)
+    seen.setdefault(fingerprint, k)
+print("exact-match dedupe keeps:", list(seen.values()))
+
+# 2) Key-based dedupe on title only
+seen2 = {}
+for k, v in data.items():
+    seen2.setdefault(v['title'], k)
+print("title-based dedupe keeps:", list(seen2.values()))
+EOF
+exact-match dedupe keeps: ['a', 'b']
+title-based dedupe keeps: ['a']
+[0m
+Because the two records aren't actually duplicates — at least not under an exact-match definition.
+
+```json
+"a": { "title": "X", "res": "1080p" }
+"b": { "title": "X", "res": "480p" }
+```
+
+They share the same `title`, but `res` differs. Any dedupe that fingerprints the whole record (hashing the full object, comparing for equality, `dict`/`set` on serialized JSON, `DISTINCT` on all columns, etc.) sees two distinct values and correctly keeps both. The map keys `a`/`b` are also different, so key-based dedupe wouldn't merge them either.
+
+The demo confirms it:
+- Exact-match dedupe on the full object → keeps both `a` and `b` (nothing to remove)
+- Dedupe keyed on `title` only → collapses to one entry
+
+So if your intent is "same title = duplicate", dedupe needs to be told that explicitly: dedupe on `title` as the key, plus a rule for which record survives (e.g., prefer the higher `res`, i.e. keep `1080p`). Without that key/field selection, a generic dedupe has no duplicates to find here — it's working as designed, not broken.

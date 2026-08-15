@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead spend_breakdown.json
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+Yes, you are overspending. Out of the $10.00 total cost, $8.00 (80%) is spent on repeated subtasks that are marked as cacheable (`repeated_subtask_cacheable: true`). Implementing caching would reduce spend significantly.

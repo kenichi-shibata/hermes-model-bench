@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead resource_contention.json
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Yes. There are 5 concurrent writers accessing the shared resource (`shared.log`) without synchronization (`"has_lock": false`), resulting in resource contention and race conditions.

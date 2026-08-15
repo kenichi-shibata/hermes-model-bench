@@ -1,0 +1,67 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead dedupe.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead mirror_groups.json
+[0m
+[0m$ [0mpython3 -c "
+import json, dedupe
+db = json.load(open('mirror_groups.json'))
+for gid in db:
+    print(dedupe.scan_mirror_group(gid, db))
+"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+[0m
+[0m← [0mEdit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -8,11 +8,11 @@
+ 
+ 
+ def suggest_keep(candidates):
+     """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    Must match the write-path ranking (playability first, then size) so the
++    suggestion can never recommend a proven-dead file over a playable one."""
++    return pick_canonical(candidates)
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+[0m
+Bug confirmed: the review page suggests keeping `scenes:100` (the dead 5.2 GB file) while the real write path would keep `scenes:101` (the playable one). Anyone trusting the suggestion would delete their only playable copy. Fixing `suggest_keep` to use the same playability-first ranking as the write path:
+[0m$ [0mpython3 -c "
+import json, dedupe
+db = json.load(open('mirror_groups.json'))
+for gid in db:
+    r = dedupe.scan_mirror_group(gid, db)
+    print(r)
+    assert r['suggested_keep'] == r['canonical_would_be'] == 'scenes:101', 'MISMATCH'
+
+# edge cases
+c = [{'id':'a','playable':False,'size_gb':9.9},{'id':'b','playable':False,'size_gb':1.0}]
+assert dedupe.suggest_keep(c)['id'] == 'a'  # all dead -> fall back to biggest
+c = [{'id':'a','playable':True,'size_gb':1.0},{'id':'b','playable':True,'size_gb':2.0}]
+assert dedupe.suggest_keep(c)['id'] == 'b'  # all playable -> biggest playable
+print('all checks passed')
+"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+all checks passed
+[0m
+Done. Summary:
+
+**Checked:** Ran `scan_mirror_group` against the real data in `mirror_groups.json`. The bug was live: for `group_42` the review page suggested keeping `scenes:100` (unplayable, 5.2 GB) while the actual write path would keep `scenes:101` (playable, 1.8 GB) — following the suggestion would have deleted the only playable copy.
+
+**Improved:** `suggest_keep` in `dedupe.py` now delegates to `pick_canonical` (playability first, then size) instead of ranking by size alone. Since the display ranking and write-path ranking are now the same function, they can never diverge again.
+
+**Verified:**
+- `group_42`: both rankings now agree on `scenes:101` (the playable file)
+- Edge case: all-dead group → falls back to largest file
+- Edge case: all-playable group → picks largest playable file

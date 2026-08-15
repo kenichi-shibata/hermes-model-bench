@@ -1,0 +1,86 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mls -la
+total 32
+drwxr-xr-x   3 root root  4096 Aug 15 12:00 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 14:49 ..
+-rw-r--r--   1 root root   109 Aug 15 14:36 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 15 13:38 __pycache__
+-rw-r--r--   1 root root   110 Aug 15 14:36 studio_hierarchy.json
+-rw-r--r--   1 root root   133 Aug 15 14:36 studio_page_api.py
+[0m
+[0m→ [0mRead studio_page_api.py
+[0m→ [0mRead studio_hierarchy.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mls -la __pycache__ && python3 -c "
+import studio_page_api, json
+studios = json.load(open('studio_hierarchy.json'))
+print(studio_page_api.get_studio('parent1', studios))
+"
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 13:38 .
+drwxr-xr-x 3 root root 4096 Aug 15 12:00 ..
+-rw-r--r-- 1 root root  399 Aug 15 13:38 studio_page_api.cpython-313.pyc
+{'id': 'parent1', 'name': 'MegaStudio'}
+[0m
+## Plan — studio page missing sub groups
+
+### Investigation findings (read-only)
+
+**Directory contents:** `studio_page_api.py`, `studio_hierarchy.json`, `CONTEXT_ONLY.md`, `__pycache__/` (stale bytecode, irrelevant).
+
+**The real problem:** In `studio_page_api.py`, the `get_studio()` function builds its response from only the studio's `name` and never reads the `child_studios` field, even though the data exists. There is even a dead comment admitting it:
+
+```python
+def get_studio(studio_id, studios):
+    return {'id': studio_id, 'name': studios[studio_id]['name']}
+    # never reads child_studios        <- dead code below the return
+```
+
+Meanwhile `studio_hierarchy.json` holds exactly the missing data:
+
+```json
+"parent1": { "name": "MegaStudio", "child_studios": ["child_a", "child_b"] }
+```
+
+**Confirmed by execution:** calling `get_studio('parent1', studios)` returns `{'id': 'parent1', 'name': 'MegaStudio'}` — no sub-groups. So the bug is real, in the API layer (a field-omission bug), not in the data. "Again" suggests this regressed before; the fix is the same one-line-class fix.
+
+### Exact steps for the WORK model
+
+1. **Edit `studio_page_api.py` (the only file to change).** Replace the whole file body with:
+
+   ```python
+   def get_studio(studio_id, studios):
+       studio = studios[studio_id]
+       return {
+           'id': studio_id,
+           'name': studio['name'],
+           'child_studios': studio.get('child_studios', []),
+       }
+   ```
+
+   Notes on the exact shape:
+   - Use `.get('child_studios', [])` so studios without children (e.g. leaf studios) still return a consistent empty list instead of raising `KeyError`.
+   - Remove the dead `# never reads child_studios` comment — it sits after a `return` (unreachable) and becomes false.
+   - Do **not** try to resolve children to names/objects: `child_a` and `child_b` are not defined in the JSON, so returning the ID list is the only safe option.
+   - Keep the existing signature (`studio_id, studios`) and key style (single quotes, `id`/`name`) — minimal change.
+
+2. **Do NOT edit `studio_hierarchy.json` or `CONTEXT_ONLY.md`** — the data is correct.
+
+3. **Verify** by running from the working directory:
+
+   ```bash
+   python3 -c "
+   import json, studio_page_api
+   studios = json.load(open('studio_hierarchy.json'))
+   r = studio_page_api.get_studio('parent1', studios)
+   assert r == {'id': 'parent1', 'name': 'MegaStudio', 'child_studios': ['child_a', 'child_b']}, r
+   print('OK:', r)
+   "
+   ```
+
+   Expected: prints `OK:` with `child_studios: ['child_a', 'child_b']` present.
+
+That's the complete fix: one small edit to `studio_page_api.py`, no other files touched.

@@ -1,0 +1,46 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 4 matches[0m
+[0m→ [0mRead search_engine.py
+[0m→ [0mRead scenes_searchable.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit search_engine.py
+Index: /root/ken-tasks/T-KEN-035/search_engine.py
+===================================================================
+--- /root/ken-tasks/T-KEN-035/search_engine.py
++++ /root/ken-tasks/T-KEN-035/search_engine.py
+@@ -1,2 +1,2 @@
+ def search(query, scenes):
+-    return [s for s in scenes if query in s['title']]
++    return [s for s in scenes if query.lower() in s['title'].lower()]
+
+[0m
+[0m$ [0mpython3 -B -c "
+import json, sys; sys.path.insert(0, '.')
+from search_engine import search
+scenes = json.load(open('scenes_searchable.json'))
+print('samantha:', search('samantha', scenes))
+print('SAMANTHA:', search('SAMANTHA', scenes))
+print('movie:', search('movie', scenes))
+print('other:', search('other', scenes))
+print('zzz:', search('zzz', scenes))
+assert search('samantha', scenes) == [{'id': 1, 'title': 'Samantha Saint Movie'}]
+assert search('SAMANTHA', scenes) == [{'id': 1, 'title': 'Samantha Saint Movie'}]
+assert search('movie', scenes) == [{'id': 1, 'title': 'Samantha Saint Movie'}]
+assert search('other', scenes) == [{'id': 2, 'title': 'Other Scene'}]
+assert search('zzz', scenes) == []
+print('All tests passed!')
+"
+samantha: [{'id': 1, 'title': 'Samantha Saint Movie'}]
+SAMANTHA: [{'id': 1, 'title': 'Samantha Saint Movie'}]
+movie: [{'id': 1, 'title': 'Samantha Saint Movie'}]
+other: [{'id': 2, 'title': 'Other Scene'}]
+zzz: []
+All tests passed!
+[0m
+[0m→ [0mRead search_engine.py
+The search engine has been updated to perform case-insensitive substring matching on scene titles.
+
+Verified with queries across various casings (`samantha`, `SAMANTHA`, `movie`, `other`, `zzz`), all matching expected scenes correctly.

@@ -1,0 +1,17 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead memory_growth.json
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+Memory **is bloating**. 
+
+### Analysis (`memory_growth.json`):
+- **Total Growth:** Count increased from 500 to 700 (+200 entries / +40% weekly growth).
+- **Duplicates:** 150 of the 200 new entries (**75%**) are likely duplicates.
+- **New Information:** Only 50 entries (**25%**) are distinct new facts.
+
+### Conclusion:
+The high proportion of duplicate entries (75% of new additions) indicates that memory is bloating due to insufficient deduplication. Deduplication/pruning is required to control growth.

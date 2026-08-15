@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead hash_compare.json
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Yes, both entries `a` and `b` in `hash_compare.json` are duplicates with identical hash values (`"hash": "abc"`).

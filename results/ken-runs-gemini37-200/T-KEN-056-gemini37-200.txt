@@ -1,0 +1,14 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead one_service_metrics.json
+[0m→ [0mRead host_wide_vmstat.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+Host-wide check results (`host_wide_vmstat.json`):
+
+1. **High CPU Contention / Noisy Neighbor:** `unrelated_batch_job.py` is consuming **95% CPU**.
+2. **Severe Memory Pressure & Swapping:** Swap usage is at **7,800 MB / 8,192 MB (~95.2%)**, indicating heavy memory exhaustion and swap thrashing host-wide.
+
+While individual service metrics (`one_service_metrics.json`) appear normal, the host-level CPU saturation and memory exhaustion caused by the batch job are degrading overall system performance.

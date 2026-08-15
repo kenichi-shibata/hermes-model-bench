@@ -1,0 +1,14 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead keep_logic.json
+**No — it's keeping the wrong one.**
+
+The file shows:
+- Kept: `a` (1.2 GB)
+- Not kept: `b` (4.8 GB)
+- Both are playable
+
+Since both files are playable, the standard keep logic is to keep the larger (higher quality) file. That's `b` at 4.8 GB — but `a` was kept instead, which means the smaller/lower-quality copy was retained and the better one was discarded.
+
+If you'd like, I can correct `keep_logic.json` to keep `b`.

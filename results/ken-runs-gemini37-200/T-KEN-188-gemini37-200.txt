@@ -1,0 +1,10 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead pr_diff_6.py
+[0m→ [0mRead downstream_callers.json
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Yes, this breaks downstream caller **`a.py`**. 
+
+`process` now requires two positional arguments (`data, verbose`) without a default value for `verbose`, so calling `process(x)` in `a.py` will raise a `TypeError: process() missing 1 required positional argument: 'verbose'`. `b.py` and `c.py` pass both arguments (`process(x, True)`) and are not broken.

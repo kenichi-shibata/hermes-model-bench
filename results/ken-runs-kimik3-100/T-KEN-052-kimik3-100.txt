@@ -1,0 +1,57 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead container_boot_log.txt
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root    58 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   109 Aug 15 13:35 container_boot_log.txt
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+## Why the container won't start
+
+The boot log shows a clear failure chain:
+
+```
+Starting container 112...
+mount: /data: no such device        ← root cause
+failed to mount rootfs overlay      ← consequence
+container boot aborted              ← result
+```
+
+**Root cause:** The container's root filesystem is an overlay whose backing storage lives on `/data`. The host fails to mount `/data` with **`no such device` (ENODEV)** — meaning the block device/storage backing `/data` is not present. Since `/data` can't be mounted, the overlay rootfs can't be assembled, and LXC aborts the boot.
+
+This is a **host-side storage problem, not a container config problem** — the container itself is fine; its disk is missing.
+
+## Likely reasons `/data` has "no such device"
+
+- The disk for `/data` is detached, failed, or not visible to the host
+- LVM volume not activated (`vgchange -ay` needed)
+- ZFS pool not imported (`zpool import` needed)
+- Stale/wrong entry in `/etc/fstab` (e.g., UUID changed)
+- Required filesystem driver/module missing
+
+## How to fix (on the host)
+
+```bash
+# 1. Try mounting manually to see the real error
+mount /data
+
+# 2. Check what storage the host actually sees
+lsblk -f
+dmesg | tail -20
+
+# 3. Depending on storage type:
+vgchange -ay            # if LVM
+zpool import -a         # if ZFS
+
+# 4. Verify /etc/fstab entry for /data matches reality (blkid for UUIDs)
+
+# 5. Once /data mounts successfully, start the container again
+lxc-start -n 112        # or: pct start 112  (Proxmox)
+```
+
+**Bottom line:** Container 112 won't start because the host can't mount `/data` — the underlying device is missing. Restore/activate that storage (or repoint the config if it's permanently gone), and the container will boot.

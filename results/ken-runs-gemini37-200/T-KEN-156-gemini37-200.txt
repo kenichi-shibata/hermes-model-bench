@@ -1,0 +1,11 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead memory_write_read_test.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+Based on `memory_write_read_test.json`, memory is **partially working** (90% success rate):
+
+- **Writes:** All 10 items (IDs 0–9) were successfully written (`written: true`).
+- **Retrievals:** 9 out of 10 items were successfully retrieved (`retrievable: true`), but item **ID 5** failed retrieval (`retrievable: false`).

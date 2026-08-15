@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead pr_diff_5.py
+Yes, a test for the empty input error case (`test_parse_empty_raises`) is missing to verify that calling `parse` with an empty or falsy value (such as `""` or `None`) raises a `ValueError('empty')`.

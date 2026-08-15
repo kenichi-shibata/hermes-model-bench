@@ -1,0 +1,59 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead retry_engine_v2.py
+[0m→ [0mRead CONTEXT_ONLY.md
+Investigation complete. Here's what I found and the concrete plan for the WORK model.
+
+## What's actually in the directory
+
+- `retry_engine_v2.py` — the entire "retry engine", 5 lines total (shown below in full)
+- `CONTEXT_ONLY.md` — just repeats that `retry_engine_v2.py` is the current retry engine. No other context, no callers, no tests, no download/search functions anywhere.
+
+```python
+attempts = {}
+def check_and_retry(item_id):
+    attempts[item_id] = attempts.get(item_id, 0) + 1
+    return {'item_id': item_id, 'attempts': attempts[item_id]}
+    # BUG: never actually calls a download/search function
+```
+
+## The real problem
+
+**Answer to the task question: it is just spinning — it never retries at all.**
+
+The function `check_and_retry` is a counter, not a retry engine:
+
+1. It increments a global dict entry and returns the count. Nothing is ever invoked — there is no download, no search, no work function of any kind being re-attempted.
+2. There is **no loop, no recursion, and no retry logic**: no max-attempts check, no success/failure branching, no backoff/delay, no exception handling, no stop condition. The word "retry" appears only in the name.
+3. The `# BUG` comment on line 5 is **unreachable dead code** (it sits after the `return`), and the comment itself confirms the diagnosis.
+4. Secondary issues: `attempts` is a module-level global (state leaks across unrelated calls/tests and is never reset), and there is no way to distinguish a succeeded item from a failed one — the counter goes up even on success paths, since there is no path at all.
+
+So the honest characterization: this isn't a retry engine that spins wastefully; it's a stub that *only* counts and does zero work per call. Each call returns immediately with a bigger number.
+
+## Concrete plan for the WORK model
+
+The file needs to be rewritten (it's 5 lines; a full rewrite via `write` is cleaner than surgical `edit`s). Since no download/search function exists anywhere in the workspace, the engine must accept the work to be retried as an injectable callable rather than referencing a nonexistent function.
+
+**File to edit: `retry_engine_v2.py` (only file; full rewrite).**
+
+Rewrite it as a real retry engine:
+
+1. **Accept a callable**: `check_and_retry(item_id, work_fn, max_attempts=3)` — or keep a module-level registry/`WORK_FN` that callers set. Simplest faithful-to-original signature: keep `check_and_retry(item_id)` working but add `work_fn` as a required (or defaulted-None-with-clear-error) parameter. The WORK model should pick the injectable-callable approach since nothing in the repo provides the download/search function.
+2. **Actually loop**: up to `max_attempts` times, call `work_fn(item_id)` inside a `try/except`; on success return immediately; on failure record the attempt and continue.
+3. **Track attempts per item** in the existing `attempts` dict (preserve the existing return shape `{'item_id': ..., 'attempts': ...}` and add `'status': 'success' | 'failed'` and optionally `'error'`).
+4. **Reset the counter on success** (or on demand) so the global dict doesn't grow stale; consider a `reset(item_id=None)` helper. Keep the module-level dict if minimal-change fidelity matters, but document it.
+5. **Give up correctly**: after `max_attempts` failures, return the failure status (or re-raise the last exception) instead of silently returning a count.
+6. **Remove the dead `# BUG` comment** and the unreachable code.
+
+**Verification steps for the WORK model:**
+
+- Write a quick throwaway test (e.g., `/tmp/opencode/test_retry.py` or an inline `python -c`) with:
+  - a `work_fn` that always succeeds → assert it's called exactly once, status success;
+  - a `work_fn` that fails twice then succeeds → assert it's called exactly 3 times and `attempts == 3`;
+  - a `work_fn` that always raises → assert it's called exactly `max_attempts` times and status is `failed`.
+- Run it with `python` and confirm all three cases pass.
+- Do **not** edit `CONTEXT_ONLY.md` (context only).
+
+**One open question the WORK model should note** (not block on): the task mentions "download/search function" but none exists in the workspace, so the injectable callable is the correct resolution; if the caller later supplies a real download/search function, it plugs in as `work_fn` with no engine changes.

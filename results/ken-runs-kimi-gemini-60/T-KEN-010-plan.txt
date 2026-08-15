@@ -1,0 +1,65 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead bot.py
+[0m→ [0mRead follow_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+# PLAN REPORT — T-KEN-010
+
+## Diagnosis: yes, there is a real bug (but it's not "recursive follow")
+
+**What's actually happening:** In `bot.py`, the function `track_studio_or_performer()` bundles two actions that should be separate:
+
+```python
+def track_studio_or_performer(entity_id, entity_type):
+    db.add_track(entity_id, entity_type)
+    db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here
+```
+
+Every time you (or anyone) pressed **track** on a studio/performer, the bot *also* silently fired a **Discord follow** for that entity. That's why you see follows you never made — no recursion involved, just one stray `follow_discord()` call inside the track handler. The docstring in the file even documents this as a known bug with the intended fix.
+
+**Evidence in `follow_log.json` (812 lines, 162 entries):**
+- **142 illegitimate follows** (`"legit": false`, `"source": "track_button_bug"`): `perf_0`…`perf_139` (140 entries) **plus `codey_steele` and `cherry_kiss`** — the two you asked about. Confirmed: you never followed them; the bug did.
+- **20 legitimate follows** (`"legit": true`, `"source": "manual_follow"`): `legit_perf_0`…`legit_perf_19`. These must be preserved.
+
+## Exact steps for the WORK model
+
+### Step 1 — Fix `bot.py` (the code bug)
+Edit `track_studio_or_performer()`:
+- **Delete line 7:** `db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here`
+- **Update the docstring (lines 4–5)** so it no longer describes the bug — e.g. `"""Track a studio or performer (tracking only; following is a separate action)."""`
+- **Keep** `db.add_track(entity_id, entity_type)` and `return {"tracked": True}` unchanged.
+- Do not touch the `db` class.
+
+### Step 2 — Clean `follow_log.json` (the data damage = "remove them on Discord")
+This log is the follow history / source of truth for Discord follows in this workspace, so cleaning it *is* the unfollow action.
+- Remove **every entry with `"legit": false`** (equivalently, every entry with `"source": "track_button_bug"`) — all 142 of them, which includes `codey_steele` and `cherry_kiss`.
+- Keep **only the 20 entries with `"legit": true"`** (`legit_perf_0`…`legit_perf_19`), preserving the existing JSON format (2-space indent array of objects with `entity_id`, `source`, `legit`).
+- Filter by the `legit` flag, not by entity_id, so nothing legitimate is deleted by mistake.
+- Do not touch `CONTEXT_ONLY.md`.
+
+### Step 3 — Verify
+Run from the working directory:
+```bash
+python3 -c "
+import json, bot
+d = json.load(open('follow_log.json'))
+assert len(d) == 20 and all(e['legit'] for e in d), 'log still dirty'
+assert not any(e['entity_id'] in ('codey_steele','cherry_kiss') for e in d)
+bot.track_studio_or_performer('test_x', 'performer')
+assert bot.db._tracks == [('test_x', 'performer')]
+assert bot.db._follows == [], 'track still triggers follow!'
+print('OK: log clean (20 legit follows); track no longer follows')
+"
+```
+This proves (a) only the 20 legit follows remain, (b) codey_steele/cherry_kiss are gone, (c) tracking still works, and (d) tracking no longer creates a follow.
+
+## Expected end state
+- `bot.py`: track handler calls only `db.add_track()`; no `follow_discord()` call anywhere in the track path.
+- `follow_log.json`: exactly 20 entries, all `"legit": true`, all `"source": "manual_follow"`.
+
+## Answer to the user's questions (for the final reply)
+- "Do I have a bug on following?" — **Yes**, in `bot.py`'s track handler.
+- "Recursive follow?" — **No**; it's a single misplaced `follow_discord()` call fired on every track action.
+- "Codey Steele / Cherry Kiss?" — You never followed them; both are `track_button_bug` entries and will be removed along with the other 140 bogus follows. Your 20 real follows stay untouched.

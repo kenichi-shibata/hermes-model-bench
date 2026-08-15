@@ -1,0 +1,83 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-005
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 14:11 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 14:11 ..
+-rw-r--r--   1 root root   110 Aug 15 14:11 CONTEXT_ONLY.md
+-rw-r--r--   1 root root  1136 Aug 15 14:11 api.py
+-rw-r--r--   1 root root   224 Aug 15 14:11 scenes.json
+[0m
+[0m→ [0mRead api.py
+[0m→ [0mRead scenes.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mpython3 -c "
+import json, api
+data = json.load(open('scenes.json'))
+print('TRENDING:', json.dumps(api._home_trending(data['trending']), ensure_ascii=False))
+print('RESUME  :', json.dumps([api._hydrate_code(s) for s in data['resume']], ensure_ascii=False))
+"
+TRENDING: [{"id": 1, "title": "Trending Scene", "performers": [{"name_jp": "彩月七緒", "name_en": "Nanao Ayatsuki"}]}]
+RESUME  : [{"id": 2, "title": "Resume Scene", "performers": [{"name_jp": "彩月七緒", "name_en": null}]}]
+[0m
+[0m✱ [0mGrep "_hydrate_code|_scene_out|translate"[90m in . · 9 matches[0m
+Both files are tiny. Let me verify the actual runtime behavior to confirm the bug before writing the plan.
+Investigation complete. Bug confirmed and reproduced. Here is the plan.
+
+---
+
+## PLAN — T-KEN-005: Untranslated performer names on homepage cards
+
+### The real problem
+
+The homepage has two scene sections built by `api.py`: **trending** and **resume/continue-watching**. The "blue translation thing" (the romanized `name_en` shown under the Japanese performer name) is driven entirely by the `translate` flag in `_scene_out()`:
+
+- `_home_trending()` (line 19) correctly calls `_scene_out(s, translate=True)` → romanization fires.
+- `_hydrate_code()` (line 24, the resume/continue-watching builder) calls `_scene_out(scene)` **without** `translate=True`, and the parameter defaults to `False` → the `if translate and not name_en:` branch (line 12) never runs → `name_en` stays `null` for every performer card in that section.
+
+**Reproduced just now** against the real data in `scenes.json`:
+
+```
+TRENDING: [{"id": 1, ... "performers": [{"name_jp": "彩月七緒", "name_en": "Nanao Ayatsuki"}]}]
+RESUME  : [{"id": 2, ... "performers": [{"name_jp": "彩月七緒", "name_en": null}]}]   ← bug
+```
+
+The resume section is the "bunch of no translation cards" the user sees. `scenes.json` is fine — `name_en: null` is exactly the case the translate path exists to handle. `romanize()` is a mock that always succeeds, so there's no failure-mode risk in enabling it.
+
+### Exact steps for the WORK model
+
+**File to edit: `api.py` — one functional change, plus stale-comment cleanup.**
+
+1. **The fix (line 24):** change
+   ```python
+   return _scene_out(scene)  # missing translate=True
+   ```
+   to
+   ```python
+   return _scene_out(scene, translate=True)
+   ```
+
+2. **Remove the now-stale BUG documentation** so the file doesn't lie after the fix:
+   - Rewrite the `_scene_out` docstring (lines 4–8) to something neutral, e.g. `"""Builds a scene card payload; romanizes missing name_en when translate=True."""`
+   - Rewrite the `_hydrate_code` docstring (line 23) to just `"""Used by the resume/continue-watching section."""`
+
+3. **Do NOT touch** `scenes.json` (data is correct), `romanize()`, `_home_trending()`, or the `translate=False` default (changing the default would be a wider behavioral change than needed; the minimal fix is at the call site).
+
+### Verification (WORK model must run this)
+
+```bash
+python3 -c "
+import json, api
+data = json.load(open('scenes.json'))
+print('TRENDING:', json.dumps(api._home_trending(data['trending']), ensure_ascii=False))
+print('RESUME  :', json.dumps([api._hydrate_code(s) for s in data['resume']], ensure_ascii=False))
+"
+```
+
+**Pass criteria:** both sections emit `"name_en": "Nanao Ayatsuki"` for 彩月七緒 — i.e., RESUME no longer shows `name_en: null`. TRENDING output must be unchanged from before.
+
+**Scope note:** the directory contains only `api.py`, `scenes.json`, `CONTEXT_ONLY.md` — there are no other callers of `_hydrate_code`/`_scene_out` and no test suite. One-line fix + comment cleanup + the verification run above is the entire job.

@@ -1,0 +1,10 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead deploy_state.json
+No, the repository is not in sync with what is deployed. 
+
+According to `deploy_state.json`, the deployed SHA (`e4f5g6h`) differs from the repo HEAD SHA (`h7i8j9k`), with 3 commits between them.

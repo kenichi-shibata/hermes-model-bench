@@ -1,0 +1,28 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead search_engine.py
+[0m→ [0mRead scenes_searchable.json[90m [limit=100][0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 3 matches[0m
+[0m
+[0m← [0mEdit search_engine.py
+Index: /root/ken-tasks/T-KEN-035/search_engine.py
+===================================================================
+--- /root/ken-tasks/T-KEN-035/search_engine.py
++++ /root/ken-tasks/T-KEN-035/search_engine.py
+@@ -1,2 +1,2 @@
+ def search(query, scenes):
+-    return [s for s in scenes if query in s['title']]
++    return [s for s in scenes if query.lower() in s['title'].lower()]
+
+[0m
+[0m$ [0mpython3 -c "import json, search_engine; scenes = json.load(open('scenes_searchable.json')); print(search_engine.search('samantha', scenes)); print(search_engine.search('OTHER', scenes)); print(search_engine.search('Movie', scenes))"
+[{'id': 1, 'title': 'Samantha Saint Movie'}]
+[{'id': 2, 'title': 'Other Scene'}]
+[{'id': 1, 'title': 'Samantha Saint Movie'}]
+[0m
+[0m→ [0mRead search_engine.py
+Updated `search_engine.py` to make title searching case-insensitive by comparing `query.lower()` with `s['title'].lower()`.

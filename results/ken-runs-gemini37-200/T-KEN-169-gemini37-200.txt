@@ -1,0 +1,13 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dns_query_results.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+DNS is not resolving correctly:
+
+- **Resolved IP:** `10.0.0.5`
+- **Actual Service IP:** `10.0.0.9`
+
+The resolved address does not match the actual current service IP.

@@ -1,0 +1,61 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "**/*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead api.py
+[0m→ [0mRead scenes.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x  2 root root  4096 Aug 15 11:38 .
+drwxr-xr-x 32 1000 1000 12288 Aug 15 11:38 ..
+-rw-r--r--  1 root root   110 Aug 15 11:38 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  1136 Aug 15 11:38 api.py
+-rw-r--r--  1 root root   224 Aug 15 11:38 scenes.json
+[0m
+[0m$ [0mpython3 -c "import json, api; data = json.load(open('scenes.json')); print('trending:', api._home_trending(data['trending'])); print('resume:', [api._hydrate_code(s) for s in data['resume']])"
+trending: [{'id': 1, 'title': 'Trending Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+resume: [{'id': 2, 'title': 'Resume Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': None}]}]
+[0m
+[0m← [0mEdit api.py
+Index: /root/ken-tasks/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-005/api.py
++++ /root/ken-tasks/T-KEN-005/api.py
+@@ -1,12 +1,8 @@
+ """Scene homepage sections."""
+ 
+ def _scene_out(scene, translate=False):
+-    """Builds a scene card payload.
+-    BUG: translate defaults to False, and _hydrate_code() below never
+-    passes translate=True, so performer names never get romanized on
+-    the resume/continue-watching section even though _home_trending
+-    correctly passes translate=True."""
++    """Builds a scene card payload."""
+     out = {"id": scene["id"], "title": scene["title"], "performers": []}
+     for p in scene["performers"]:
+         name_en = p.get("name_en")
+         if translate and not name_en:
+@@ -19,10 +15,10 @@
+     return [_scene_out(s, translate=True) for s in scenes]
+ 
+ 
+ def _hydrate_code(scene):
+-    """Used by the resume/continue-watching section. BUG: forgot translate=True."""
+-    return _scene_out(scene)  # missing translate=True
++    """Used by the resume/continue-watching section."""
++    return _scene_out(scene, translate=True)
+ 
+ 
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+
+[0m
+[0m$ [0mpython3 -c "import json, api; data = json.load(open('scenes.json')); print('trending:', api._home_trending(data['trending'])); print('resume:', [api._hydrate_code(s) for s in data['resume']])"
+trending: [{'id': 1, 'title': 'Trending Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+resume: [{'id': 2, 'title': 'Resume Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+[0m
+[0m→ [0mRead api.py
+Updated `_hydrate_code` in `api.py` to pass `translate=True` to `_scene_out`, ensuring performer names are properly translated/romanized for resume cards.

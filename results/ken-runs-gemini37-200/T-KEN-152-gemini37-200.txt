@@ -1,0 +1,11 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead token_usage_log.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+`token_usage_log.json` token usage:
+- **Cache Read Tokens:** 92,000
+- **Fresh Input Tokens:** 8,000
+- **Total Tokens:** 100,000

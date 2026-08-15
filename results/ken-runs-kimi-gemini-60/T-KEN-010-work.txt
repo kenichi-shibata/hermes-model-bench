@@ -1,0 +1,60 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead bot.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead bot.py
+[0m→ [0mRead follow_log.json[90m [limit=100][0m
+[0m→ [0mRead bot.py
+[0m→ [0mRead bot.py[90m [offset=1, limit=100][0m
+[0m✱ [0mGrep ".*"[90m in . · 100 matches[0m
+[0m✱ [0mGrep "codey_steele|cherry_kiss|"legit": true"[90m in . · 22 matches[0m
+[0m→ [0mRead follow_log.json[90m [limit=120, offset=700][0m
+[0m→ [0mRead bot.py[90m [offset=1, limit=30][0m
+[0m
+[0m← [0mEdit bot.py
+Index: /root/ken-tasks/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks/T-KEN-010/bot.py
++++ /root/ken-tasks/T-KEN-010/bot.py
+@@ -1,11 +1,9 @@
+ """Discord bot track/follow handlers."""
+ 
+ def track_studio_or_performer(entity_id, entity_type):
+-    """BUG: bundles a follow action with tracking, which should be
+-    separate. Fix: remove the follow_discord() call from here."""
++    """Track a studio or performer (tracking only; following is a separate action)."""
+     db.add_track(entity_id, entity_type)
+-    db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here
+     return {"tracked": True}
+ 
+ 
+ class db:
+
+[0m
+[0m✱ [0mGrep ".*"[90m in . · 19 matches[0m
+[0m
+[0m← [0mWrite follow_log.json
+Wrote file successfully.
+[0m
+I will run a python test script to verify that `follow_log.json` contains only the 20 legitimate follows and that `bot.track_studio_or_performer` no longer triggers Discord follows.
+[0m$ [0mpython3 -c "
+import json, bot
+d = json.load(open('follow_log.json'))
+assert len(d) == 20 and all(e['legit'] for e in d), 'log still dirty'
+assert not any(e['entity_id'] in ('codey_steele','cherry_kiss') for e in d)
+bot.track_studio_or_performer('test_x', 'performer')
+assert bot.db._tracks == [('test_x', 'performer')]
+assert bot.db._follows == [], 'track still triggers follow!'
+print('OK: log clean (20 legit follows); track no longer follows')
+"
+OK: log clean (20 legit follows); track no longer follows
+[0m
+[0m✱ [0mGlob "*"[90m 4 matches[0m
+- **Bug on following:** Yes. In `bot.py`, `track_studio_or_performer()` was calling `db.follow_discord()` whenever an entity was tracked.
+- **Recursive follow:** No recursion was occurring; tracking an entity was simply bundling a silent Discord follow.
+- **Codey Steele & Cherry Kiss:** You did not follow them. They were added automatically due to the track button bug (`track_button_bug`).
+- **Fix applied:**
+  - Removed the `db.follow_discord()` call from `track_studio_or_performer()` in `bot.py`.
+  - Cleaned `follow_log.json` to remove all 142 illegitimate follow entries (including Codey Steele and Cherry Kiss), preserving only your 20 legitimate manual follows.

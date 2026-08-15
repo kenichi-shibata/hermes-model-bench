@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead container_boot_log.txt
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+The container failed to start because mounting `/data` failed with `no such device`, which caused the rootfs overlay mount to fail and aborted the boot process.

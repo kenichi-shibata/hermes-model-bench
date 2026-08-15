@@ -1,0 +1,32 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead near_dup.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-082/
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root    21 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   117 Aug 15 13:35 near_dup.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mWrite near_dup.json
+Wrote file successfully.
+[0m
+Both records have the same hash (`xyz`) and near-identical titles ("Big Movie" vs "BigMovie") — they're duplicates. I'll merge them into a single canonical record.
+[0m$ [0mpython3 -m json.tool /root/ken-tasks/T-KEN-082/near_dup.json
+{
+    "a": {
+        "title": "Big Movie",
+        "hash": "xyz"
+    }
+}
+[0m
+Done. The two records were duplicates of the same entity:
+
+- **a**: `"Big Movie"`, hash `xyz`
+- **b**: `"BigMovie"`, hash `xyz` — same hash, title identical except for a missing space
+
+I removed the duplicate (`b`) and kept the canonical record with the properly spaced title `"Big Movie"`. The file now contains a single deduplicated record, and the JSON is valid.

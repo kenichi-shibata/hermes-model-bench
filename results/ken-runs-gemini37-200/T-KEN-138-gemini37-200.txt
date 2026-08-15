@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead fleet_health_snapshot.json
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Yes, **`svc_3`** has an elevated error rate of **12%** (`0.12`), whereas all other services in the fleet have a baseline error rate of **0.1%** (`0.001`).

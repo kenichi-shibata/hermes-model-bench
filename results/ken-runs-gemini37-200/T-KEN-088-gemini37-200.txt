@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead db_vs_app.json
+It is not the database. The database query takes only 12 ms (`db_query_ms`), whereas the application layer serialization takes 3,800 ms (`app_serialize_ms`) to process the 50,000 returned rows.

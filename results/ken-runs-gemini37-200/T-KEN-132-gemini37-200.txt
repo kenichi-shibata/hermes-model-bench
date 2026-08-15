@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+[0m→ [0mRead translate_cache_meta.json
+[0m→ [0mRead CONTEXT_ONLY.md
+Yes, the translation cache is stale. It was cached 95 days ago (`cached_at_days_ago: 95`), which exceeds its TTL of 90 days (`ttl_days: 90`).

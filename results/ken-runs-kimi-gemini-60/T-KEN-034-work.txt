@@ -1,0 +1,88 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead cover_image_resolver.py
+[0m→ [0mRead scenes_covers.json
+[0m
+[0m← [0mEdit cover_image_resolver.py
+Index: /root/ken-tasks/T-KEN-034/cover_image_resolver.py
+===================================================================
+--- /root/ken-tasks/T-KEN-034/cover_image_resolver.py
++++ /root/ken-tasks/T-KEN-034/cover_image_resolver.py
+@@ -1,2 +1,7 @@
+ def get_cover(scene):
+-    return scene.get('cover_url')
++    cover = scene.get('cover_url')
++    if cover:
++        return cover
++    screenshots = scene.get('screenshots') or []
++    return screenshots[0] if screenshots else None
++
+
+[0m
+[0m$ [0mpython3 -c "
+import json
+from cover_image_resolver import get_cover
+
+with open('scenes_covers.json') as f:
+    scenes = json.load(f)
+
+for s in scenes:
+    cover = get_cover(s)
+    print(f'Scene {s[\"id\"]}: {cover}')
+    assert cover is not None
+
+assert get_cover({}) is None
+assert get_cover({'cover_url': None, 'screenshots': []}) is None
+assert get_cover({'cover_url': '', 'screenshots': ['http://fallback.jpg']}) == 'http://fallback.jpg'
+assert get_cover({'cover_url': 'http://cover.jpg', 'screenshots': ['http://fallback.jpg']}) == 'http://cover.jpg'
+print('All tests passed!')
+"
+Scene 0: http://x/0_1.jpg
+Scene 1: http://x/1_1.jpg
+Scene 2: http://x/2_1.jpg
+Scene 3: http://x/3_1.jpg
+Scene 4: http://x/4_1.jpg
+Scene 5: http://x/5.jpg
+Scene 6: http://x/6.jpg
+Scene 7: http://x/7.jpg
+Scene 8: http://x/8.jpg
+Scene 9: http://x/9.jpg
+Scene 10: http://x/10.jpg
+Scene 11: http://x/11.jpg
+Scene 12: http://x/12.jpg
+Scene 13: http://x/13.jpg
+Scene 14: http://x/14.jpg
+Scene 15: http://x/15.jpg
+Scene 16: http://x/16.jpg
+Scene 17: http://x/17.jpg
+Scene 18: http://x/18.jpg
+Scene 19: http://x/19.jpg
+All tests passed!
+[0m
+[0m$ [0mls -la
+total 32
+drwxr-xr-x   3 root root  4096 Aug 15 14:52 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 14:49 ..
+-rw-r--r--   1 root root    83 Aug 15 14:36 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 15 14:52 __pycache__
+-rw-r--r--   1 root root   193 Aug 15 14:52 cover_image_resolver.py
+-rw-r--r--   1 root root  2152 Aug 15 14:36 scenes_covers.json
+[0m
+[0m$ [0mrm -rf __pycache__
+(no output)
+[0m
+[0m→ [0mRead cover_image_resolver.py
+The missing cover images were caused by scenes having `cover_url: null` without a fallback mechanism in `cover_image_resolver.py`.
+
+Updated `get_cover` in `cover_image_resolver.py` to fall back to the first URL in `screenshots` when `cover_url` is absent or falsy:
+
+```python
+def get_cover(scene):
+    cover = scene.get('cover_url')
+    if cover:
+        return cover
+    screenshots = scene.get('screenshots') or []
+    return screenshots[0] if screenshots else None
+```

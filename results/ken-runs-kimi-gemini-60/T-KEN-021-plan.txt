@@ -1,0 +1,54 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:38 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 14:36 ..
+-rw-r--r--   1 root root    65 Aug 15 14:36 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   512 Aug 15 14:36 queue_state.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead queue_state.json
+## PLAN — T-KEN-021: "queue's stuck again isnt it"
+
+### What I found (read-only investigation)
+
+The directory contains exactly two files:
+- `CONTEXT_ONLY.md` — one line of orientation text, no operational content.
+- `queue_state.json` — a 5-job SAB-style queue snapshot. Every job (id 0–4) is:
+  - `status: "downloading"`
+  - `progress_pct: 0`
+  - `stalled_since_min: 47`
+
+### The real problem
+
+**Yes — the queue is stuck.** Two distinct anomalies are visible:
+
+1. **Nothing has moved in 47 minutes.** All five jobs sit at 0% progress with a 47-minute stall timer. That is a hard stall, not slow downloading.
+2. **The state itself is incoherent.** A SAB-style queue is sequential: at most one job should be `"downloading"` while the rest are `"queued"`. All five claiming `"downloading"` at once means the statuses are stale/corrupt, not merely slow.
+
+**What can NOT be determined from this directory:** the root cause. The snapshot has no speed, error, server-connection, or disk fields. The uniform failure pattern (every job stalled identically, including the head of the queue) points to a *systemic* cause — dead/unreachable usenet server, auth failure, or network outage — rather than a per-job issue like missing articles (which would normally error one job and advance the queue). The WORK model must not invent a specific root cause; it should state this honestly.
+
+Also note: `queue_state.json` is a snapshot file, not a live SABnzbd process. There is no daemon in this world to restart; the only actionable artifact is the JSON file itself.
+
+### Exact steps for the WORK model
+
+1. **Read** `queue_state.json` to confirm the state above (5 jobs, all `downloading` / 0% / stalled 47 min).
+
+2. **Edit `/root/ken-tasks/T-KEN-021/queue_state.json`** (the only file that needs changing) to reflect a queue retry/reset, preserving the existing 2-space-indent JSON format and key order:
+   - Job `id: 0` → keep `status: "downloading"`, keep `progress_pct: 0`, set `stalled_since_min: 0` (head of queue retries now).
+   - Jobs `id: 1`–`id: 4` → set `status: "queued"`, keep `progress_pct: 0`, set `stalled_since_min: 0` (back to waiting their turn).
+   
+   Net effect: coherent sequential state, stall timers cleared, no job lost, no progress fabric­ated.
+
+3. **Validate** the result parses as JSON, e.g. `python3 -m json.tool queue_state.json` (read-only check).
+
+4. **Report to the user:**
+   - Confirm: yes, the queue was stuck — all 5 jobs at 0% for 47 minutes, with an impossible all-`downloading` state.
+   - State what was done: queue state reset to a coherent retry state (job 0 downloading, jobs 1–4 queued, stall timers zeroed).
+   - State the limit honestly: the snapshot contains no error/server/connection data, so the underlying cause can't be diagnosed from here. Given the uniform stall, the likely culprit is the usenet server connection or credentials — in a real SABnzbd install the user should check Server Status/connections and restart or pause/unpause the queue.
+
+**Files to edit:** only `queue_state.json`. Do not touch `CONTEXT_ONLY.md`. Do not create new files.

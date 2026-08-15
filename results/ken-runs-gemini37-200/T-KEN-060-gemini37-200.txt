@@ -1,0 +1,9 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead release_readiness.json
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+The release is not ready to be tagged because the working tree is not clean (`working_tree_clean: false`). No tag was created.

@@ -1,0 +1,9 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead retry_engine_v2.py
+It is **just spinning**. 
+
+`check_and_retry` only increments and returns the attempt count in the `attempts` dictionary (`attempts[item_id] = attempts.get(item_id, 0) + 1`) without actually calling or executing any retry/download/search operation.

@@ -1,0 +1,146 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead stashdb_mock.py
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/root/ken-tasks/T-KEN-003/performers.json') as f:
+    raw = f.read()
+print('Length:', len(raw))
+print('First 300 chars:', repr(raw[:300]))
+print('Last 100 chars:', repr(raw[-100:]))
+data = json.loads(raw)
+print('Keys:', data.keys())
+performers = data['performers']
+print('Total performers:', len(performers))
+
+hosts = {}
+for p in performers:
+    img = p.get('image')
+    host = img.split('/')[2] if img and '://' in img else str(img)
+    hosts[host] = hosts.get(host, 0) + 1
+print('Hosts distribution:', hosts)
+
+broken = [p for p in performers if p.get('image') and '198.51.100.64' in p['image']]
+print('Broken count:', len(broken))
+with_stashdb = [p for p in broken if p.get('stashdb_id')]
+without_stashdb = [p for p in broken if not p.get('stashdb_id')]
+print('Broken with stashdb_id:', len(with_stashdb))
+print('Broken without stashdb_id:', len(without_stashdb))
+"
+Length: 315596
+First 300 chars: '{"performers": [{"id": 0, "name": "Performer0", "image": "http://198.51.100.64:9999/performer/0/image", "stashdb_id": "stashdb-0"}, {"id": 1, "name": "Performer1", "image": "http://198.51.100.64:9999/performer/1/image", "stashdb_id": "stashdb-1"}, {"id": 2, "name": "Performer2", "image": "http://198'
+Last 100 chars: '": "Performer2699", "image": "http://198.51.100.69:9999/performer/2699/image", "stashdb_id": null}]}'
+Keys: dict_keys(['performers'])
+Total performers: 2700
+Hosts distribution: {'198.51.100.64:9999': 179, '198.51.100.69:9999': 2521}
+Broken count: 179
+Broken with stashdb_id: 40
+Broken without stashdb_id: 139
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/root/ken-tasks/T-KEN-003/performers.json') as f:
+    raw = f.read()
+data = json.loads(raw)
+dumped = json.dumps(data, separators=(', ', ': '))
+print('Match exactly?', dumped == raw)
+if dumped != raw:
+    print('Diff in len:', len(dumped), len(raw))
+    for i in range(min(len(dumped), len(raw))):
+        if dumped[i] != raw[i]:
+            print(f'Diff at {i}: dumped={repr(dumped[i:i+30])} raw={repr(raw[i:i+30])}')
+            break
+"
+Match exactly? True
+[0m
+[0m$ [0mpython3 -c "
+import json
+import sys
+from stashdb_mock import get_fallback_image
+
+with open('/root/ken-tasks/T-KEN-003/performers.json', 'r') as f:
+    data = json.load(f)
+
+fixed_count = 0
+null_count = 0
+untouched_count = 0
+
+for p in data['performers']:
+    img = p.get('image')
+    if img and '198.51.100.64:9999' in img:
+        fallback = get_fallback_image(p.get('stashdb_id'))
+        if fallback:
+            p['image'] = fallback
+            fixed_count += 1
+        else:
+            p['image'] = None
+            null_count += 1
+    else:
+        untouched_count += 1
+
+print(f'Fixed with fallback: {fixed_count}')
+print(f'Set to null: {null_count}')
+print(f'Untouched: {untouched_count}')
+
+with open('/root/ken-tasks/T-KEN-003/performers.json', 'w') as f:
+    json.dump(data, f, separators=(', ', ': '))
+"
+Fixed with fallback: 40
+Set to null: 139
+Untouched: 2521
+[0m
+[0m$ [0mpython3 -c "
+import json
+
+with open('/root/ken-tasks/T-KEN-003/performers.json', 'r') as f:
+    data = json.load(f)
+
+performers = data['performers']
+assert len(performers) == 2700, f'Expected 2700 performers, got {len(performers)}'
+
+# 1. No remaining broken host 198.51.100.64
+broken_remaining = [p for p in performers if p.get('image') and '198.51.100.64' in p['image']]
+assert len(broken_remaining) == 0, f'Still have broken hosts: {broken_remaining}'
+
+# 2. Exactly 40 images matching stashdb
+stashdb_images = [p for p in performers if p.get('image') and 'stashdb.org' in p['image']]
+assert len(stashdb_images) == 40, f'Expected 40 stashdb images, got {len(stashdb_images)}'
+for i, p in enumerate(stashdb_images):
+    assert p['id'] == i
+    assert p['stashdb_id'] == f'stashdb-{i}'
+    assert p['image'] == f'https://stashdb.org/images/stashdb-{i}.jpg'
+
+# 3. Exactly 139 images equal to null (ids 40-178)
+null_images = [p for p in performers if p.get('image') is None]
+assert len(null_images) == 139, f'Expected 139 null images, got {len(null_images)}'
+null_ids = [p['id'] for p in null_images]
+assert null_ids == list(range(40, 179)), f'Null ids mismatch: {null_ids}'
+
+# 4. Remaining 2521 untouched (ids 179-2699)
+working_images = [p for p in performers if p.get('image') and '198.51.100.69:9999' in p['image']]
+assert len(working_images) == 2521, f'Expected 2521 working images, got {len(working_images)}'
+working_ids = [p['id'] for p in working_images]
+assert working_ids == list(range(179, 2700)), f'Working ids mismatch'
+
+print('All assertions passed successfully!')
+"
+All assertions passed successfully!
+[0m
+[0m✱ [0mGlob "*"[90m in . · 4 matches[0m
+[0m
+[0m$ [0mrm -rf /root/ken-tasks/T-KEN-003/__pycache__
+(no output)
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+The 179 broken performer image records pointing to the decommissioned host `198.51.100.64:9999` have been processed in `performers.json`:
+
+- **40 performers (`id`: 0–39)**: Resolved using their `stashdb_id` via `stashdb_mock.get_fallback_image()` (e.g. `https://stashdb.org/images/stashdb-<id>.jpg`).
+- **139 performers (`id`: 40–178)**: Set `image` to `null` because they have no `stashdb_id` or working image source in the dataset, allowing the UI to show default placeholder icons rather than attempting to load dead URLs.
+- **2,521 performers (`id`: 179–2699)**: Remain untouched pointing to the working host `198.51.100.69:9999`.
+
+*Note: Fully restoring images for performers 40–178 will require backfilling their `stashdb_id` values or restoring the original image assets from `198.51.100.64:9999`.*

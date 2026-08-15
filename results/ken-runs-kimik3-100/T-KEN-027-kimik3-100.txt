@@ -1,0 +1,29 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead wanted_list.json
+[0m→ [0mRead studio_catalog_page1.json
+[0m→ [0mRead studio_catalog_page2.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mWrite wanted_list.json
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 -c "
+import json
+wanted = json.load(open('wanted_list.json'))
+p1 = json.load(open('studio_catalog_page1.json'))
+p2 = json.load(open('studio_catalog_page2.json'))
+catalog = p1 + p2
+assert wanted == catalog, 'mismatch'
+assert len({i['id'] for i in wanted}) == len(wanted), 'duplicate ids'
+print(f'OK: {len(wanted)} items, ids {wanted[0][\"id\"]}..{wanted[-1][\"id\"]}')"
+OK: 15 items, ids 0..14
+[0m
+Done. Grabbed all **15 scenes** from the studio's catalog (10 from page 1 + 5 from page 2) into `wanted_list.json`.
+
+- **Page 1:** Scenes 0–9
+- **Page 2:** Scenes 10–14
+
+Verified the wanted list matches the full catalog exactly (ids 0–14, no duplicates).

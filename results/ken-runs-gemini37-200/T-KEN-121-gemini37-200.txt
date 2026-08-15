@@ -1,0 +1,17 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead studio_scenes.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+Here are the newest scenes from `studio_scenes.json` (within 30 days):
+
+- **ID 0**: 0 days old (newest)
+- **ID 1**: 5 days old
+- **ID 2**: 10 days old
+- **ID 3**: 15 days old
+- **ID 4**: 20 days old
+- **ID 5**: 25 days old
+- **ID 6**: 30 days old

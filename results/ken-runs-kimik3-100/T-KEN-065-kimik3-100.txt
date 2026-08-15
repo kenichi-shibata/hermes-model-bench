@@ -1,0 +1,24 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m
+[0m$ [0mgit rev-parse HEAD 2>&1; git status 2>&1 | head -20
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+[0m
+[0m→ [0mRead deploy_state.json
+[0m→ [0mRead CONTEXT_ONLY.md
+**No — the repo is not in sync with what's deployed.**
+
+Per `deploy_state.json`:
+
+| | SHA |
+|---|---|
+| Deployed | `e4f5g6h` |
+| Repo HEAD | `h7i8j9k` |
+
+- The deployed SHA and repo HEAD SHA **differ**.
+- `commits_between: 3` — the repo HEAD is 3 commits ahead of what's actually deployed, meaning the last 3 commits have **not been shipped**.
+
+Note: this working directory isn't a git repository (no `.git`), so `deploy_state.json` is the authoritative source here — there's no local git history to cross-check against. To sync production, you'd need to deploy `h7i8j9k` (the current repo HEAD).

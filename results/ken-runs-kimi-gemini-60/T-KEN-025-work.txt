@@ -1,0 +1,20 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scene_claim.json
+[0m→ [0mRead indexer_freshness.json
+### Diagnosis
+
+The scene is not appearing due to expected indexing intervals:
+
+- **Target Site:** According to `scene_claim.json`, the scene (`"Claimed New Scene"`) belongs to **`site_c`**.
+- **Indexer Schedule:** According to `indexer_freshness.json`, `site_c` runs on a **6-hour interval** and last ran **2 hours ago**.
+- **Status:** The next scheduled index run is in **~4 hours**. A newly added scene on `site_c` will not be indexed until that run completes.
+
+### Next Steps
+
+1. **Wait for Schedule:** The scene should automatically appear after the next scheduled index run (~4 hours).
+2. **Immediate Visibility:** Trigger a manual re-index for `site_c` if urgent.
+3. **Potential Bug Condition:** If the scene was created *prior* to the indexer run 2 hours ago, check the `site_c` indexing logs/pipeline for ingest errors.

@@ -1,0 +1,14 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead indexer_freshness.json
+[0m→ [0mRead scene_claim.json
+**Nothing's broken — it's a freshness lag, not a bug.**
+
+The claimed scene is on **site_c**, and site_c's indexer:
+- Last ran: **2h ago**
+- Runs on a **6h interval**
+
+So the earliest it could have picked up the scene is the next run, **~4h from now**. Compare with site_a (indexed 10min ago) and site_b (1h ago) — those would show new content quickly, which is probably why this feels wrong.
+
+If the scene needs to appear sooner, you'd have to either trigger a manual reindex of site_c or shorten its interval. Otherwise it'll show up on the next scheduled pass on its own.

@@ -1,0 +1,24 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead old_notes.md
+[0m→ [0mRead retry_engine.py
+[0m→ [0mRead queue_fixture.json
+The notes say the repro is to run `check()` on the fixture queue. Let me actually run it rather than trust the docstring's claim that it's fixed.
+[0m
+[0m$ [0mpython3 -c "
+import json, retry_engine
+queue = json.load(open('queue_fixture.json'))
+print(retry_engine.check(queue))
+"
+{'success_count': 8, 'total': 8}
+[0m
+**No — the recorded bug no longer reproduces.**
+
+The old repro (run `check()` on `queue_fixture.json`) previously returned `success_count=1, total=8`. Running it now returns:
+
+```
+{'success_count': 8, 'total': 8}
+```
+
+One caveat worth flagging: the current `check()` doesn't actually retry anything — it unconditionally appends `success: True` for every item. So the 1/8 symptom is gone, but the 8/8 result is guaranteed by construction, not evidence that real retry logic works. If the fixture ever contained an item that should legitimately fail, this code would still report success.

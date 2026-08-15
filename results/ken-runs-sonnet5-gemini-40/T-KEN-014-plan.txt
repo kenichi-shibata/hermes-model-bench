@@ -1,0 +1,44 @@
+[0m
+> build · anthropic/claude-sonnet-5
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-014
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 15:37 .
+drwxr-xr-x 206 1000 1000 12288 Aug 15 15:38 ..
+-rw-r--r--   1 root root    69 Aug 15 15:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   498 Aug 15 15:37 tailscale_status_mock.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead tailscale_status_mock.json
+## Diagnosis
+
+I read both files in the directory:
+
+- `CONTEXT_ONLY.md` — just says the JSON is a real Tailscale peer/route status dump.
+- `tailscale_status_mock.json` — the actual `tailscale status --json`-style snapshot.
+
+Key facts from the JSON:
+
+| Node | Role | Online | LastSeen | Routes |
+|---|---|---|---|---|
+| `phone` (Self) | your device, IP `100.1.1.1` | — | — | — |
+| `pve2` (`home-router-node`) | subnet router for home LAN | **`false`** | `2026-08-02T00:00:00Z` (13 days ago, today is Aug 15) | advertises `192.168.1.0/24` |
+| `laptop` | unrelated peer | `true` | — | none |
+| `phone2` | unrelated peer | `true` | — | none |
+
+**Root cause:** The only node that advertises your home subnet (`192.168.1.0/24`) is `pve2`, and it has been **offline for ~13 days**. Your phone itself is fine (it's a normal Tailscale peer), and the tailnet control-plane connectivity is fine (other peers `laptop`/`phone2` are online) — the problem is specifically that the subnet router that provides the path into `192.168.1.0/24` is down. Since no other peer advertises that route, there is no way for traffic to `192.168.1.x` to reach the LAN, regardless of what's configured on the phone.
+
+This is **not** a config/code bug in this sandbox — there is no application code here to patch. The "fix" lives on the actual `pve2` machine and/or in the Tailscale admin console, not in this directory.
+
+## Plan for the WORK model (no files here need editing)
+
+Since the repo only contains a static status snapshot (no app/service code), the WORK model should not attempt to "fix" anything by editing `tailscale_status_mock.json` — editing the mock would just be lying about the state, not fixing the network. Its job is to report the diagnosis and hand off the following concrete remediation steps (to be performed against the real infrastructure, outside this sandbox):
+
+1. **Confirm `pve2` is actually down** — check power/hypervisor status of the physical/VM host at home (it's a Proxmox node based on the `pve2` hostname).
+2. **Check `pve2`'s network/internet connectivity** — if the host is up but has no WAN, Tailscale can't establish a connection; check the home router's WAN link and the box's own NIC/DHCP lease.
+3. **Check the Tailscale daemon on `pve2`** — `systemctl status tailscaled`, `tailscale status` locally, restart if crashed/hung (`systemctl restart tailscaled`).
+4. **Verify subnet route advertisement is still enabled and approved**: on `pve2`, confirm `tailscale up --advertise-routes=192.168.1.0/24` is still part of its startup config; in the Tailscale admin console, confirm the route is still approved (not revoked) for that node.
+5. **Check for key expiry** — if `pve2`'s node key expired (Tailscale defaults to periodic re-auth), it would show as offline exactly like this; re-authenticate with `tailscale up` on that node if so.
+6. **Once `pve2` is back online**, re-run `tailscale status --json` and confirm `Peer.home-router-node.Online == true` and the route is present — then retest reachability to `192.168.1.x` from the phone.
+
+No file changes in this sandbox are required or appropriate; the actionable fix is entirely on the `pve2` host/Tailscale admin side.

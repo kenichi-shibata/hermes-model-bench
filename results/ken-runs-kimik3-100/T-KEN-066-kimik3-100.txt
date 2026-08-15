@@ -1,0 +1,59 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead bot_process_status.json
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root    52 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    87 Aug 15 13:35 bot_process_status.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mps aux | grep -i bot | grep -v grep; echo "---"; ps aux --sort=-%cpu | head -15
+root         910  0.0  0.1   2972  1816 ?        S    13:56   0:00 timeout 180 opencode run CONTEXT: Files: bot_process_status.json (real process state).  TASK: bot's not responding check it  Note: your working directory IS the sandbox boundary -- do not attempt to read/list parent or sibling directories; everything you need is here. --model openrouter/moonshotai/kimi-k3
+root         911 53.8 32.9 74878672 518208 ?     Sl   13:56   0:07 opencode run CONTEXT: Files: bot_process_status.json (real process state).  TASK: bot's not responding check it  Note: your working directory IS the sandbox boundary -- do not attempt to read/list parent or sibling directories; everything you need is here. --model openrouter/moonshotai/kimi-k3
+---
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         911 53.8 32.9 74878672 518700 ?     Rl   13:56   0:07 opencode run CONTEXT: Files: bot_process_status.json (real process state).  TASK: bot's not responding check it  Note: your working directory IS the sandbox boundary -- do not attempt to read/list parent or sibling directories; everything you need is here. --model openrouter/moonshotai/kimi-k3
+root           1  0.0  0.8  23164 13748 ?        Ss   13:44   0:00 /sbin/init
+root          90  0.0  0.5  19056  9128 ?        Ss   13:44   0:00 /usr/lib/systemd/systemd-logind
+root          44  0.0  0.9  34536 14644 ?        Ss   13:44   0:00 /usr/lib/systemd/systemd-journald
+root         301  0.0  0.7  21628 12028 ?        Ss   13:44   0:00 /usr/lib/systemd/systemd --user
+systemd+     183  0.0  0.6  20560 10752 ?        Ss   13:44   0:00 /usr/lib/systemd/systemd-networkd
+message+      86  0.0  0.3   8288  4760 ?        Ss   13:44   0:00 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+root         107  0.0  0.4  11760  7852 ?        Ss   13:44   0:00 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+root          85  0.0  0.1   3836  2376 ?        Ss   13:44   0:00 /usr/sbin/cron -f
+root         101  0.0  0.1   4776  2544 pts/0    Ss+  13:44   0:00 /sbin/agetty -o -- \u --noreset --noclear --keep-baud 115200,57600,38400,9600 - linux
+root         102  0.0  0.1   4776  2460 pts/1    Ss+  13:44   0:00 /sbin/agetty -o -- \u --noreset --noclear - linux
+root         104  0.0  0.1   4776  2548 pts/2    Ss+  13:44   0:00 /sbin/agetty -o -- \u --noreset --noclear - linux
+root         186  0.0  0.2   5848  3500 ?        Ss   13:44   0:00 /sbin/dhclient -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/dhclient.eth0.leases eth0
+root         281  0.0  0.2  43972  4656 ?        Ss   13:44   0:00 /usr/lib/postfix/sbin/master -w
+[0m
+Checked `bot_process_status.json` (the real process state) and the running processes. Here's the diagnosis:
+
+## Finding: Bot is a zombie — alive but disconnected
+
+```json
+{
+  "process_alive": true,       // process hasn't crashed
+  "gateway_connected": false,  // ...but gateway connection is dead
+  "disconnected_for_min": 20   // stuck like this for 20 minutes
+}
+```
+
+**Why it's not responding:** The bot process is still running, but its gateway (websocket) connection dropped **20 minutes ago** and it never re-established it. So it looks "up" from a process standpoint, but it can't receive or send anything — which is exactly why it's silent.
+
+This rules out a crash. It's a hung/stale connection state, and the bot's own reconnect logic has clearly failed (or doesn't exist), since a healthy client would have reconnected within seconds to a couple of minutes.
+
+## Recommended action
+
+1. **Restart the bot process** — this is the fix. A restart forces a fresh gateway handshake and will restore responsiveness immediately. Simply waiting won't help; it's already proven it can't recover on its own.
+2. **After it's back up, harden it** so this doesn't recur:
+   - Add/fix **auto-reconnect with backoff** on gateway disconnect.
+   - Add a **heartbeat/zombie-session watchdog**: if `gateway_connected == false` for more than ~2–5 minutes, self-terminate and let the supervisor (systemd/pm2/docker) restart it.
+   - Alert on disconnect duration, not just process liveness — a liveness check alone would have said "healthy" here.
+
+Note: there's no live bot process inside this sandbox environment itself — the status file is the authoritative state, so the restart needs to happen wherever the bot is actually hosted.

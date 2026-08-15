@@ -1,0 +1,13 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead old_notes.md
+[0m→ [0mRead retry_engine.py
+[0m→ [0mRead queue_fixture.json
+[0m
+[0m$ [0mpython3 -c "import json, retry_engine; q = json.load(open('queue_fixture.json')); print(retry_engine.check(q))"
+{'success_count': 8, 'total': 8}
+[0m
+[0m✱ [0mGlob "*"[90m 5 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+No, the bug is no longer present. Running `retry_engine.check()` against `queue_fixture.json` now succeeds on all 8 items (`{"success_count": 8, "total": 8}`).

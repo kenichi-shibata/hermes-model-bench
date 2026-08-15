@@ -1,0 +1,13 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead retention_policy.json
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+**Yes**, retention is set up and operating within policy:
+
+- **Configured retention:** 30 days
+- **Oldest file present:** 5 days old
+
+No files exceed the 30-day retention threshold.

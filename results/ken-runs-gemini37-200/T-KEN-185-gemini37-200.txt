@@ -1,0 +1,23 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead pr_diff_3.py
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m
+[0m$ [0mgit status 2>&1
+fatal: not a git repository (or any of the parent directories): .git
+[0m
+In `pr_diff_3.py`, there is a **mutable default argument** gotcha:
+
+- **Issue:** `items=[]` is evaluated once at function definition time. Calls relying on the default parameter share and mutate the same list instance across invocations.
+- **Fix:** Use `None` as the default value and initialize the list inside the function:
+
+```python
+def add_item(item, items=None):
+    if items is None:
+        items = []
+    items.append(item)
+    return items
+```

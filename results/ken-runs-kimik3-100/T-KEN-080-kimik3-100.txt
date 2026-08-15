@@ -1,0 +1,55 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead orphan_scan.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-080
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root    24 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    81 Aug 15 13:35 orphan_scan.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import json
+
+with open('orphan_scan.json') as f:
+    data = json.load(f)
+
+refs = data['broken_performer_refs']
+total = data['total_scenes']
+
+print("JSON valid: True")
+print("Keys:", sorted(data.keys()))
+print("total_scenes:", total, type(total).__name__)
+print("broken_performer_refs count:", len(refs))
+print("all ints:", all(isinstance(r, int) for r in refs))
+print("duplicates:", len(refs) != len(set(refs)))
+print("sorted ascending:", refs == sorted(refs))
+print("within 1..total range:", all(1 <= r <= total for r in refs))
+print("orphan rate: {}/{} = {:.1%}".format(len(refs), total, len(refs)/total))
+EOF
+JSON valid: True
+Keys: ['broken_performer_refs', 'total_scenes']
+total_scenes: 50 int
+broken_performer_refs count: 3
+all ints: True
+duplicates: False
+sorted ascending: True
+within 1..total range: True
+orphan rate: 3/50 = 6.0%
+[0m
+Audit complete. Findings from `orphan_scan.json`:
+
+**Orphans detected: 3 scenes** — IDs **12, 27, 41** have broken performer references (pointing at performers that no longer exist).
+
+**Scan file integrity checks (all passed):**
+- Valid JSON, expected schema (`total_scenes`, `broken_performer_refs`)
+- 3 refs, all integers, no duplicates, sorted ascending
+- All refs within valid scene range (1–50)
+
+**Summary:** 3 of 50 scenes orphaned → **6.0% orphan rate**.
+
+**Caveat:** the sandbox contains only the scan results — no underlying scene/performer data — so I could validate the report's consistency but not re-scan or confirm the orphans against source data. If you can provide the scene/performer files, I can verify refs 12, 27, 41 directly and check for any the scan missed.

@@ -1,0 +1,12 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead pr_status.json
+**No — the PR did not actually get merged.**
+
+The file shows a contradiction:
+
+- `merged_flag: true` — a flag *claims* the PR was merged
+- `target_branch_contains_commit: false` — but the PR's commit is **not present** in the target branch
+
+The ground truth is the branch state: if the target branch doesn't contain the commit, the merge never actually happened. The `merged_flag` is stale or erroneous (e.g., the PR may have been closed without merging, or the flag was set incorrectly). Don't trust the flag — trust the branch contents.

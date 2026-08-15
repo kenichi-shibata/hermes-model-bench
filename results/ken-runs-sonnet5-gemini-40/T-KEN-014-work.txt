@@ -1,0 +1,26 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead tailscale_status_mock.json
+### Root Cause
+
+Your phone cannot reach the home network (`192.168.1.0/24`) because the node serving as the subnet router—**`pve2` (`home-router-node`)**—is **offline** (`"Online": false`, last seen `2026-08-02T00:00:00Z`).
+
+Since `pve2` is the only peer configured with `PrimaryRoutes: ["192.168.1.0/24"]`, traffic destined for your home LAN cannot be routed across the Tailnet while `pve2` is down.
+
+---
+
+### Remediation Steps
+
+1. **Verify Host State:** Check the physical host or hypervisor hosting `pve2` (Proxmox node) to ensure it is powered on and connected to the local network/internet.
+2. **Check Tailscale Service:** Log in to `pve2` and verify the daemon status:
+   ```bash
+   systemctl status tailscaled
+   systemctl restart tailscaled
+   ```
+3. **Check Key Expiry & Re-authenticate:** If the node's auth key expired, re-authenticate:
+   ```bash
+   tailscale up --advertise-routes=192.168.1.0/24
+   ```
+4. **Tailscale Admin Console:** Confirm in the Tailscale admin console that `pve2` is connected and that the `192.168.1.0/24` subnet route is approved and active.

@@ -1,0 +1,21 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead post_handler.py
+[0m→ [0mRead message_log.json
+It posted twice because **`post()` has no idempotency or dedup logic — every call is a guaranteed send.**
+
+**The evidence:**
+
+- `message_log.json` — two identical `"New scene!"` entries, 5 seconds apart (`10:00:00` and `10:00:05`). That 5-second gap is the classic fingerprint of a **retry** (caller timed out waiting for the first ack, or an at-least-once queue redelivered), not a user double-click.
+- `post_handler.py:2` — the handler blindly forwards to `webhook.send(message)`. The comment even admits it: `# no idempotency tracking`.
+
+**The chain of events:**
+
+1. First `post()` call → send succeeds (logged at `10:00:00`), but the caller didn't get/see the confirmation.
+2. Caller retries ~5s later.
+3. `post()` has no memory of the first send — no message ID check, no sent-content cache, no idempotency key passed to the webhook — so the retry goes straight through → second copy logged at `10:00:05`.
+
+**In short:** the duplicate isn't in the log by accident; it's the expected behavior of this code under a retry. The webhook layer was never given a way to recognize "I've already sent this."
+
+**Fix direction** (if you want it): give each message a stable ID, record IDs (or a content hash) before/after sending, and skip already-sent ones — or pass an idempotency key to `webhook.send()` if the webhook supports it. Say the word and I'll patch `post_handler.py`.

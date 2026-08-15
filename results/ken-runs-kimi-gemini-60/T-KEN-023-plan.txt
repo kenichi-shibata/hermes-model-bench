@@ -1,0 +1,57 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+I'll investigate the working directory to understand the situation.
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead wanted_status_field.json
+[0m→ [0mRead scenes_status_field.json
+## Investigation findings
+
+Both files read in full (they're tiny):
+
+**`wanted_status_field.json`** (the lagging status field):
+```json
+{ "searching": 40, "found": 10 }
+```
+
+**`scenes_status_field.json`** (the real current-truth field):
+```json
+{ "searching": 3, "found": 47 }
+```
+
+## What the real problem is
+
+**The wanted backlog *is* moving — the status field just doesn't show it.** That's the actual problem.
+
+- Ground truth (`scenes_status_field.json`): the backlog has nearly drained. Only **3** items still `searching`, **47** `found`.
+- Lagging field (`wanted_status_field.json`): still shows the old snapshot of **40** `searching` / **10** `found`.
+
+Consistency check: both files total **50** items (40+10 = 3+47 = 50). No items were created or lost — the same 50 items have simply progressed from `searching` to `found`, and the wanted field never got updated. So this is a pure stale-field sync issue, not a data-loss or miscount issue.
+
+## Concrete plan for the WORK model
+
+**Edit exactly one file: `/root/ken-tasks/T-KEN-023/wanted_status_field.json`**
+
+1. Change `"searching": 40` → `"searching": 3`
+2. Change `"found": 10` → `"found": 47`
+
+Resulting file content (preserve 2-space indent, keep trailing newline):
+```json
+{
+  "searching": 3,
+  "found": 47
+}
+```
+
+**Do NOT touch:**
+- `scenes_status_field.json` — it is the source of truth and is already correct.
+- `CONTEXT_ONLY.md` — context only.
+
+**Verification steps after the edit:**
+1. Re-read `wanted_status_field.json` and confirm it matches `scenes_status_field.json` exactly (`searching: 3, found: 47`).
+2. Sanity-check totals: 3 + 47 = 50, matching the pre-existing total of 40 + 10 = 50 (confirms a sync, not a recount).
+3. Validate JSON parses, e.g. `python3 -m json.tool wanted_status_field.json`.
+
+**Answer to the task question:** Yes, the wanted backlog is moving (40 → 3 remaining per the truth field); the only defect is that `wanted_status_field.json` is stale and must be synced to the current truth.

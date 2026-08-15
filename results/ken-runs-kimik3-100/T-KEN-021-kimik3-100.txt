@@ -1,0 +1,17 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead queue_state.json
+Yep — stuck, and not just one job. All 5 items in the queue:
+
+- **Every job (id 0–4)**: `downloading`, **0% progress**, stalled for **47 minutes**
+
+The pattern matters here: identical 0% progress and identical 47-min stall times across *every* item points to a systemic problem, not per-item failures (missing articles, bad NZB, etc. would show partial progress or vary per job). In SAB-style queues that usually means one of:
+
+1. **Server connections dead** — Usenet server unreachable, auth failure, or all connections dropped, so no job can fetch articles.
+2. **Queue/scheduler effectively paused** — paused state or speed limit set to ~0 wouldn't change `status` to "paused" in some snapshots, but would look exactly like this.
+3. **Disk full or temp dir unwritable** — downloads can't write, so they sit at 0% indefinitely.
+
+Since everything froze at the same time ~47 min ago, first thing I'd check is the server's connection status/logs — that's the most common cause of a queue-wide 0%-across-the-board stall like this.

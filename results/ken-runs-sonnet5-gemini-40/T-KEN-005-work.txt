@@ -1,0 +1,54 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead api.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scenes.json
+[0m
+[0m← [0mEdit api.py
+Index: /root/ken-tasks/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-005/api.py
++++ /root/ken-tasks/T-KEN-005/api.py
+@@ -1,12 +1,8 @@
+ """Scene homepage sections."""
+ 
+ def _scene_out(scene, translate=False):
+-    """Builds a scene card payload.
+-    BUG: translate defaults to False, and _hydrate_code() below never
+-    passes translate=True, so performer names never get romanized on
+-    the resume/continue-watching section even though _home_trending
+-    correctly passes translate=True."""
++    """Builds a scene card payload."""
+     out = {"id": scene["id"], "title": scene["title"], "performers": []}
+     for p in scene["performers"]:
+         name_en = p.get("name_en")
+         if translate and not name_en:
+@@ -19,10 +15,10 @@
+     return [_scene_out(s, translate=True) for s in scenes]
+ 
+ 
+ def _hydrate_code(scene):
+-    """Used by the resume/continue-watching section. BUG: forgot translate=True."""
+-    return _scene_out(scene)  # missing translate=True
++    """Used by the resume/continue-watching section."""
++    return _scene_out(scene, translate=True)
+ 
+ 
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+
+[0m
+[0m$ [0mpython3 -c "
+import json, api
+data = json.load(open('scenes.json'))
+print('trending:', api._home_trending(data['trending']))
+print('resume:  ', [api._hydrate_code(s) for s in data['resume']])
+"
+trending: [{'id': 1, 'title': 'Trending Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+resume:   [{'id': 2, 'title': 'Resume Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+[0m
+[0m→ [0mRead api.py
+The fix has been applied to `api.py` by passing `translate=True` in `_hydrate_code` and removing the stale bug comments.
+
+Verification confirmed that both `trending` and `resume` scene payloads now correctly populate `name_en` with the romanized Japanese performer names.

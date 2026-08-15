@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead ci_run_log.json
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+No, CI is not passing. The latest run (Run 3, `is_head: true`) failed with status `"fail"`.

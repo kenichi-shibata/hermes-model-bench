@@ -1,0 +1,79 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead retry_engine_v2.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+[0m
+[0m← [0mWrite retry_engine_v2.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 -c "
+import retry_engine_v2 as engine
+
+# Test 1: work_fn that always succeeds
+calls = []
+def success_fn(item_id):
+    calls.append(item_id)
+    return f'done_{item_id}'
+
+res1 = engine.check_and_retry('item1', success_fn)
+assert res1['status'] == 'success'
+assert res1['attempts'] == 1
+assert res1['result'] == 'done_item1'
+assert len(calls) == 1
+assert engine.attempts['item1'] == 1
+
+# Test 2: work_fn that fails twice then succeeds
+fails = {'count': 0}
+def fail_twice_fn(item_id):
+    fails['count'] += 1
+    if fails['count'] < 3:
+        raise RuntimeError('temporary error')
+    return 'ok'
+
+res2 = engine.check_and_retry('item2', fail_twice_fn, max_attempts=3)
+assert res2['status'] == 'success'
+assert res2['attempts'] == 3
+assert res2['result'] == 'ok'
+assert fails['count'] == 3
+assert engine.attempts['item2'] == 3
+
+# Test 3: work_fn that always fails
+def always_fail_fn(item_id):
+    raise ValueError('fatal error')
+
+res3 = engine.check_and_retry('item3', always_fail_fn, max_attempts=4)
+assert res3['status'] == 'failed'
+assert res3['attempts'] == 4
+assert 'fatal error' in res3['error']
+assert engine.attempts['item3'] == 4
+
+# Test 4: reset helper
+engine.reset('item1')
+assert 'item1' not in engine.attempts
+assert 'item2' in engine.attempts
+engine.reset()
+assert len(engine.attempts) == 0
+
+# Test 5: non-callable work_fn
+try:
+    engine.check_and_retry('item4', work_fn=None)
+    assert False, 'Should have raised ValueError'
+except ValueError:
+    pass
+
+print('ALL TESTS PASSED!')
+"
+ALL TESTS PASSED!
+[0m
+[0m→ [0mRead retry_engine_v2.py
+[0m→ [0mRead CONTEXT_ONLY.md
+The original implementation in `retry_engine_v2.py` was just spinning/counting without performing any actual retries or executing any work functions.
+
+`retry_engine_v2.py` has been updated to:
+- Accept an injectable callable `work_fn(item_id)` along with configurable `max_attempts` and optional `delay`.
+- Execute `work_fn` in a loop up to `max_attempts` times with `try/except` handling.
+- Record attempt counts and return execution status (`success` / `failed`), results, and error details.
+- Provide a `reset(item_id=None)` helper to manage the attempts registry.

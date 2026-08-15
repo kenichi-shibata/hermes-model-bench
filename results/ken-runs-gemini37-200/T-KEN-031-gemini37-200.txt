@@ -1,0 +1,65 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead similar_performers.py
+[0m→ [0mRead performer_vectors.json[90m [limit=100][0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m
+[0m$ [0mpython3 -c "import sys; print(sys.version)"
+3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-031
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 11:54 ..
+-rw-r--r--   1 root root   120 Aug 15 11:54 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   280 Aug 15 11:54 performer_vectors.json
+-rw-r--r--   1 root root   192 Aug 15 11:54 similar_performers.py
+[0m
+[0m← [0mEdit similar_performers.py
+Index: /root/ken-tasks/T-KEN-031/similar_performers.py
+===================================================================
+--- /root/ken-tasks/T-KEN-031/similar_performers.py
++++ /root/ken-tasks/T-KEN-031/similar_performers.py
+@@ -1,3 +1,10 @@
+ def get_similar(performer_id, vectors):
+-    v = vectors[str(performer_id)]  # KeyError if missing
+-    return sorted(vectors.items(), key=lambda kv: sum((a-b)**2 for a,b in zip(v, kv[1])))[:5]
++    if not vectors:
++        return []
++    v = vectors.get(str(performer_id))
++    if v is None:
++        v = vectors.get(performer_id)
++    if not v:
++        return []
++    candidates = [kv for kv in vectors.items() if kv[1] is not None]
++    return sorted(candidates, key=lambda kv: sum((a-b)**2 for a,b in zip(v, kv[1])))[:5]
+
+[0m
+[0m$ [0mpython3 -c '
+import json
+from similar_performers import get_similar
+
+with open("performer_vectors.json") as f:
+    vectors = json.load(f)
+
+print("Existing performer 1:", get_similar(1, vectors))
+print("Existing performer \"1\":", get_similar("1", vectors))
+print("Missing performer 99:", get_similar(99, vectors))
+print("Missing performer \"99\":", get_similar("99", vectors))
+print("None vectors:", get_similar(1, None))
+print("Empty vectors:", get_similar(1, {}))
+print("Vectors with None item:", get_similar(1, {"1": [0.1, 0.2], "2": None}))
+'
+Existing performer 1: [('1', [0.1, 0.2]), ('0', [0.0, 0.0]), ('2', [0.2, 0.4]), ('3', [0.30000000000000004, 0.6000000000000001]), ('4', [0.4, 0.8])]
+Existing performer "1": [('1', [0.1, 0.2]), ('0', [0.0, 0.0]), ('2', [0.2, 0.4]), ('3', [0.30000000000000004, 0.6000000000000001]), ('4', [0.4, 0.8])]
+Missing performer 99: []
+Missing performer "99": []
+None vectors: []
+Empty vectors: []
+Vectors with None item: [('1', [0.1, 0.2])]
+[0m
+[0m→ [0mRead similar_performers.py
+Handled missing performer vectors in `similar_performers.py` by safely checking if the performer's vector exists and returning an empty list `[]` instead of raising a `KeyError`.

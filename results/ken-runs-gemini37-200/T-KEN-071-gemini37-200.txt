@@ -1,0 +1,28 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead follow_targets.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m
+[0m← [0mEdit follow_targets.json
+Index: /root/ken-tasks/T-KEN-071/follow_targets.json
+===================================================================
+--- /root/ken-tasks/T-KEN-071/follow_targets.json
++++ /root/ken-tasks/T-KEN-071/follow_targets.json
+@@ -1,10 +1,6 @@
+ [
+   {
+-    "id": "target_performer",
+-    "reason": "manual"
+-  },
+-  {
+     "id": "perf_0",
+     "reason": "track_button_bug"
+   },
+   {
+
+[0m
+[0m→ [0mRead follow_targets.json
+Removed `target_performer` from `follow_targets.json`.

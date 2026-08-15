@@ -1,0 +1,15 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead model_cost_comparison.json
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+**Yes**, using the cheaper model is actually saving money.
+
+### Breakdown:
+- **Cheap model:** 
+  - $0.002/call × 3 calls = **$0.006** (or 4 calls with 3 retries = **$0.008**)
+- **Expensive model:** 
+  - $0.08/call × 1 call = **$0.080** (or 2 calls with 1 retry = **$0.160**)
+
+Even with the additional retries, the cheap model costs **~10–13× less** per successful outcome.

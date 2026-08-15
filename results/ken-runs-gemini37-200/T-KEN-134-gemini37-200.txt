@@ -1,0 +1,14 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead llm_call_log.json
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+Based on `llm_call_log.json`, it is **failing silently**:
+
+- `requests_24h`: 40
+- `actual_llm_calls_logged`: 0
+
+While 40 requests were processed over the last 24 hours, 0 actual LLM calls were logged.

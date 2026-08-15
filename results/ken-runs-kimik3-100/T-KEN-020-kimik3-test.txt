@@ -1,0 +1,23 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead usenet_config.json
+[0m→ [0mRead backbone_lookup_mock.json
+**Verdict: you're cooked.** 🍳
+
+Your setup is redundant in name only:
+
+| Role | Provider | Backbone |
+|---|---|---|
+| Primary | Eweka | **Omicron** |
+| Backup | Newshosting | **Omicron** |
+
+Both the config and the lookup table agree: Eweka and Newshosting are two different storefronts on the **same Omicron backbone**. That means:
+
+- **Backbone outage** (network/infra failure at Omicron) → both providers go down together. Your "backup" is dead at exactly the moment you need it.
+- **Article-level failures correlate** — DMCA/copyright takedowns and propagation gaps happen at the backbone level, so a missing article on Eweka will very likely be missing on Newshosting too. Completion-wise, your backup buys you almost nothing.
+- The only failure mode it actually covers is provider-account/billing issues, which is the least likely reason you'd fail over.
+
+**What actual redundancy looks like:** primary + backup on *different* backbones. Per the lookup table you have, adding a Highwinds-based provider (e.g., **UsenetExpress** or **BlockNews**) as the backup — while keeping Eweka on Omicron as primary — would give you genuine diversity. Swapping Newshosting for **UsenetServer** would not help, since it's also Omicron.
+
+Want me to rewrite `usenet_config.json` with a cross-backbone backup?

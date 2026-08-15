@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead backup_file_stats.json
+[0m→ [0mRead CONTEXT_ONLY.md
+The backup is effectively empty / not good. Although the status indicates `"completed"`, the backup file size is only 12 bytes compared to the expected normal size of 90 MB.

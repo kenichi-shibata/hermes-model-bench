@@ -1,0 +1,11 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead restore_candidates.json
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[93m[1m! [0mpermission requested: external_directory (/tmp/*); auto-rejecting
+[0m✗ [0mGlob "*" failed[90m in /tmp[0m
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.

@@ -1,0 +1,42 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead sab_config.json
+[0m→ [0mRead speed_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+# PLAN — "why is sab so slow rn"
+
+## Investigation findings
+
+**`sab_config.json`** (the whole config, 4 lines):
+```json
+{ "max_download_speed_kbps": 500, "connections": 20 }
+```
+
+**`speed_log.json`**: 20 throughput samples, all between **485–494 kbps** — every single sample sits at 97–99% of the 500 kbps cap, with tiny sawtooth variation and zero samples ever exceeding ~494.
+
+**`CONTEXT_ONLY.md`**: contains only the file description, no extra info.
+
+## Diagnosis
+
+This is **not a network or server problem — sab is throttling itself**. The signature is unambiguous:
+
+- Real congestion/server limits produce *variable* throughput that fluctuates well below a cap.
+- A configured rate limiter produces *stable* throughput pinned just under the cap (limiter overhead/rounding explains the 485–494 vs. 500 gap).
+
+The throughput curve hugs `max_download_speed_kbps: 500` perfectly. The `connections: 20` setting is already generous and is not the bottleneck — the limiter engages long before connection count matters.
+
+## Concrete steps for the WORK model
+
+1. **Edit `/root/ken-tasks/T-KEN-022/sab_config.json` only.** No other files need changes.
+2. Change `max_download_speed_kbps` from `500` to either:
+   - `0` — SABnzbd's convention for "no limit" (preferred if the goal is "not slow"), or
+   - a much higher explicit cap (e.g., `50000`) if a limit is still desired.
+   
+   The exact target value is a user-preference decision; if no preference is given, `0` (unlimited) directly answers "why is it slow — make it not slow."
+3. **Leave `connections: 20` unchanged** — it is not implicated by the data.
+4. Resulting file should remain valid JSON with the same schema (two keys, same names).
+5. **Verification**: after the change, subsequent throughput samples should be able to exceed 500 kbps. The WORK model can note that the existing `speed_log.json` pre-dates the fix, so the log itself doesn't need editing — new samples are what would demonstrate the fix.
+
+**Do not** chase other explanations (server health, connection count, disk I/O) — the evidence in `speed_log.json` fully accounts for the observed slowness via the configured cap.

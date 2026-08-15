@@ -1,0 +1,65 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mls -la
+total 32
+drwxr-xr-x   3 root root  4096 Aug 15 12:05 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 15:04 ..
+-rw-r--r--   1 root root    75 Aug 15 14:36 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 15 15:06 __pycache__
+-rw-r--r--   1 root root    91 Aug 15 14:36 performer_bio_sync.py
+-rw-r--r--   1 root root   417 Aug 15 14:36 performers_bios.json
+[0m
+[0m→ [0mRead performers_bios.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead performer_bio_sync.py
+[0m
+[0m$ [0mls -la __pycache__
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 15:06 .
+drwxr-xr-x 3 root root 4096 Aug 15 12:05 ..
+-rw-r--r-- 1 root root  374 Aug 15 15:06 performer_bio_sync.cpython-313.pyc
+[0m
+[0m$ [0mpython3 -c "
+import dis, marshal, importlib.util, sys
+
+path = '__pycache__/performer_bio_sync.cpython-313.pyc'
+with open(path, 'rb') as f:
+    data = f.read()
+
+# header is 16 bytes for 3.7+
+code = marshal.loads(data[16:])
+dis.dis(code)
+print('---CONSTS---')
+def walk(c, depth=0):
+    print(' '*depth, 'code object:', c.co_name, 'names:', c.co_names, 'consts:', [x for x in c.co_consts if not hasattr(x,'co_name')])
+    for const in c.co_consts:
+        if hasattr(const, 'co_name'):
+            walk(const, depth+2)
+walk(code)
+"
+0           RESUME                   0
+
+  1           LOAD_CONST               0 (<code object sync_bio at 0x7ff7fbf62790, file "/root/ken-tasks/T-KEN-038/performer_bio_sync.py", line 1>)
+              MAKE_FUNCTION
+              STORE_NAME               0 (sync_bio)
+              RETURN_CONST             1 (None)
+
+Disassembly of <code object sync_bio at 0x7ff7fbf62790, file "/root/ken-tasks/T-KEN-038/performer_bio_sync.py", line 1>:
+  1           RESUME                   0
+
+  2           LOAD_FAST                1 (source_a)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_FAST                0 (performer)
+              LOAD_CONST               1 ('id')
+              BINARY_SUBSCR
+              BUILD_MAP                0
+              CALL                     2
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               2 ('bio')
+              CALL                     1
+              RETURN_VALUE
+---CONSTS---
+ code object: <module> names: ('sync_bio',) consts: [None]
+   code object: sync_bio names: ('get',) consts: [None, 'id', 'bio']
+[0m

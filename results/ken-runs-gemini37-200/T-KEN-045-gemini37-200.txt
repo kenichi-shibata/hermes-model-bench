@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead flaresolverr_health.json[90m [offset=1, limit=100][0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+No. FlareSolverr is healthy—the CPU briefly spiked to 180% at `t=1` (normal challenge solving) and quickly returned to baseline (~16–18% at `t=2` and `t=3`).

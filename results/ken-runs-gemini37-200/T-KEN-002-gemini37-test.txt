@@ -1,0 +1,63 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dedupe.py
+[0m→ [0mRead mirror_groups.json[90m [limit=100][0m
+[0m→ [0mRead mirror_groups.json
+[0m
+[0m$ [0mpython3 -c 'import json, dedupe; db = json.load(open("mirror_groups.json")); print(dedupe.scan_mirror_group("group_42", db))'
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+[0m
+[0m← [0mEdit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -7,12 +7,10 @@
+     return max(pool, key=lambda c: c["size_gb"])
+ 
+ 
+ def suggest_keep(candidates):
+-    """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    """DISPLAY-ONLY ranking shown on the review page: playability first, then size."""
++    return pick_canonical(candidates)
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+[0m
+[0m→ [0mRead dedupe.py
+[0m
+[0m$ [0mpython3 -c 'import json, dedupe; db = json.load(open("mirror_groups.json")); res = dedupe.scan_mirror_group("group_42", db); print(res); assert res["suggested_keep"] == res["canonical_would_be"] == "scenes:101"'
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+[0m
+[0m$ [0mpython3 -c '
+import dedupe
+
+# Test 1: playable vs unplayable larger
+candidates1 = [{"id": "1", "playable": False, "size_gb": 10}, {"id": "2", "playable": True, "size_gb": 2}]
+assert dedupe.suggest_keep(candidates1)["id"] == "2"
+assert dedupe.pick_canonical(candidates1)["id"] == "2"
+
+# Test 2: multiple playable
+candidates2 = [{"id": "1", "playable": True, "size_gb": 1}, {"id": "2", "playable": True, "size_gb": 5}, {"id": "3", "playable": False, "size_gb": 10}]
+assert dedupe.suggest_keep(candidates2)["id"] == "2"
+assert dedupe.pick_canonical(candidates2)["id"] == "2"
+
+# Test 3: no playable
+candidates3 = [{"id": "1", "playable": False, "size_gb": 1}, {"id": "2", "playable": False, "size_gb": 5}]
+assert dedupe.suggest_keep(candidates3)["id"] == "2"
+assert dedupe.pick_canonical(candidates3)["id"] == "2"
+
+print("All assertions passed successfully!")
+'
+All assertions passed successfully!
+[0m
+I have updated `suggest_keep` in `dedupe.py` to prioritize playable files before ranking by file size (matching `pick_canonical`), resolving the issue where unplayable files with larger sizes were erroneously recommended over smaller playable files.

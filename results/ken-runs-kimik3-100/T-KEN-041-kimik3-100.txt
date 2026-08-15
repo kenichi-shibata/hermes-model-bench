@@ -1,0 +1,33 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m
+[0m$ [0mpwd
+/root/ken-tasks/T-KEN-041
+[0m
+[0m→ [0mRead resume_section.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead resume_scenes.json
+[0m
+[0m← [0mEdit resume_section.py
+Index: /root/ken-tasks/T-KEN-041/resume_section.py
+===================================================================
+--- /root/ken-tasks/T-KEN-041/resume_section.py
++++ /root/ken-tasks/T-KEN-041/resume_section.py
+@@ -1,2 +1,2 @@
+ def get_resume(scenes):
+-    return sorted(scenes, key=lambda s: s['added_at'], reverse=True)
++    return sorted(scenes, key=lambda s: s['last_watched_at'], reverse=True)
+
+[0m
+The bug: a "resume" section should order by when you last watched (`last_watched_at`), but `get_resume` sorts by `added_at`. With the sample data this puts scene 2 (watched Aug 1) above scene 1 (watched Aug 13) — backwards.
+[0m$ [0mpython3 -c "
+import json
+from resume_section import get_resume
+scenes = json.load(open('resume_scenes.json'))
+print([s['id'] for s in get_resume(scenes)])
+"
+[1, 2]
+[0m
+Fixed. `get_resume` now sorts by `last_watched_at` (descending) instead of `added_at`. Verified with the sample data: the order is now `[1, 2]` — the most recently watched scene (id 1, watched Aug 13) comes first, which is what a "resume watching" section should show.

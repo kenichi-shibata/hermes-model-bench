@@ -1,0 +1,213 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m
+[0m$ [0mls -la
+total 56
+drwxr-xr-x   3 root root  4096 Aug 15 13:36 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 14:36 ..
+-rw-r--r--   1 root root    99 Aug 15 14:36 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 15 13:36 __pycache__
+-rw-r--r--   1 root root  9092 Aug 15 14:36 errored_backlog.json
+-rw-r--r--   1 root root  2574 Aug 15 13:36 process_backlog.py
+-rw-r--r--   1 root root   253 Aug 15 14:36 retry_api_mock.py
+-rw-r--r--   1 root root  9692 Aug 15 13:36 retry_results.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead retry_api_mock.py
+[0m→ [0mRead process_backlog.py
+[0m
+[0m$ [0mpython3 -c "
+import json
+b = json.load(open('errored_backlog.json'))
+print('backlog type:', type(b).__name__, 'len:', len(b))
+from collections import Counter
+print('statuses:', Counter(it.get('status') for it in b))
+print('sample:', b[:3])
+ids = [it['id'] for it in b]
+print('unique ids:', len(set(ids)))
+r = json.load(open('retry_results.json'))
+print('results type:', type(r).__name__, 'len:', len(r))
+print('result statuses:', Counter(it.get('status') for it in r))
+print('result sample:', r[:3])
+rids = set(it['id'] for it in r)
+bids = set(ids)
+print('errored ids missing from results:', len(bids - rids))
+print('result ids not in backlog:', len(rids - bids))
+"
+backlog type: list len: 200
+statuses: Counter({'error': 200})
+sample: [{'id': 0, 'status': 'error'}, {'id': 1, 'status': 'error'}, {'id': 2, 'status': 'error'}]
+unique ids: 200
+results type: list len: 200
+result statuses: Counter({'resolved': 200})
+result sample: [{'id': 0, 'status': 'resolved'}, {'id': 1, 'status': 'resolved'}, {'id': 2, 'status': 'resolved'}]
+errored ids missing from results: 0
+result ids not in backlog: 0
+[0m
+[0m$ [0mls -la __pycache__/ && head -c 400 errored_backlog.json && echo && head -c 400 retry_results.json
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 13:36 .
+drwxr-xr-x 3 root root 4096 Aug 15 13:36 ..
+-rw-r--r-- 1 root root  666 Aug 15 13:36 retry_api_mock.cpython-313.pyc
+[
+  {
+    "id": 0,
+    "status": "error"
+  },
+  {
+    "id": 1,
+    "status": "error"
+  },
+  {
+    "id": 2,
+    "status": "error"
+  },
+  {
+    "id": 3,
+    "status": "error"
+  },
+  {
+    "id": 4,
+    "status": "error"
+  },
+  {
+    "id": 5,
+    "status": "error"
+  },
+  {
+    "id": 6,
+    "status": "error"
+  },
+  {
+    "id": 7,
+    "status": "error"
+  },
+  {
+    "id": 8,
+    "status": "error"
+  },
+  
+[
+  {
+    "id": 0,
+    "status": "resolved"
+  },
+  {
+    "id": 1,
+    "status": "resolved"
+  },
+  {
+    "id": 2,
+    "status": "resolved"
+  },
+  {
+    "id": 3,
+    "status": "resolved"
+  },
+  {
+    "id": 4,
+    "status": "resolved"
+  },
+  {
+    "id": 5,
+    "status": "resolved"
+  },
+  {
+    "id": 6,
+    "status": "resolved"
+  },
+  {
+    "id": 7,
+    "status": "resolved"
+  },
+  {
+    "id": 8,
+    "
+[0m
+[0m$ [0mPYTHONDONTWRITEBYTECODE=1 python3 -c "
+import json, queue, threading, time
+from collections import Counter
+from retry_api_mock import retry
+
+backlog = json.load(open('errored_backlog.json'))
+errored = [it for it in backlog if it.get('status') == 'error']
+
+def run(workers):
+    q = queue.Queue()
+    for it in errored: q.put(it)
+    results, lock, stats = [], threading.Lock(), Counter()
+    def worker():
+        while True:
+            try: item = q.get_nowait()
+            except queue.Empty: return
+            while True:
+                try:
+                    res = retry(item['id'])
+                    with lock: results.append(res); stats['resolved'] += 1
+                    break
+                except Exception as e:
+                    if '429' in str(e):
+                        with lock: stats['429s'] += 1
+                        time.sleep(0.001)
+                    else:
+                        with lock: stats['failed'] += 1
+                        break
+            q.task_done()
+    ts = [threading.Thread(target=worker) for _ in range(workers)]
+    t0 = time.time()
+    [t.start() for t in ts]; [t.join() for t in ts]
+    return time.time()-t0, stats, len(results)
+
+for w in (5,):
+    el, st, n = run(w)
+    print(f'workers={w}: {el:.3f}s resolved={st[\"resolved\"]} failed={st[\"failed\"]} 429s={st[\"429s\"]} results={n}')
+"
+workers=5: 0.001s resolved=200 failed=0 429s=0 results=200
+[0m
+[0m$ [0mPYTHONDONTWRITEBYTECODE=1 python3 -c "
+import json
+# exact-format check: is retry_results.json byte-identical to what process_backlog.py would write?
+r = json.load(open('retry_results.json'))
+expected = json.dumps(sorted(r, key=lambda x: x['id']), indent=2)
+actual = open('retry_results.json').read()
+print('sorted+indent2 identical:', expected == actual)
+print('tail:', repr(actual[-30:]))
+"
+sorted+indent2 identical: True
+tail: '    "status": "resolved"\n  }\n]'
+[0m
+Let me verify the runtime behavior without modifying anything (bytecode writing disabled, no files written):
+## PLAN REPORT — T-KEN-024 "go full tilt on the errored ones"
+
+### What I found
+
+| File | State |
+|---|---|
+| `errored_backlog.json` | 200 items, **all** `status: "error"`, unique ids 0–199 |
+| `retry_api_mock.py` | Semaphore(5), non-blocking acquire → raises `429 rate limited` when saturated; otherwise always returns `{'id', 'status': 'resolved'}`. Never raises non-429 errors. |
+| `process_backlog.py` | **Already exists and is correct**: 5 workers (matches semaphore capacity), queue-based, infinite retry on 429 with 1ms backoff, fail-path for non-429 errors, sorts results by id, writes `retry_results.json` (indent=2), asserts 200/200 resolved. |
+| `retry_results.json` | **Already exists and is complete**: 200 entries, all `resolved`, ids exactly match the backlog. Byte-identical to what the script produces (sorted, indent=2). |
+
+### The real problem
+
+**There is no code problem.** The solution script and its output are already in place and verified:
+
+- I simulated the exact worker logic in-memory (no files written): 5 workers → **200/200 resolved, 0 failed** in ~1ms. 429s are possible under contention but are always retried, so the run cannot lose items.
+- The only anomaly is timestamps: `errored_backlog.json` / `retry_api_mock.py` were touched at 14:36, while `retry_results.json` is from 13:36 — i.e., the results *may* be stale relative to the current backlog, even though their contents match perfectly right now.
+
+So the task reduces to: **(re)run the existing script to produce a fresh, verified `retry_results.json`, and confirm.** No edits required.
+
+### Exact steps for the WORK model
+
+1. **Do NOT rewrite or "improve" anything.** Specifically do not:
+   - raise `WORKERS` above 5 (extra threads only churn on 429s; 5 exactly saturates the API),
+   - modify `retry_api_mock.py` or `errored_backlog.json`,
+   - add logging/jitter/dependencies to `process_backlog.py`.
+2. Run: `python3 process_backlog.py` in `/root/ken-tasks/T-KEN-024`.
+3. Verify stdout shows: `Resolved: 200/200`, `Failed: 0`, and `Verified: every errored item resolved.` (the two asserts must pass; 429 count may be 0 or more — irrelevant, all retried).
+4. Verify output file with a quick check: `retry_results.json` contains exactly 200 entries, every `status == "resolved"`, and the set of ids equals the set of errored ids in `errored_backlog.json` (0–199).
+5. Done. If step 3 or 4 ever failed (it shouldn't, since the API only ever raises retriable 429s), the only sanctioned fix would be ensuring the 429-retry loop is intact — but the current script already has it.
+
+**Bottom line:** the "full tilt" machinery is already built and correct; the WORK model just needs to execute it and verify the fresh results.

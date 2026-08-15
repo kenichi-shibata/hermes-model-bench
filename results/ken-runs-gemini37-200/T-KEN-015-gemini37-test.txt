@@ -1,0 +1,15 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead dedupe_auto.py
+[0m→ [0mRead groups.json
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dedupe_auto.py[90m [limit=100, offset=1][0m
+[0m✱ [0mGrep ".*"[90m in . · 42 matches[0m
+In both groups, there is a **playability vs. user-data conflict**:
+
+- One item is **unplayable** (`playable: false`) but has user data (`play_count > 0`: `s1` with 12, `s3` with 3).
+- The duplicate item is **playable** (`playable: true`) but has no user data (`play_count: 0`: `s2`, `s4`).
+
+`auto_canonicalize_plan()` explicitly triggers a safety check for this scenario and returns `{"action": "refuse", "reason": "playability vs user-data conflict -- needs human review"}` to prevent automatic data loss or retaining unplayable tracks.

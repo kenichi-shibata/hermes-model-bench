@@ -1,0 +1,9 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead single_fact_retrieval.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+Based on `single_fact_retrieval.json`, the fact is verified as retrievable with 1 hit via the alternate query (`alternate_query_hits: 1`, `obvious_query_hits: 0`).

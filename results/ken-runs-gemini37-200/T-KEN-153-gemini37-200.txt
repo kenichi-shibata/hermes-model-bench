@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead before_after_comparison.json
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+No, nothing broke. The number of passing tests remained at 18 while the cost decreased from 3.0 to 0.3.

@@ -1,0 +1,41 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead tailscale_status_mock.json
+[0m→ [0mRead CONTEXT_ONLY.md
+## Investigation findings
+
+The directory contains only two files: `CONTEXT_ONLY.md` (orientation note, no extra info) and `tailscale_status_mock.json`, which is the phone's Tailscale status.
+
+What the JSON shows:
+
+- **Self**: `phone` at `100.1.1.1` — the phone itself is on the tailnet.
+- **Peer `home-router-node`** (hostname `pve2`): **`Online: false`**, `LastSeen: 2026-08-02` — that's **13 days stale** (today is 2026-08-15). It is the node advertising `PrimaryRoutes: ["192.168.1.0/24"]` — i.e., the **subnet router for the home LAN**.
+- Other peers (`laptop`, `phone2`) are online but advertise **no routes**.
+
+## The real problem
+
+The phone's Tailscale connectivity is fine. The reason it can't reach the home network: **the only subnet router advertising the home LAN route `192.168.1.0/24` — the `pve2` node — is offline** (last seen 2026-08-02). With no online node advertising that route, the phone has no path into `192.168.1.0/24`. There is no failover subnet router.
+
+## Plan for the WORK model
+
+1. **Do NOT edit `tailscale_status_mock.json`.** It is diagnostic evidence (real status data), not a config file. Flipping `Online` to `true` or editing routes would falsify the data, not fix anything. There is no file in this directory whose edit fixes the problem — the fix is operational, on the real `pve2` host.
+
+2. **Report the diagnosis to the user** (this is the deliverable; no file changes are needed or appropriate):
+   - Cause: home subnet router `pve2` (the node advertising `192.168.1.0/24`) has been offline since 2026-08-02.
+   - Evidence: `tailscale_status_mock.json` — `Peer["home-router-node"].Online == false`, and it is the sole peer with `PrimaryRoutes` containing `192.168.1.0/24`.
+
+3. **Give the user concrete remediation steps** to run on `pve2` (a Proxmox host):
+   - Check the host is powered on and has internet connectivity.
+   - Check the Tailscale daemon: `systemctl status tailscaled`; restart if needed: `sudo systemctl restart tailscaled`.
+   - Re-authenticate if the node key expired: `sudo tailscale up --advertise-routes=192.168.1.0/24` (keep advertising the route).
+   - Confirm IP forwarding is still enabled: `sysctl net.ipv4.ip_forward` (should be `1`); make it persistent in `/etc/sysctl.conf` if not.
+   - In the Tailscale admin console, verify the route `192.168.1.0/24` is still **approved** for `pve2` (route approval can be revoked).
+
+4. **Verification step** (from the phone, after `pve2` is back):
+   - `tailscale status` should show `home-router-node` online, then `ping 192.168.1.1` (or another LAN host) should succeed.
+
+5. **Optional hardening recommendation** (mention briefly, don't implement): add a second subnet router for `192.168.1.0/24` on different hardware — Tailscale supports high-availability subnet routers — so a single offline node doesn't kill home access.
+
+**Summary for WORK model:** No edits to any file in this directory. The task resolves to a diagnosis + operational runbook: the sole subnet router for `192.168.1.0/24` (`pve2`) is offline since 2026-08-02; restore Tailscale on that host (service, auth key, route advertisement/approval, IP forwarding), then verify from the phone.

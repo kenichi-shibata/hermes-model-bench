@@ -1,0 +1,39 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead wanted_status_field.json
+[0m→ [0mRead scenes_status_field.json
+[0m
+[0m← [0mEdit wanted_status_field.json
+Index: /root/ken-tasks/T-KEN-023/wanted_status_field.json
+===================================================================
+--- /root/ken-tasks/T-KEN-023/wanted_status_field.json
++++ /root/ken-tasks/T-KEN-023/wanted_status_field.json
+@@ -1,4 +1,4 @@
+ {
+-  "searching": 40,
+-  "found": 10
+-}
+\ No newline at end of file
++  "searching": 3,
++  "found": 47
++}
+
+[0m
+[0m→ [0mRead wanted_status_field.json
+[0m
+[0m$ [0mpython3 -m json.tool wanted_status_field.json
+{
+    "searching": 3,
+    "found": 47
+}
+[0m
+[0m$ [0mpython3 -m json.tool scenes_status_field.json
+{
+    "searching": 3,
+    "found": 47
+}
+[0m
+The wanted backlog is moving. Ground truth (`scenes_status_field.json`) shows 47 items found and 3 searching (down from 40 searching / 10 found). `wanted_status_field.json` has been updated to match the current status.

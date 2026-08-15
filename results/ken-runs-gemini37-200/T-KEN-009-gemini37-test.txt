@@ -1,0 +1,22 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead disk_fleet.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+### Disk Fleet Status Summary
+
+| Host | Name | Used % | Thin Provisioned | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **host1** | - | 45% | No | OK |
+| **host2** | - | 38% | No | OK |
+| **host3** | `media-pool` | **92%** | **Yes** | ⚠️ **Critical / High Usage** |
+| **host4** | - | 22% | No | OK |
+| **host5** | - | 30% | No | OK |
+
+---
+
+### Key Findings & Observations
+- **Critical Alert:** `host3` (`media-pool`) is at **92% disk usage** and is **thin-provisioned**, putting it at immediate risk of running out of allocated space.
+- **Normal Fleet Usage:** The remaining hosts (`host1`, `host2`, `host4`, `host5`) have healthy utilization levels ranging from 22% to 45% (average across the fleet is 45.4%).

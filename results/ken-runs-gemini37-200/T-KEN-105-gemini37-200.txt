@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead backup_error_log.txt
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+The backup failed during the upload of `backup.tar.gz` at 45% completion due to a `BrokenPipeError: [Errno 32] Broken pipe`, indicating the receiving server or process closed the connection/pipe prematurely while data was being written.

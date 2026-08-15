@@ -1,0 +1,13 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob "**/.*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead alert_vs_ground_truth.json
+### Investigation Findings
+
+1. **Discrepancy:** The alert reported **95%**, but the actual current metric is **45%**.
+2. **Root Cause:** **Data Staleness / Metric Lag** — `check_data_age_min` is **120 minutes** (2 hours). The alert triggered on outdated/stale data rather than real-time ground truth.
+3. **Conclusion:** The alert is a **false positive caused by a 2-hour metric delay**. Ensure data ingestion/collection pipelines are healthy and alerting queries use fresh data.

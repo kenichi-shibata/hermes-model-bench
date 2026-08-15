@@ -1,0 +1,68 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead movie_grouping.py
+[0m→ [0mRead scenes_movie_parts.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-036
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root   111 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    88 Aug 15 13:35 movie_grouping.py
+-rw-r--r--   1 root root   452 Aug 15 13:35 scenes_movie_parts.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mWrite movie_grouping.py
+Wrote file successfully.
+[0m
+The bug: `movie_grouping.py` only *finds* ungrouped scenes — nothing ever groups them. There's no logic to recognize that "BigMovie Part 1..6" are the same movie, so they never get a shared `movie_id`. I'll add title-based grouping (stripping "Part N" suffixes) and id assignment.
+[0m$ [0mpython3 - <<'EOF'
+import json
+import movie_grouping as mg
+
+scenes = json.load(open('scenes_movie_parts.json'))
+assert len(mg.find_ungrouped(scenes)) == 6
+
+groups = mg.group_scenes(scenes)
+print("groups:", {k: [s['id'] for s in v] for k, v in groups.items()})
+assert len(groups) == 1 and len(groups['BigMovie']) == 6
+
+mg.assign_movie_ids(scenes)
+ids = {s['movie_id'] for s in scenes}
+print("movie_ids:", ids)
+assert len(ids) == 1
+assert mg.find_ungrouped(scenes) == []
+
+# sanity: other titles / existing ids behave
+extra = [
+    {"id": 7, "title": "Other Film", "movie_id": None},
+    {"id": 8, "title": "BigMovie Part 7", "movie_id": None},
+    {"id": 9, "title": "Pre Set", "movie_id": 42},
+    {"id": 10, "title": "Sequel: Part II", "movie_id": None},
+    {"id": 11, "title": "Sequel: Part III", "movie_id": None},
+]
+mg.assign_movie_ids(extra)
+print([(s['title'], s['movie_id']) for s in extra])
+by_id = {}
+for s in extra: by_id.setdefault(s['movie_id'], []).append(s['id'])
+assert [8] != by_id[extra[0]['movie_id']]  # Other Film is its own movie
+assert extra[0]['movie_id'] != extra[1]['movie_id']  # Other Film vs BigMovie
+assert extra[3]['movie_id'] == extra[4]['movie_id']  # Sequel parts together
+assert extra[2]['movie_id'] == 42  # preserved
+print("ALL OK")
+EOF
+groups: {'BigMovie': [1, 2, 3, 4, 5, 6]}
+movie_ids: {1}
+[('Other Film', 43), ('BigMovie Part 7', 44), ('Pre Set', 42), ('Sequel: Part II', 45), ('Sequel: Part III', 45)]
+ALL OK
+[0m
+Fixed. The problem was that `movie_grouping.py` only *detected* ungrouped scenes — nothing actually grouped them, so "BigMovie Part 1–6" never got linked. Changes:
+
+- **`base_title()`** — strips trailing part designators (`Part 2`, `Pt. 3`, `Part II`, `- Part 4`, etc.) to get the movie's base title.
+- **`group_scenes()`** — groups scenes by existing `movie_id`, falling back to base title, so all "BigMovie Part N" scenes land in one `BigMovie` group.
+- **`assign_movie_ids()`** — gives every scene sharing a base title the same `movie_id` (preserving existing ids, new ids start above them).
+- `find_ungrouped()` kept as-is.
+
+Verified against `scenes_movie_parts.json`: all 6 scenes now group into one movie with a single shared `movie_id`, and `find_ungrouped` returns empty. Sanity checks confirm unrelated titles stay separate, existing ids are untouched, and roman-numeral parts (`Part II`/`Part III`) group correctly.

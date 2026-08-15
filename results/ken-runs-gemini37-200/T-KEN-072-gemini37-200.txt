@@ -1,0 +1,9 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead webhook_delivery_log.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+Yes, the webhook actually fired. According to `webhook_delivery_log.json`, the outbound HTTP request completed successfully with status `200` (`"outbound_call_status": 200`), though the message did not appear in the channel (`"message_appeared_in_channel": false`).

@@ -1,0 +1,55 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 14:49 ..
+-rw-r--r--   1 root root    83 Aug 15 14:36 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    56 Aug 15 14:36 cover_image_resolver.py
+-rw-r--r--   1 root root  2152 Aug 15 14:36 scenes_covers.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead cover_image_resolver.py
+[0m→ [0mRead scenes_covers.json
+## Investigation Report
+
+**Directory contents:** `CONTEXT_ONLY.md` (just repeats the task orientation), `cover_image_resolver.py` (the entire logic, 2 lines), `scenes_covers.json` (20 scenes, ids 0–19).
+
+### The real problem
+
+`cover_image_resolver.py` is:
+
+```python
+def get_cover(scene):
+    return scene.get('cover_url')
+```
+
+In `scenes_covers.json`, **scenes 0–4 have `"cover_url": null`**, while scenes 5–19 have a real URL. So `get_cover()` returns `None` for exactly those 5 scenes — that's why some scenes show no cover image.
+
+The key observation: **every scene — including 0–4 — has a non-empty `screenshots` list** (e.g. scene 0 has `http://x/0_1.jpg`). The resolver simply never uses it as a fallback. So this is a missing-fallback bug in the resolver, not missing data.
+
+### Concrete plan for the WORK model
+
+1. **Edit only `cover_image_resolver.py`** (no changes needed to the JSON): add a fallback to the first screenshot when `cover_url` is missing/null. Target implementation:
+
+   ```python
+   def get_cover(scene):
+       cover = scene.get('cover_url')
+       if cover:
+           return cover
+       screenshots = scene.get('screenshots') or []
+       return screenshots[0] if screenshots else None
+   ```
+
+   Notes for the implementer:
+   - Use a truthiness check (`if cover`) rather than `is not None` so empty strings also fall back.
+   - Use `scene.get('screenshots') or []` so a missing key or explicit `null` doesn't crash.
+   - Keep the function signature and module structure unchanged — this is the minimal fix.
+
+2. **Verify** (no test suite exists, so run a one-off check, e.g. via `python3 -c` or a temp script in `/tmp/opencode` — do not add files to the repo):
+   - Import `get_cover`, load `scenes_covers.json`, call it on all 20 scenes.
+   - Expected result: all 20 scenes return a non-`None` cover; scenes 0–4 return their screenshot URL (`http://x/0_1.jpg` … `http://x/4_1.jpg`); scenes 5–19 still return their original `cover_url` (fallback must not override existing covers).
+   - Edge-case check: `get_cover({})` and `get_cover({"cover_url": None, "screenshots": []})` should return `None` without raising.
+
+No other files need to be touched.

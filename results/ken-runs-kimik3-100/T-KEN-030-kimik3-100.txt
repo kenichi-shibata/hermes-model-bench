@@ -1,0 +1,70 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead ratings_api.py
+[0m→ [0mRead ratings_db.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mpython3 -c "
+import json
+from ratings_api import get_rating
+
+db = json.load(open('ratings_db.json'))
+for scene in db:
+    print(scene['id'], get_rating(scene))
+"
+Traceback (most recent call last):
+  File "<string>", line 7, in <module>
+    print(scene['id'], get_rating(scene))
+                       ~~~~~~~~~~^^^^^^^
+  File "/root/ken-tasks/T-KEN-030/ratings_api.py", line 2, in get_rating
+    return scene['total_score'] / scene['vote_count']
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~
+ZeroDivisionError: division by zero
+[0m
+[0m← [0mEdit ratings_api.py
+Index: /root/ken-tasks/T-KEN-030/ratings_api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-030/ratings_api.py
++++ /root/ken-tasks/T-KEN-030/ratings_api.py
+@@ -1,2 +1,4 @@
+ def get_rating(scene):
++    if scene['vote_count'] == 0:
++        return 0
+     return scene['total_score'] / scene['vote_count']
+
+[0m
+[0m$ [0mpython3 -c "
+import json
+from ratings_api import get_rating
+
+db = json.load(open('ratings_db.json'))
+for scene in db:
+    print(scene['id'], get_rating(scene))
+"
+0 0
+1 0
+2 0
+3 4.0
+4 4.0
+5 4.0
+6 4.0
+7 4.0
+8 4.0
+9 4.0
+[0m
+Fixed. The rating page was crashing with a `ZeroDivisionError`.
+
+**Root cause:** `get_rating()` in `ratings_api.py` divides `total_score` by `vote_count`, but scenes 0–2 in `ratings_db.json` have `vote_count: 0` (no votes yet), so building the page data blew up on the very first scene.
+
+**Fix:** Guard against zero votes — a scene with no votes now returns a rating of `0` instead of crashing:
+
+```python
+def get_rating(scene):
+    if scene['vote_count'] == 0:
+        return 0
+    return scene['total_score'] / scene['vote_count']
+```
+
+Verified against the full DB: all 10 scenes now produce ratings (0 for unvoted scenes, 4.0 for the voted ones) with no errors.

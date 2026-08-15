@@ -1,0 +1,29 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead fleet_latency.json
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root    26 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   237 Aug 15 13:35 fleet_latency.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Checked the fleet data — it's not *everything*. One service is the culprit:
+
+| Service | Latency |
+|---|---|
+| svc_0 | 40 ms |
+| svc_1 | 40 ms |
+| svc_2 | 40 ms |
+| **svc_3** | **300 ms** ⚠️ |
+| svc_4 | 40 ms |
+| svc_5 | 40 ms |
+
+**svc_3 is running at 300 ms — 7.5× the fleet norm of 40 ms.** Every other service is healthy.
+
+Why it *feels* like everything is sluggish: if svc_3 sits in a common request path (or a dashboard averages the fleet), that one slow service drags down the perceived performance of the whole system.
+
+**Recommended next step:** investigate svc_3 specifically — check its recent deploys, resource usage (CPU/memory/GC pressure), upstream dependencies, and connection pool saturation. The rest of the fleet doesn't need attention.

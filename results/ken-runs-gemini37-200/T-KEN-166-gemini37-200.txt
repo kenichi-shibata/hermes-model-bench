@@ -1,0 +1,5 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead cert_status.json
+No, the certificate is not expired. It expires in 3 days.

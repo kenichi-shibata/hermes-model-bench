@@ -1,0 +1,10 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 4 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dedupe_merge.py
+[0m→ [0mRead duplicate_groups.json
+[0m✱ [0mGlob "**/.*"[90m 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m 4 matches[0m
+It is only flagging. `flag_duplicates()` in `dedupe_merge.py` sets `item['duplicate'] = True` on elements from `group[1:]` and returns the full group unmodified without merging or removing any records.

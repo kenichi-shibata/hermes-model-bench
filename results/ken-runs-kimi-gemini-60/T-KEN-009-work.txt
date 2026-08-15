@@ -1,0 +1,28 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead disk_fleet.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+### Disk Fleet Status Report
+
+**Summary:** 5 hosts inspected; 4 healthy, 1 critical.
+
+#### **Critical Alert**
+- **Host:** `host3` (`media-pool`)
+- **Usage:** **92%** (Critical threshold exceeded)
+- **Thin Provisioned:** `true`
+- **Risk:** High. Thin-provisioned storage pools are vulnerable to sudden write failures across all allocated volumes if the underlying physical pool runs out of space.
+- **Recommended Actions:**
+  1. Immediately clean up unnecessary media files or temp data.
+  2. Expand the physical storage capacity / underlying pool.
+  3. Migrate active workloads or media data to hosts with spare capacity (`host4` @ 22%, `host5` @ 30%).
+
+---
+
+#### **Healthy Hosts**
+- **host1:** 45% used (`thin_provisioned: false`) — OK
+- **host2:** 38% used (`thin_provisioned: false`) — OK
+- **host4:** 22% used (`thin_provisioned: false`) — OK
+- **host5:** 30% used (`thin_provisioned: false`) — OK

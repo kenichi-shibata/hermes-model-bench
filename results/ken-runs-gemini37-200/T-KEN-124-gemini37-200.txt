@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead performer_disambiguation.json
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+Based on `performer_disambiguation.json`, these are **namesakes** (distinct individuals sharing the same name "Jane Doe"), as indicated by their separate unique IDs (`p1` and `p2`).

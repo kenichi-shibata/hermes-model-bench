@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead block_reason.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Yes. It is blocked because the target status is actively `"downloading"` and only at `45%` progress (`progress_pct: 45`), meaning the download has not yet completed.

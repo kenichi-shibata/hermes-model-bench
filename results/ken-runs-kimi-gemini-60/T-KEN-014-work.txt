@@ -1,0 +1,48 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead tailscale_status_mock.json
+### Diagnosis
+
+You cannot reach your home network (`192.168.1.0/24`) from your phone because **your home subnet router (`home-router-node` / `pve2`) is currently offline**.
+
+### Evidence from `tailscale_status_mock.json`
+- **Phone Status:** Connected to the tailnet (`100.1.1.1`).
+- **Subnet Router (`pve2`):** `Online: false`, last seen `2026-08-02`.
+- **Route Status:** `pve2` is the sole peer advertising `PrimaryRoutes: ["192.168.1.0/24"]`. Other active peers (`laptop`, `phone2`) advertise no routes. With `pve2` offline and no failover router configured, traffic to `192.168.1.0/24` cannot be routed.
+
+---
+
+### Remediation Steps on `pve2` (Proxmox / Linux Host)
+
+1. **Verify Host Connectivity:** Ensure the machine is powered on and connected to the local network and internet.
+2. **Check Tailscale Service:**
+   ```bash
+   sudo systemctl status tailscaled
+   sudo systemctl restart tailscaled
+   ```
+3. **Re-authenticate & Advertise Routes:**
+   If the node key expired or Tailscale is stopped:
+   ```bash
+   sudo tailscale up --advertise-routes=192.168.1.0/24 --accept-routes
+   ```
+4. **Verify IP Forwarding:**
+   Ensure packet forwarding is active:
+   ```bash
+   sysctl net.ipv4.ip_forward
+   # If 0, enable it and make it persistent in /etc/sysctl.conf:
+   sudo sysctl -w net.ipv4.ip_forward=1
+   ```
+5. **Tailscale Admin Console:**
+   Check the [Tailscale Admin Console](https://login.tailscale.com/admin/machines) to ensure the `192.168.1.0/24` subnet route for `pve2` is still **approved**.
+
+---
+
+### Verification
+Once `pve2` is back online:
+1. Run `tailscale status` on your phone/client to confirm `home-router-node` (`pve2`) is `online`.
+2. Ping a device on the home network (e.g., `ping 192.168.1.1`).
+
+*(Tip: Consider setting up a secondary high-availability subnet router on another device to avoid single-point-of-failure outages.)*

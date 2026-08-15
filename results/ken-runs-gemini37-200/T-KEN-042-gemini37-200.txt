@@ -1,0 +1,10 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead breaker_state.json
+[0m→ [0mRead breaker_logic.py
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+The breaker is **just stuck open**. 
+
+`is_open()` in `breaker_logic.py` directly returns `state['open']` without checking if the cooldown period (`cooldown_sec: 900`) since `opened_at` has expired.

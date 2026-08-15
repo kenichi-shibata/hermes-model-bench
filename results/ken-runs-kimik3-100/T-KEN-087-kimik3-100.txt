@@ -1,0 +1,30 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead api_trace.json
+**The API is slow because it's hammering the database with 500 separate queries.**
+
+The math from the trace:
+
+| Metric | Value |
+|---|---|
+| Total request time | 4500 ms |
+| Number of DB queries | 500 |
+| Time per query | 8 ms |
+| **Time spent in DB** | **500 × 8 ms = 4000 ms** |
+
+So ~4 seconds of the 4.5 second request is just database round-trips. The remaining ~500 ms is overhead (app code, serialization, network).
+
+**This is the classic N+1 query pattern** — the code is almost certainly looping over a collection and firing one query per item, e.g.:
+
+```python
+for user in users:            # 1 query to get users
+    orders = db.query(...)    # +1 query per user → 500 total
+```
+
+**The fix:** collapse the 500 queries into 1–2 batched queries:
+
+- Use a `JOIN` or eager loading (`joinedload` / `select_related` / `includes`, depending on your ORM)
+- Or batch with `WHERE id IN (...)` instead of querying one ID at a time
+
+Result: 500 round-trips → ~1 query at ~8–20 ms. The request should drop from **4.5 s to well under 100 ms** of DB time. No amount of query tuning or indexing will help as much as simply not making 500 trips.

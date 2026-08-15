@@ -1,0 +1,12 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead migration_integrity_check.json
+No. The migration has experienced data integrity issues:
+
+- **Total records:** 10,000
+- **Successfully migrated:** 9,950 (99.5%)
+- **Corrupted/Failed:** 50 records
+- **Issue:** Data truncation detected (`truncated_at_255_chars`)

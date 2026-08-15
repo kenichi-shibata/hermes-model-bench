@@ -1,0 +1,33 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead db_vs_app.json
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root    22 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    77 Aug 15 13:35 db_vs_app.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+**It's not the DB — it's the app.**
+
+The numbers in `db_vs_app.json` are unambiguous:
+
+| Stage | Time |
+|---|---|
+| DB query | **12 ms** |
+| App serialization | **3,800 ms** |
+| Rows returned | 50,000 |
+
+The database does its job in 12 ms. The application then spends **~317× longer** (3.8 s) serializing those 50,000 rows. So the bottleneck is entirely on the app side — object hydration/JSON serialization of a huge result set.
+
+**Where to fix it (not the DB):**
+
+1. **Return fewer rows** — paginate / add `LIMIT` + cursor instead of shipping 50k rows at once. This is usually the real fix.
+2. **Stream the response** — serialize row-by-row (e.g., streaming JSON encoder) instead of building one giant payload in memory.
+3. **Trim the payload** — select only needed columns/fields; 50k rows × fat objects is what kills the serializer.
+4. **Faster serializer** — if the volume is truly needed, swap to a faster JSON library (e.g., `orjson`/`ujson` in Python, `serde_json` + `simd-json` in Rust, etc.) and avoid ORM object overhead (use raw dicts/DTOs, skip lazy-load cascades).
+
+Any time spent indexing or tuning the query would be wasted — there's only 12 ms on the table there.

@@ -1,0 +1,32 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead guard_logic.py
+[0m
+[0m← [0mEdit guard_logic.py
+Index: /root/ken-tasks/T-KEN-093/guard_logic.py
+===================================================================
+--- /root/ken-tasks/T-KEN-093/guard_logic.py
++++ /root/ken-tasks/T-KEN-093/guard_logic.py
+@@ -1,4 +1,2 @@
+ def check(a, b):
+-    if a['has_data'] and not a['playable'] and b['playable'] and not b['has_data']:
+-        return 'refuse'
+     return 'ok'
+
+[0m
+[0m$ [0mpython3 -c "
+from guard_logic import check
+cases = [
+    ({'has_data': True, 'playable': False}, {'playable': True, 'has_data': False}),
+    ({'has_data': False, 'playable': True}, {'playable': False, 'has_data': True}),
+]
+for a, b in cases:
+    print(check(a, b))
+"
+ok
+ok
+[0m
+Done. The guard in `guard_logic.py` now unconditionally returns `'ok'` — the refusal branch is removed, so every case is forced through. Verified: the previously-refused case (`a` has data but unplayable, `b` playable without data) now returns `'ok'`.

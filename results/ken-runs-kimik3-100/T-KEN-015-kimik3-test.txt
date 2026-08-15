@@ -1,0 +1,37 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead dedupe_auto.py
+[0m→ [0mRead groups.json
+Let me quickly verify the runtime behavior to confirm:
+[0m
+[0m$ [0mpython3 -c "
+import json
+from dedupe_auto import auto_canonicalize_plan
+groups = json.load(open('groups.json'))
+for name, g in groups.items():
+    print(name, '->', auto_canonicalize_plan(g))
+"
+group_1 -> {'action': 'refuse', 'reason': 'playability vs user-data conflict -- needs human review'}
+group_2 -> {'action': 'refuse', 'reason': 'playability vs user-data conflict -- needs human review'}
+[0m
+**It's not doing anything because that's exactly what the code is designed to do.** Both of your "real duplicate groups" hit the safety-refusal rule in `dedupe_auto.py` dead-on — this is intentional behavior, not a bug.
+
+## Why each group refuses
+
+The refusal condition (lines 12–13) triggers when one record **has user data but is unplayable**, and the other **is playable but has no data**:
+
+| Group | Unplayable + has data | Playable + no data | Result |
+|-------|----------------------|--------------------|--------|
+| group_1 | s1 (playable=false, play_count=12) | s2 (playable=true, play_count=0) | refuse |
+| group_2 | s3 (playable=false, play_count=3) | s4 (playable=true, play_count=0) | refuse |
+
+Both groups are structurally identical in the only dimensions the function checks, so both take the first branch of the `if` (`a_has_data and not a_playable and b_playable and not b_has_data`) and return `{"action": "refuse"}`.
+
+## Why the rule exists
+
+If the code *did* auto-merge, line 15 would keep the **playable** record (s2/s4) as canonical — and the play history attached to s1/s3 (12 and 3 plays) would be orphaned/lost. Merging these safely requires *migrating* the play_count onto the playable record, which the auto-merger doesn't do — so it punts to human review.
+
+## If you want them merged
+
+You need a manual/semi-auto path that merges with data migration, e.g. keep `s2` as canonical *and* transfer `play_count: 12` from `s1` onto it. The auto-canonicalizer is deliberately the wrong tool for that — its job is to refuse exactly this conflict. If you want, I can add a `--force-migrate` mode that merges these by summing play counts onto the playable record.

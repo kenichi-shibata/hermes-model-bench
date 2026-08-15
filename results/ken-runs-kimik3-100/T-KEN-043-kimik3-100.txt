@@ -1,0 +1,65 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead trending_cache.py
+[0m→ [0mRead trending_cache_meta.json
+[0m→ [0mRead CONTEXT_ONLY.md
+Now let me verify the cache freshness against the TTL:
+[0m
+[0m$ [0mpython3 -c "
+import json
+from datetime import datetime, timezone
+from trending_cache import TTL_HOURS
+
+meta = json.load(open('trending_cache_meta.json'))
+last = datetime.fromisoformat(meta['last_refresh'])
+now_meta = datetime.fromisoformat(meta['now'])
+now_real = datetime.now()
+
+age_meta = now_meta - last
+age_real = now_real - last
+
+print(f'TTL_HOURS        : {TTL_HOURS} h')
+print(f'last_refresh     : {last}  (tzinfo={last.tzinfo})')
+print(f'meta \"now\"       : {now_meta}')
+print(f'real now         : {now_real}')
+print(f'age vs meta now  : {age_meta} = {age_meta.total_seconds()/3600:.1f} h  (days={age_meta.days})')
+print(f'age vs real now  : {age_real.days} d {age_real.seconds//3600} h = {age_real.total_seconds()/3600:.1f} h')
+print(f'stale (meta now) : {age_meta.total_seconds() > TTL_HOURS*3600}')
+print(f'stale (real now) : {age_real.total_seconds() > TTL_HOURS*3600}')
+print(f'days-only check  : age.days ({age_meta.days}) < TTL_HOURS ({TTL_HOURS}) -> considered fresh: {age_meta.days < TTL_HOURS}')
+"
+
+TTL_HOURS        : 6 h
+last_refresh     : 2026-08-11 18:00:00  (tzinfo=None)
+meta "now"       : 2026-08-13 00:00:00
+real now         : 2026-08-15 13:46:04.707864
+age vs meta now  : 1 day, 6:00:00 = 30.0 h  (days=1)
+age vs real now  : 3 d 19 h = 91.8 h
+stale (meta now) : True
+stale (real now) : True
+days-only check  : age.days (1) < TTL_HOURS (6) -> considered fresh: True
+[0m
+**Diagnosis: the trending cache is stale and should have refreshed — here's why it likely isn't.**
+
+**Facts from the files:**
+
+| Item | Value |
+|---|---|
+| `TTL_HOURS` (trending_cache.py) | 6 hours |
+| `last_refresh` (meta json) | 2026-08-11 18:00 |
+| `now` recorded in meta json | 2026-08-13 00:00 → **age = 30 h** |
+| Actual current time | 2026-08-15 → **age ≈ 92 h (3.8 days)** |
+
+By any correct check, 30 h (let alone 92 h) ≫ 6 h TTL, so the cache **is stale and should have been refreshed many times over**. The data confirms "it's not updating."
+
+**Most likely root causes (in order of probability):**
+
+1. **Units bug in the freshness check** — the classic one: comparing `timedelta.days` against `TTL_HOURS`. Here `age.days == 1`, and `1 < 6` → the cache is wrongly considered **fresh** for up to 6 *days* instead of 6 *hours*. My check above shows exactly this: a days-based comparison reports "fresh" while the real age is 30+ hours. The fix is comparing `total_seconds() > TTL_HOURS * 3600` (or `age > timedelta(hours=TTL_HOURS)`).
+
+2. **Refresh job not running / not writing back** — `last_refresh` hasn't moved since Aug 11, so even if a refresh fired, the timestamp isn't being persisted (or the scheduler/cron/worker that triggers it is dead).
+
+3. **Naive timestamps** — both timestamps in the meta file have no timezone (`tzinfo=None`). If the refresh code compares them against timezone-aware datetimes (`datetime.now(timezone.utc)`), it raises `TypeError`, which—if swallowed by a `try/except`—silently skips every refresh.
+
+**Recommended fix:** in whatever code reads this meta file, use `age = now - last_refresh; if age.total_seconds() > TTL_HOURS * 3600: refresh()`, keep timestamps consistently timezone-aware, and verify the scheduler that performs the refresh is actually running. Note the checker code itself isn't in this directory — only `TTL_HOURS = 6` and the meta snapshot are here — so the buggy comparison lives wherever the meta file is consumed.

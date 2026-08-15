@@ -1,0 +1,12 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead weekly_completion.json
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Based on `weekly_completion.json`:
+
+- **Total tasks:** 11 (IDs 0–10)
+- **Status "completed":** 11/11 (**100%**)
+- **Completed with valid result:** 9/11 (**81.82%**)
+- **Completed with `null` result:** 2/11 (**18.18%**, IDs: 0, 1)

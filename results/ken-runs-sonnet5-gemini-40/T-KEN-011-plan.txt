@@ -1,0 +1,105 @@
+[0m
+> build · anthropic/claude-sonnet-5
+[0m
+[0m$ [0mfind /root/ken-tasks/T-KEN-011 -type f | sort
+/root/ken-tasks/T-KEN-011/CONTEXT_ONLY.md
+/root/ken-tasks/T-KEN-011/PerformerDetailPage.jsx
+/root/ken-tasks/T-KEN-011/PerformersGrid.jsx
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead PerformerDetailPage.jsx
+[0m→ [0mRead PerformersGrid.jsx
+## Investigation Summary
+
+I read all 3 files in the directory (`CONTEXT_ONLY.md`, `PerformerDetailPage.jsx`, `PerformersGrid.jsx`). Total code is tiny (13 + 6 lines), so I verified every claim in the comments against what the code actually does rather than trusting the comments at face value.
+
+## Confirmed Bug #1 — `PerformerDetailPage.jsx` (the annotated one, and it's real)
+
+The comment on line 7-9 correctly self-diagnoses the bug: the "5-star" badge is a plain `<a href="/leaderboard">` instead of a `Link` to `/performers/${performer.id}`.
+
+Corroborating evidence the bug is real (not just a comment claim):
+- `Link` is imported from `react-router-dom` on line 1 but **never used** anywhere in the file — this is a dead giveaway the fix was started (import added) but never finished (JSX never updated). An ESLint `no-unused-vars`/`react/jsx-uses-react` pass would already be flagging this.
+- The literal href `/leaderboard` is hardcoded and ignores `performer.id` entirely, contradicting the component's whole purpose (a single-performer detail page).
+
+**Exact fix:** replace line 10:
+```jsx
+<a href="/leaderboard">5-star</a>
+```
+with:
+```jsx
+<Link to={`/performers/${performer.id}`}>5-star</Link>
+```
+and delete the now-resolved BUG comment (lines 7-9).
+
+## Confirmed Bug #2 — the "red herring" comment in `PerformersGrid.jsx` is misleading; don't trust it as-is
+
+The header comment (lines 1-3) asserts the component "lazy loads 60 at a time via 'Load more'" and that this is "WORKING AS INTENDED... despite looking slow." I checked the actual implementation against that claim:
+
+```jsx
+export default function PerformersGrid({ performers }) {
+  return <div>{performers.slice(0, 60).map(p => <div key={p.id}>{p.name}</div>)}</div>;
+}
+```
+
+This does **not** implement "load more" at all:
+- There is no state (`offset`/`page`), no button, no click handler — nothing that could ever reveal performer #61 through #2700.
+- `slice(0, 60)` is a hardcoded, permanent cap. Out of a 2700-performer dataset, **2640 performers (98%) are permanently unreachable** in the UI.
+- The comment describes behavior that doesn't exist in the code. This is either a stale/aspirational comment or a trap to get the plan/work model to skip a real functional gap because a comment says "don't worry about it."
+
+**This should be treated as a real defect**, not dismissed. The "looking slow" framing in the comment is a distraction — the actual problem isn't perceived slowness, it's that most data is simply inaccessible.
+
+**Recommended fix:** implement the load-more behavior the comment claims already exists:
+```jsx
+import { useState } from "react";
+
+const PAGE_SIZE = 60;
+
+export default function PerformersGrid({ performers = [] }) {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const visible = performers.slice(0, visibleCount);
+  const hasMore = visibleCount < performers.length;
+
+  return (
+    <div>
+      <div>
+        {visible.map(p => (
+          <div key={p.id}>
+            <Link to={`/performers/${p.id}`}>{p.name}</Link>
+          </div>
+        ))}
+      </div>
+      {hasMore && (
+        <button onClick={() => setVisibleCount(c => c + PAGE_SIZE)}>
+          Load more
+        </button>
+      )}
+    </div>
+  );
+}
+```
+Given the 2700-item scale, also flag (as a follow-up, not blocking) that true windowing/virtualization (e.g. `react-window`) would be a better long-term fix than incremental `slice` growth, since the DOM list still grows unboundedly as the user clicks "Load more" repeatedly.
+
+## Additional real issues found (not mentioned in any comment)
+
+1. **Grid items aren't links at all.** Even ignoring the load-more gap, `PersonersGrid` renders `<div key={p.id}>{p.name}</div>` — plain text, no navigation. There is currently **no way to get from the grid to a performer's detail page**, which is presumably the grid's main purpose. This ties directly to bug #1: fix both by adding `<Link to={`/performers/${p.id}`}>` in the grid item (shown in the snippet above).
+
+2. **No prop safety / defensive checks.**
+   - `PerformersGrid`: if `performers` is `undefined` (e.g. still loading), `performers.slice` throws. Default to `[]` or guard with a loading/empty state.
+   - `PerformerDetailPage`: if `performer` is `undefined`/`null` (e.g. not found), `performer.name` throws. Add a not-found/loading guard before rendering.
+
+3. **Non-semantic markup.** Both files render lists of performers as bare `<div>`s. Using `<ul>/<li>` (or at least `role="list"`) would improve accessibility/screen-reader navigation for what is semantically a list.
+
+4. **Hardcoded "5-star" label.** `PerformerDetailPage` shows the literal string `5-star` regardless of the actual performer's rating — there's no `performer.rating`/`performer.rank` field being read. If the performer model carries a rating, the badge should render it dynamically (e.g. `${performer.rating}-star`) instead of a hardcoded value. Worth confirming against the actual data model before changing, but flag it — as written this label is wrong for any performer that isn't 5-star.
+
+## Concrete steps for the WORK model, in priority order
+
+1. **`PerformerDetailPage.jsx`** — fix the acknowledged bug: replace the `<a href="/leaderboard">` badge with `<Link to={`/performers/${performer.id}`}>`, using the already-imported (currently unused) `Link`. Remove the resolved BUG comment.
+2. **`PerformerDetailPage.jsx`** — add a guard for missing/undefined `performer` (render `null` or a "not found" message) before accessing `performer.name`/`performer.id`.
+3. **`PerformerDetailPage.jsx`** — replace the hardcoded `"5-star"` text with the performer's actual rating field if one exists on the `performer` object (check how `performer` is shaped elsewhere in the real app before inventing a field name).
+4. **`PerformersGrid.jsx`** — implement real pagination/"load more" state (`useState` + button) instead of the permanent `slice(0, 60)`, since the current code contradicts its own header comment and hides 98% of the dataset. Remove or correct the misleading comment once fixed.
+5. **`PerformersGrid.jsx`** — make each grid item a `Link` to `/performers/${p.id}` so the grid actually connects to the detail page (currently plain text with no navigation).
+6. **`PerformersGrid.jsx`** — default `performers` prop to `[]` and add an empty-state message; guard against `undefined`.
+7. **Both files** — switch list containers from bare `<div>` wrappers to `<ul>/<li>` (or `role="list"`/`role="listitem"`) for accessibility.
+8. **Follow-up/optional** — once load-more works, consider windowing (`react-window`) for the grid given the 2700-item scale, so the live DOM node count doesn't grow unbounded as users repeatedly click "Load more."
+
+No file edits were made — this is a plan only, per the read-only instruction.

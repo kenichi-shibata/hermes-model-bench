@@ -1,0 +1,43 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead indexer_freshness.json
+[0m→ [0mRead scene_claim.json
+## Investigation Summary
+
+The directory contains only three files (all read):
+
+- **`CONTEXT_ONLY.md`** — orientation note: `indexer_freshness.json` = last indexer run per site; `scene_claim.json` = scene being asked about.
+- **`indexer_freshness.json`** — `site_a: 10min ago`, `site_b: 1h ago`, `site_c: 2h ago (interval 6h)`.
+- **`scene_claim.json`** — `{ "title": "Claimed New Scene", "site": "site_c" }`.
+
+## What the real problem is
+
+**There is no code bug and nothing to fix in files. This is a stale-index / scheduling-expectation issue, fully explained by the data:**
+
+1. The missing scene lives on **site_c**.
+2. site_c's indexer runs on a **6-hour interval**, and its last run was **2 hours ago** → the next scheduled run is **~4 hours from now**.
+3. The scene is titled "Claimed **New** Scene", i.e. it was almost certainly added recently — after site_c's last index run. So the indexer simply hasn't had a chance to see it yet. Sites a/b are red herrings; they're irrelevant because the scene isn't on them.
+
+So the answer to "that scene still not showing up huh" is: **expected behavior — site_c's index is stale by design; the scene will appear at the next scheduled run (~4h), or immediately if a manual re-index of site_c is triggered.**
+
+One caveat worth reporting: the data doesn't record *when* the scene was added. If it was actually added **before** site_c's run 2h ago and still isn't showing, that would indicate a genuine indexer failure for site_c — but there is no evidence for that here, and no indexer code exists in this directory to fix.
+
+## Concrete plan for the WORK model
+
+**Files to edit: NONE.** `indexer_freshness.json` and `scene_claim.json` are evidence/data, not configuration or code — do not modify them.
+
+Steps:
+
+1. **Verify the cross-reference (no edits):**
+   - `scene_claim.json` → `site = site_c`
+   - `indexer_freshness.json` → `site_c = last run 2h ago, interval 6h`
+   - Compute: next scheduled site_c run ≈ 4h from now.
+
+2. **Report the diagnosis to the user:** the scene isn't showing because site_c is only indexed every 6 hours and the last run predates the (new) scene. This is normal lag, not a bug. ETA for visibility: next scheduled run (~4 hours).
+
+3. **Offer the operational remedy (outside these files):** trigger a manual re-index of site_c if immediate visibility is needed. There is no indexer tooling in this directory, so this is an action for the user/ops, not a file change.
+
+4. **State the escalation condition:** only if the user confirms the scene existed *before* site_c's last run (2h ago) should this be treated as an indexer bug — and that investigation would happen wherever the indexer code lives, not in this directory.

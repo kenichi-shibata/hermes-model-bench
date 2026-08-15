@@ -1,0 +1,10 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dependency_check.json
+[0m✱ [0mGlob "**/.*"[90m in . · 0 matches[0m
+Yes, deleting record 5 would break dependencies as it is currently referenced by:
+- `groups.member_ids`
+- `tag_map.scene_id`

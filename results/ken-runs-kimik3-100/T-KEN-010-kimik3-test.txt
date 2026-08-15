@@ -1,0 +1,61 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead bot.py
+[0m→ [0mRead follow_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit bot.py
+Index: /root/ken-tasks/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks/T-KEN-010/bot.py
++++ /root/ken-tasks/T-KEN-010/bot.py
+@@ -1,11 +1,10 @@
+ """Discord bot track/follow handlers."""
+ 
+ def track_studio_or_performer(entity_id, entity_type):
+-    """BUG: bundles a follow action with tracking, which should be
+-    separate. Fix: remove the follow_discord() call from here."""
++    """Track a studio or performer. Tracking only; following on Discord
++    is a separate, explicit action."""
+     db.add_track(entity_id, entity_type)
+-    db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here
+     return {"tracked": True}
+ 
+ 
+ class db:
+
+[0m
+I found the issue. It's not a recursive follow — it's a bundled one. In `bot.py`, `track_studio_or_performer()` calls `db.follow_discord()` every time you track something, so every track silently became a Discord follow. That's where `codey_steele`, `cherry_kiss`, and 140 other entries came from (all marked `"source": "track_button_bug", "legit": false` in `follow_log.json`).
+
+Fixing both files now:
+[0m← [0mWrite follow_log.json
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 -c "
+import json, py_compile
+py_compile.compile('bot.py', doraise=True)
+log = json.load(open('follow_log.json'))
+bad = [e for e in log if not e['legit']]
+print('entries:', len(log), '| non-legit remaining:', len(bad))
+print('codey_steele present:', any(e['entity_id']=='codey_steele' for e in log))
+print('cherry_kiss present:', any(e['entity_id']=='cherry_kiss' for e in log))
+import bot
+bot.track_studio_or_performer('perf_x','performer')
+print('tracks:', bot.db._tracks, '| follows after track:', bot.db._follows)
+"
+entries: 20 | non-legit remaining: 0
+codey_steele present: False
+cherry_kiss present: False
+tracks: [('perf_x', 'performer')] | follows after track: []
+[0m
+Fixed. Here's what was going on:
+
+**The bug** — not recursion, but a bundled action. `track_studio_or_performer()` in `bot.py` was calling `db.follow_discord()` in addition to `db.add_track()`, so every time you hit "track" on a performer/studio, it also silently followed them on Discord. That's how `codey_steele`, `cherry_kiss`, and 140 other entries (`perf_0`–`perf_139`) got in — all flagged `"source": "track_button_bug", "legit": false` in the log.
+
+**Changes made:**
+1. **`bot.py`** — removed the `db.follow_discord()` call from `track_studio_or_performer()`. Tracking now only tracks; following stays a separate explicit action.
+2. **`follow_log.json`** — removed all 142 illegitimate `track_button_bug` entries (including Codey Steele and Cherry Kiss). Only your 20 genuine `manual_follow` entries remain.
+
+**Verified:** `bot.py` compiles, a test track call adds a track with zero follows, and the log is valid JSON with no non-legit entries left.

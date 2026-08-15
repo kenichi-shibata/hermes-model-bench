@@ -1,0 +1,25 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead pr_diff_1.py
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+### Code Review: `pr_diff_1.py`
+
+#### Issues:
+1. **Critical: SQL Injection Vulnerability**
+   - Directly interpolating `username` via f-string (`f"SELECT * FROM users WHERE name = '{username}'"`) allows SQL injection.
+2. **Undefined Reference:**
+   - `db` is used globally without being imported, defined, or passed in as a dependency.
+
+---
+
+#### Recommended Fix:
+Use parameterized queries / prepared statements instead of string interpolation:
+
+```python
+def get_user(db, username: str):
+    # Parameter placeholder syntax depends on your DB driver (e.g., %s or ?)
+    query = "SELECT * FROM users WHERE name = %s"
+    return db.execute(query, (username,))
+```

@@ -1,0 +1,15 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead vm_spec.json
+[0m→ [0mRead workload_profile.json
+**No — the VM is under-provisioned.**
+
+| | CPU demand | vs. capacity (2 cores = 200%) |
+|---|---|---|
+| p50 | 150% (1.5 cores) | ✅ fits — 75% utilized |
+| p95 | 380% (3.8 cores) | ❌ **exceeds by 180%** |
+
+**Conclusion:** With only 2 configured cores, the workload's p95 demand of 380% (≈3.8 cores) is nearly double the VM's total capacity. During peak periods the VM will be CPU-saturated, causing throttling and latency. Even the median load (150%) leaves just 25% headroom.
+
+**Recommendation:** provision at least **4 cores** to cover p95, or **5–6 cores** if you want ~20–30% headroom above peak.

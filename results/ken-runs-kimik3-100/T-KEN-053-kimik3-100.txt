@@ -1,0 +1,37 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead network_symptoms.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-053
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root    66 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    97 Aug 15 13:35 network_symptoms.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Checked `network_symptoms.json`. Here's the read:
+
+**Findings**
+
+| VLAN | Packet loss | Status |
+|---|---|---|
+| 10.0.1.0/24 | 0% | ✅ Healthy |
+| 10.0.2.0/24 | **50%** | ❌ Degraded |
+
+**Diagnosis**
+
+- The problem is isolated to **VLAN 10.0.2.0/24** — 10.0.1.0/24 is clean, so this isn't a core/wide outage; it's specific to that segment or its path.
+- **Exactly 50% loss is a suspicious signature.** Random congestion/dirty-fiber loss tends to be erratic (7%, 23%, etc.). A flat 50% usually means an **every-other-packet failure**, which points at:
+  1. **Dual-path setup with one dead leg** — ECMP or a LAG/bonded link where one of two paths is down or black-holing. Packets hashed onto the dead path drop; the other half get through.
+  2. **Flapping interface** with a ~50% duty cycle (less likely to be this clean).
+  3. **One of two redundant gateways/HSRP members** misbehaving.
+
+**Recommended next checks on 10.0.2.0/24**
+
+1. Run a traceroute (or repeated pings with interface/path pinning) to see if failures alternate between two next-hops — confirms the ECMP/LAG theory.
+2. Check LAG/bond member status and interface error counters (`show interfaces` — look for CRC/input errors or a member in down state).
+3. Check for recent link-flap events in logs on that VLAN's gateway.
+
+**Bottom line:** your network "weirdness" is 50% packet loss on VLAN 10.0.2.0/24, and the clean 50/50 split strongly suggests one of two redundant paths to/within that VLAN is down.

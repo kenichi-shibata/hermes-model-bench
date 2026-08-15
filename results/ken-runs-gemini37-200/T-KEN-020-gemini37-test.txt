@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead usenet_config.json
+[0m→ [0mRead backbone_lookup_mock.json
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+**No, it is not redundant (you are cooked).** Both your primary (`Eweka`) and backup (`Newshosting`) rely on the same underlying backbone (**Omicron**), so an outage or retention/takedown issue on Omicron will affect both providers simultaneously.

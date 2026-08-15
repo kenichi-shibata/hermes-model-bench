@@ -1,0 +1,62 @@
+[0m
+> build · anthropic/claude-sonnet-5
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-015
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 15:37 .
+drwxr-xr-x 206 1000 1000 12288 Aug 15 15:38 ..
+-rw-r--r--   1 root root   124 Aug 15 15:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   771 Aug 15 15:37 dedupe_auto.py
+-rw-r--r--   1 root root   351 Aug 15 15:37 groups.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dedupe_auto.py
+[0m→ [0mRead groups.json
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-015 && python3 -c "
+import json
+from dedupe_auto import auto_canonicalize_plan
+
+with open('groups.json') as f:
+    groups = json.load(f)
+
+for name, g in groups.items():
+    print(name, '->', auto_canonicalize_plan(g))
+"
+
+group_1 -> {'action': 'refuse', 'reason': 'playability vs user-data conflict -- needs human review'}
+group_2 -> {'action': 'refuse', 'reason': 'playability vs user-data conflict -- needs human review'}
+[0m
+## Investigation Summary
+
+I ran the code directly against the data (read-only, no edits):
+
+```
+group_1 -> {'action': 'refuse', 'reason': 'playability vs user-data conflict -- needs human review'}
+group_2 -> {'action': 'refuse', 'reason': 'playability vs user-data conflict -- needs human review'}
+```
+
+**Both groups hit the exact same branch.** This is not a stray boolean-logic bug — the code in `dedupe_auto.py:12-14` does exactly what its own docstring says: if one candidate is unplayable but has `play_count > 0`, and the other is playable but has `play_count == 0`, it refuses. `group_1` (s1: unplayable/12 plays, s2: playable/0 plays) and `group_2` (s3: unplayable/3 plays, s4: playable/0 plays) are textbook matches for that pattern. The operator precedence and grouping in the condition are correct; there's no accidental inversion.
+
+## The real problem
+
+The comment ("this is CORRECT safety behavior, not a bug") is misleading in context. It's true that *blindly deleting the record with play history* would be a data-loss bug, and refusing to do that blindly is reasonable. But the check as written treats "which copy to keep" and "what to do with the play_count" as one indivisible decision — and only offers two outcomes: fully auto-merge (dropping the data) or fully refuse (merging nothing). It never considers the obvious third option: **keep the playable copy, but carry the play_count forward onto it.**
+
+That's why "auto dedupe isn't doing anything" for these two groups: the only two real duplicate groups in the dataset are precisely the case the tool is hard-coded to always refuse — a case where the correct survivor is *not actually ambiguous* (the playable one), only the metadata handling is unresolved. So the "safety" branch isn't protecting against genuine ambiguity here; it's blocking a resolvable case because the code has no representation for "merge + carry forward user data."
+
+## Plan for the WORK model
+
+1. **Do not simply delete/weaken the refuse condition.** That would silently drop `play_count` (12 and 3 plays) and reintroduce the exact data-loss bug the check exists to prevent. That's the wrong fix even though it would make the groups "merge."
+
+2. **Edit `dedupe_auto.py`**, replacing the `refuse` branch (lines 12-14) so that when this exact conflict pattern is detected, it returns an `auto_merge` action that:
+   - keeps the playable id (same logic already used at line 15: `a["id"] if a_playable else b["id"]`)
+   - explicitly carries the discarded record's `play_count` forward, e.g. add a field like `"carry_forward_play_count": <the non-playable record's play_count>` (or `merged_play_count = a["play_count"] + b["play_count"]` if cumulative semantics are preferred — since the kept record's count is 0 in both sample groups, transfer and sum are equivalent here, but pick one convention and document it).
+   - Keep a genuine `refuse` fallback only for cases that are actually ambiguous (e.g., both have play_count>0 and both unplayable, or both playable, or any pattern not covered by the "one has data / other has none" case) — i.e. don't remove safety wholesale, just add the missing merge-with-transfer branch.
+
+3. **Update the docstring** (lines 4-6) to reflect the new behavior — remove/replace "this is CORRECT safety behavior, not a bug" since the behavior is changing to auto-merge-with-data-preservation instead of refuse.
+
+4. **Verify against `groups.json`** by re-running the same snippet used above (or add a small script/test) and confirm:
+   - `group_1` → `{"action": "auto_merge", "keep": "s2", "carry_forward_play_count": 12}`
+   - `group_2` → `{"action": "auto_merge", "keep": "s4", "carry_forward_play_count": 3}`
+
+5. If there's any doubt about whether "always keep the playable copy" is the right survivor policy (vs. e.g. flagging for review when losing playback history matters for some downstream stats feature), that's a product decision — flag it rather than assuming, but the code as written already treats "keep whichever is playable" as the resolution rule elsewhere (line 15), so applying it consistently here instead of refusing is the minimal, self-consistent fix.

@@ -1,0 +1,10 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead self_vs_delegate.json
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Based on `self_vs_delegate.json`:
+
+- **Doing it yourself:** Direct dollar cost is **$0**, but it has a **hidden opportunity cost** (your time and focus).
+- **Delegating:** Has a direct dollar cost of **$0.05**, eliminating the hidden opportunity cost of doing the work yourself.

@@ -1,0 +1,17 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead proxy_error_log.txt
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+Based on `proxy_error_log.txt`, here is the diagnosis and recommended resolution:
+
+### Root Cause
+The reverse proxy served **502 Bad Gateway** errors (14 occurrences) between `10:00:02` and `10:00:08` because the upstream backend server was unavailable while undergoing a restart (initiated at `10:00:00`, healthy again at `10:00:08`). Normal `200 OK` traffic resumed once the backend was healthy at `10:00:09`.
+
+### Recommendations
+1. **Zero-Downtime / Rolling Restarts:** Deploy backend instances in a rolling fashion or use graceful reload mechanisms (e.g., blue-green deployments, `systemctl reload`, or process manager reload like PM2/gunicorn reload) so traffic is only routed to ready instances.
+2. **Redundancy & Load Balancing:** Run at least two backend instances behind the proxy with health checks so restarts of a single instance do not drop traffic.
+3. **Upstream Retries:** Configure proxy upstream retries (e.g., `proxy_next_upstream` in Nginx) to automatically retry requests against another backend or handle brief startup delays.

@@ -1,0 +1,405 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead movie_grouping.py
+[0m→ [0mRead scenes_movie_parts.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead __pycache__
+[0m
+[0m$ [0mls -la --time-style=full-iso . __pycache__ && python3 -c "
+import dis, marshal, importlib.util, sys
+f = open('__pycache__/movie_grouping.cpython-313.pyc','rb')
+data = f.read()
+print('pyc size:', len(data))
+code = marshal.loads(data[16:])
+dis.dis(code)
+"
+.:
+total 32
+drwxr-xr-x   3 root root  4096 2026-08-15 13:40:34.529249407 +0000 .
+drwxr-xr-x 205 1000 1000 12288 2026-08-15 14:49:34.652078353 +0000 ..
+-rw-r--r--   1 root root   111 2026-08-15 14:36:26.514772384 +0000 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 2026-08-15 13:40:34.529249407 +0000 __pycache__
+-rw-r--r--   1 root root    88 2026-08-15 14:36:26.513772360 +0000 movie_grouping.py
+-rw-r--r--   1 root root   452 2026-08-15 14:36:26.513772360 +0000 scenes_movie_parts.json
+
+__pycache__:
+total 12
+drwxr-xr-x 2 root root 4096 2026-08-15 13:40:34.529249407 +0000 .
+drwxr-xr-x 3 root root 4096 2026-08-15 13:40:34.529249407 +0000 ..
+-rw-r--r-- 1 root root 2881 2026-08-15 13:40:34.529249407 +0000 movie_grouping.cpython-313.pyc
+pyc size: 2881
+  0           RESUME                   0
+
+  1           LOAD_CONST               0 (0)
+              LOAD_CONST               1 (None)
+              IMPORT_NAME              0 (re)
+              STORE_NAME               0 (re)
+
+  3           LOAD_NAME                0 (re)
+              LOAD_ATTR                2 (compile)
+              PUSH_NULL
+
+  4           LOAD_CONST               2 ("\n    [\\s\\-:—–]*                                   # optional separator\n    [\\(\\[]?                                      # optional opening bracket\n    (?:part|pt\\.?|vol\\.?|volume|episode|ep\\.?)   # 'part' keyword\n    [\\s\\.]*\n    (?:\\d+|[ivxlcdm]+)                           # number or roman numeral\n    [\\)\\]]?                                      # optional closing bracket\n    \\s*$\n    ")
+
+ 13           LOAD_NAME                0 (re)
+              LOAD_ATTR                4 (IGNORECASE)
+              LOAD_NAME                0 (re)
+              LOAD_ATTR                6 (VERBOSE)
+              BINARY_OP                7 (|)
+
+  3           CALL                     2
+              STORE_NAME               4 (PART_SUFFIX_RE)
+
+ 17           LOAD_CONST               3 (<code object base_title at 0x77d7b58c7df0, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 17>)
+              MAKE_FUNCTION
+              STORE_NAME               5 (base_title)
+
+ 22           LOAD_CONST               4 (<code object group_scenes at 0x77d7b574b230, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 22>)
+              MAKE_FUNCTION
+              STORE_NAME               6 (group_scenes)
+
+ 38           LOAD_CONST               5 (<code object assign_movie_ids at 0xd3017e0, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 38>)
+              MAKE_FUNCTION
+              STORE_NAME               7 (assign_movie_ids)
+
+ 57           LOAD_CONST               6 (<code object find_ungrouped at 0x77d7b5726790, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 57>)
+              MAKE_FUNCTION
+              STORE_NAME               8 (find_ungrouped)
+              RETURN_CONST             1 (None)
+
+Disassembly of <code object base_title at 0x77d7b58c7df0, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 17>:
+ 17           RESUME                   0
+
+ 19           LOAD_GLOBAL              0 (PART_SUFFIX_RE)
+              LOAD_ATTR                3 (sub + NULL|self)
+              LOAD_CONST               1 ('')
+              LOAD_FAST                0 (title)
+              COPY                     1
+              TO_BOOL
+              POP_JUMP_IF_TRUE         2 (to L1)
+              POP_TOP
+              LOAD_CONST               1 ('')
+      L1:     CALL                     2
+              LOAD_ATTR                5 (strip + NULL|self)
+              CALL                     0
+              RETURN_VALUE
+
+Disassembly of <code object group_scenes at 0x77d7b574b230, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 22>:
+ 22           RESUME                   0
+
+ 29           BUILD_MAP                0
+              STORE_FAST               1 (groups)
+
+ 30           LOAD_FAST                0 (scenes)
+              GET_ITER
+      L1:     FOR_ITER                82 (to L3)
+              STORE_FAST               2 (scene)
+
+ 31           LOAD_FAST                2 (scene)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               1 ('movie_id')
+              CALL                     1
+              STORE_FAST               3 (key)
+
+ 32           LOAD_FAST                3 (key)
+              POP_JUMP_IF_NOT_NONE    26 (to L2)
+
+ 33           LOAD_GLOBAL              3 (base_title + NULL)
+              LOAD_FAST                2 (scene)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               2 ('title')
+              CALL                     1
+              CALL                     1
+              STORE_FAST               3 (key)
+
+ 34   L2:     LOAD_FAST                1 (groups)
+              LOAD_ATTR                5 (setdefault + NULL|self)
+              LOAD_FAST                3 (key)
+              BUILD_LIST               0
+              CALL                     2
+              LOAD_ATTR                7 (append + NULL|self)
+              LOAD_FAST                2 (scene)
+              CALL                     1
+              POP_TOP
+              JUMP_BACKWARD           84 (to L1)
+
+ 30   L3:     END_FOR
+              POP_TOP
+
+ 35           LOAD_FAST                1 (groups)
+              RETURN_VALUE
+
+Disassembly of <code object assign_movie_ids at 0xd3017e0, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 38>:
+  38            RESUME                   0
+
+  44            LOAD_FAST                0 (scenes)
+                GET_ITER
+                LOAD_FAST_AND_CLEAR      1 (s)
+                SWAP                     2
+        L1:     BUILD_LIST               0
+                SWAP                     2
+                GET_ITER
+        L2:     FOR_ITER                46 (to L5)
+                STORE_FAST               1 (s)
+                LOAD_GLOBAL              1 (isinstance + NULL)
+                LOAD_FAST                1 (s)
+                LOAD_ATTR                3 (get + NULL|self)
+                LOAD_CONST               1 ('movie_id')
+                CALL                     1
+                LOAD_GLOBAL              4 (int)
+                CALL                     2
+                TO_BOOL
+        L3:     POP_JUMP_IF_TRUE         2 (to L4)
+                JUMP_BACKWARD           41 (to L2)
+        L4:     LOAD_FAST                1 (s)
+                LOAD_CONST               1 ('movie_id')
+                BINARY_SUBSCR
+                LIST_APPEND              2
+                JUMP_BACKWARD           48 (to L2)
+        L5:     END_FOR
+                POP_TOP
+        L6:     STORE_FAST               2 (existing)
+                STORE_FAST               1 (s)
+
+  45            LOAD_FAST                2 (existing)
+                TO_BOOL
+                POP_JUMP_IF_FALSE       14 (to L7)
+                LOAD_GLOBAL              7 (max + NULL)
+                LOAD_FAST                2 (existing)
+                CALL                     1
+                LOAD_CONST               2 (1)
+                BINARY_OP                0 (+)
+                JUMP_FORWARD             1 (to L8)
+        L7:     LOAD_CONST               2 (1)
+        L8:     STORE_FAST               3 (next_id)
+
+  46            BUILD_MAP                0
+                STORE_FAST               4 (ids_by_base)
+
+  47            LOAD_FAST                0 (scenes)
+                GET_ITER
+        L9:     FOR_ITER                70 (to L12)
+                STORE_FAST               5 (scene)
+
+  48            LOAD_FAST                5 (scene)
+                LOAD_ATTR                3 (get + NULL|self)
+                LOAD_CONST               1 ('movie_id')
+                CALL                     1
+                POP_JUMP_IF_NONE         2 (to L10)
+                JUMP_BACKWARD           23 (to L9)
+
+  49   L10:     LOAD_GLOBAL              9 (base_title + NULL)
+                LOAD_FAST                5 (scene)
+                LOAD_ATTR                3 (get + NULL|self)
+                LOAD_CONST               3 ('title')
+                CALL                     1
+                CALL                     1
+                STORE_FAST               6 (base)
+
+  50            LOAD_FAST_LOAD_FAST    100 (base, ids_by_base)
+                CONTAINS_OP              1
+                POP_JUMP_IF_FALSE        9 (to L11)
+
+  51            LOAD_FAST_LOAD_FAST     52 (next_id, ids_by_base)
+                LOAD_FAST                6 (base)
+                STORE_SUBSCR
+
+  52            LOAD_FAST                3 (next_id)
+                LOAD_CONST               2 (1)
+                BINARY_OP               13 (+=)
+                STORE_FAST               3 (next_id)
+
+  53   L11:     LOAD_FAST_LOAD_FAST     70 (ids_by_base, base)
+                BINARY_SUBSCR
+                LOAD_FAST                5 (scene)
+                LOAD_CONST               1 ('movie_id')
+                STORE_SUBSCR
+                JUMP_BACKWARD           72 (to L9)
+
+  47   L12:     END_FOR
+                POP_TOP
+
+  54            LOAD_FAST                0 (scenes)
+                RETURN_VALUE
+
+  --   L13:     SWAP                     2
+                POP_TOP
+
+  44            SWAP                     2
+                STORE_FAST               1 (s)
+                RERAISE                  0
+ExceptionTable:
+  L1 to L3 -> L13 [2]
+  L4 to L6 -> L13 [2]
+
+Disassembly of <code object find_ungrouped at 0x77d7b5726790, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 57>:
+  57           RESUME                   0
+
+  58           LOAD_FAST                0 (scenes)
+               GET_ITER
+               LOAD_FAST_AND_CLEAR      1 (s)
+               SWAP                     2
+       L1:     BUILD_LIST               0
+               SWAP                     2
+               GET_ITER
+       L2:     FOR_ITER                24 (to L5)
+               STORE_FAST_LOAD_FAST    17 (s, s)
+               LOAD_ATTR                1 (get + NULL|self)
+               LOAD_CONST               1 ('movie_id')
+               CALL                     1
+       L3:     POP_JUMP_IF_NONE         2 (to L4)
+               JUMP_BACKWARD           22 (to L2)
+       L4:     LOAD_FAST                1 (s)
+               LIST_APPEND              2
+               JUMP_BACKWARD           26 (to L2)
+       L5:     END_FOR
+               POP_TOP
+       L6:     SWAP                     2
+               STORE_FAST               1 (s)
+               RETURN_VALUE
+
+  --   L7:     SWAP                     2
+               POP_TOP
+
+  58           SWAP                     2
+               STORE_FAST               1 (s)
+               RERAISE                  0
+ExceptionTable:
+  L1 to L3 -> L7 [2]
+  L4 to L6 -> L7 [2]
+[0m
+[0m$ [0mpython3 -B -c "
+import movie_grouping, json
+print('module attrs:', [a for a in dir(movie_grouping) if not a.startswith('__')])
+print('has group_scenes:', hasattr(movie_grouping, 'group_scenes'))
+print('has assign_movie_ids:', hasattr(movie_grouping, 'assign_movie_ids'))
+scenes = json.load(open('scenes_movie_parts.json'))
+print('ungrouped count:', len(movie_grouping.find_ungrouped(scenes)))
+"
+module attrs: ['find_ungrouped']
+has group_scenes: False
+has assign_movie_ids: False
+ungrouped count: 6
+[0m
+[0m$ [0mpython3 -B -c "
+import re
+PART_SUFFIX_RE = re.compile(r'''
+    [\s\-:—–]*                                   # optional separator
+    [\(\[]?                                      # optional opening bracket
+    (?:part|pt\.?|vol\.?|volume|episode|ep\.?)   # part keyword
+    [\s\.]*
+    (?:\d+|[ivxlcdm]+)                           # number or roman numeral
+    [\)\]]?                                      # optional closing bracket
+    \s*\$
+    ''', re.IGNORECASE | re.VERBOSE)
+for t in ['BigMovie Part 1','BigMovie Part 6','BigMovie pt.2','BigMovie (Part IV)','BigMovie: Vol 3','BigMovie']:
+    print(repr(t), '->', repr(PART_SUFFIX_RE.sub('', t).strip()))
+"
+'BigMovie Part 1' -> 'BigMovie'
+'BigMovie Part 6' -> 'BigMovie'
+'BigMovie pt.2' -> 'BigMovie'
+'BigMovie (Part IV)' -> 'BigMovie'
+'BigMovie: Vol 3' -> 'BigMovie'
+'BigMovie' -> 'BigMovie'
+[0m
+The `__pycache__` artifact is the smoking gun here. Let me verify the current behavior safely (with `-B` so no bytecode is written).
+# PLAN: "movies arent grouping right still"
+
+## The real problem
+
+`movie_grouping.py` on disk has been gutted — it contains **only** `find_ungrouped` (2 lines). The actual grouping logic is **missing from the source** and survives only in a stale compiled artifact, `__pycache__/movie_grouping.cpython-313.pyc` (compiled 13:40, before the current source's mtime 14:36, so Python correctly ignores it and recompiles from the 2-line source).
+
+Verified just now:
+- `movie_grouping` exposes only `find_ungrouped`. `group_scenes` and `assign_movie_ids` **do not exist** — any caller gets `AttributeError`/`ImportError`.
+- All 6 scenes in `scenes_movie_parts.json` have `movie_id: null`, and since nothing ever assigns IDs, `find_ungrouped` returns all 6 — hence "movies aren't grouping right."
+
+I fully decompiled the stale `.pyc`. It contained a complete, working implementation: a `PART_SUFFIX_RE` regex that strips "Part N"-style suffixes, a `base_title()` helper, `group_scenes()`, and `assign_movie_ids()`. I tested the recovered regex against the data and variants — `"BigMovie Part 1"` → `"BigMovie"`, also handles `pt.2`, `(Part IV)`, `: Vol 3`, etc. The fix is to **restore that implementation into the source file**.
+
+## Exact steps for the WORK model
+
+### Step 1 — Rewrite `movie_grouping.py` (the only file to edit)
+
+Replace its entire contents with the implementation recovered from the `.pyc` (this is a faithful reconstruction of what was there, verified against the bytecode):
+
+```python
+import re
+
+PART_SUFFIX_RE = re.compile(
+    r"""
+    [\s\-:—–]*                                   # optional separator
+    [\(\[]?                                      # optional opening bracket
+    (?:part|pt\.?|vol\.?|volume|episode|ep\.?)   # 'part' keyword
+    [\s\.]*
+    (?:\d+|[ivxlcdm]+)                           # number or roman numeral
+    [\)\]]?                                      # optional closing bracket
+    \s*$
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+
+def base_title(title):
+    return PART_SUFFIX_RE.sub('', title or '').strip()
+
+
+def group_scenes(scenes):
+    groups = {}
+    for scene in scenes:
+        key = scene.get('movie_id')
+        if key is None:
+            key = base_title(scene.get('title'))
+        groups.setdefault(key, []).append(scene)
+    return groups
+
+
+def assign_movie_ids(scenes):
+    existing = [s['movie_id'] for s in scenes if isinstance(s.get('movie_id'), int)]
+    next_id = max(existing) + 1 if existing else 1
+    ids_by_base = {}
+    for scene in scenes:
+        if scene.get('movie_id') is not None:
+            continue
+        base = base_title(scene.get('title'))
+        if base not in ids_by_base:
+            ids_by_base[base] = next_id
+            next_id += 1
+        scene['movie_id'] = ids_by_base[base]
+    return scenes
+
+
+def find_ungrouped(scenes):
+    return [s for s in scenes if s.get('movie_id') is None]
+```
+
+Notes for the WORK model:
+- Keep `find_ungrouped` byte-for-byte identical to what's on disk now — don't "fix" it, it was never the bug.
+- Do **not** hand-edit `scenes_movie_parts.json` to bake IDs into it — it's input fixture data ("no movie_id set" is its stated purpose). Grouping must happen in code.
+- Do **not** delete `__pycache__/` — it's harmless; Python will regenerate it since the source is newer. (Removing it is optional cosmetics, not required.)
+
+### Step 2 — Verify (no new test files needed; one inline check is enough)
+
+Run:
+
+```bash
+python3 -c "
+import json, movie_grouping as mg
+scenes = json.load(open('scenes_movie_parts.json'))
+mg.assign_movie_ids(scenes)
+ids = {s['movie_id'] for s in scenes}
+assert len(ids) == 1, ids                      # all 6 parts -> one shared movie_id
+groups = mg.group_scenes(scenes)
+assert len(groups) == 1 and len(next(iter(groups.values()))) == 6
+assert mg.find_ungrouped(scenes) == []
+print('OK: all 6 parts grouped under movie_id', ids.pop())
+"
+```
+
+Expected output: `OK: all 6 parts grouped under movie_id 1`.
+
+### Optional hardening (only if the WORK model wants a regression guard)
+
+Add a small `test_movie_grouping.py` with the three assertions above so the next "still not grouping" report has a failing test to point at. Not required by the task — keep it minimal if skipped.
+
+**Summary:** One file to edit (`movie_grouping.py`), restoring the four missing pieces (`PART_SUFFIX_RE`, `base_title`, `group_scenes`, `assign_movie_ids`) exactly as recovered from the stale `.pyc`; leave the JSON and `find_ungrouped` untouched; verify with the inline script above.

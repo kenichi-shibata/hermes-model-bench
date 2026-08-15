@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead fleet_latency.json[90m [limit=100, offset=1][0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+`svc_3` is the outlier causing the sluggishness, with a latency of **300 ms** compared to the **40 ms** baseline of all other services (`svc_0`, `svc_1`, `svc_2`, `svc_4`, `svc_5`).

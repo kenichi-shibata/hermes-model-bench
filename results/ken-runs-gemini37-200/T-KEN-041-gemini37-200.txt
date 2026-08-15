@@ -1,0 +1,26 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead resume_scenes.json
+[0m→ [0mRead resume_section.py
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m 3 matches[0m
+[0m
+[0m← [0mEdit resume_section.py
+Index: /root/ken-tasks/T-KEN-041/resume_section.py
+===================================================================
+--- /root/ken-tasks/T-KEN-041/resume_section.py
++++ /root/ken-tasks/T-KEN-041/resume_section.py
+@@ -1,2 +1,2 @@
+ def get_resume(scenes):
+-    return sorted(scenes, key=lambda s: s['added_at'], reverse=True)
++    return sorted(scenes, key=lambda s: s['last_watched_at'], reverse=True)
+
+[0m
+[0m$ [0mpython3 -c "import json, resume_section; scenes = json.load(open('resume_scenes.json')); print(resume_section.get_resume(scenes))"
+[{'id': 1, 'added_at': '2026-08-01', 'last_watched_at': '2026-08-13'}, {'id': 2, 'added_at': '2026-08-13', 'last_watched_at': '2026-08-01'}]
+[0m
+[0m→ [0mRead resume_section.py
+Fixed `get_resume` in `resume_section.py` to sort scenes by `last_watched_at` in descending order instead of `added_at`.

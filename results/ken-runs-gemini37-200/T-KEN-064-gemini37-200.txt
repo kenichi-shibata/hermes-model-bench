@@ -1,0 +1,19 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead session_commits.json
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m
+[0m← [0mWrite CHANGELOG.md
+Wrote file successfully.
+[0m
+# Changelog
+
+### Features
+- **Backup Retry**: Added backup retry with exponential backoff (`e4f5g6h`)
+
+### Bug Fixes
+- **Image Fallback**: Added dead-host image fallback for 40 performers (`a1b2c3d`)

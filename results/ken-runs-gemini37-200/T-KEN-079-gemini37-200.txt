@@ -1,0 +1,42 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead canonical_bug.py
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m
+[0m$ [0mpython3 -c "import canonical_bug"
+(no output)
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-079
+total 28
+drwxr-xr-x   3 root root  4096 Aug 15 12:21 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 11:54 ..
+-rw-r--r--   1 root root    24 Aug 15 11:54 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 15 12:21 __pycache__
+-rw-r--r--   1 root root    81 Aug 15 11:54 canonical_bug.py
+[0m
+[0m→ [0mRead canonical_bug.py
+[0m
+[0m← [0mEdit canonical_bug.py
+Index: /root/ken-tasks/T-KEN-079/canonical_bug.py
+===================================================================
+--- /root/ken-tasks/T-KEN-079/canonical_bug.py
++++ /root/ken-tasks/T-KEN-079/canonical_bug.py
+@@ -1,2 +1,2 @@
+ def pick_canonical(items):
+-    return max(items, key=lambda i: i['upload_date'])
++    return min(items, key=lambda i: i['upload_date'])
+
+[0m
+[0m→ [0mRead canonical_bug.py
+[0m
+[0m$ [0mpython3 -c "import canonical_bug; assert canonical_bug.pick_canonical([{'upload_date': 2}, {'upload_date': 1}]) == {'upload_date': 1}"
+(no output)
+[0m
+[0m$ [0mpython3 -c "print(repr(open('canonical_bug.py').read()))"
+"def pick_canonical(items):\n    return min(items, key=lambda i: i['upload_date'])\n"
+[0m
+The canonical item is the earliest/original upload rather than the newest. Updated `pick_canonical` in `canonical_bug.py` to use `min()` instead of `max()`.

@@ -1,0 +1,41 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead sab_config_history.json
+[0m→ [0mRead CONTEXT_ONLY.md
+## Findings
+
+The directory contains exactly two files: `CONTEXT_ONLY.md` (just an orientation note) and `sab_config_history.json` (the config change log). There is no live config, no sync script, nothing else to inspect — the log is the only evidence.
+
+The log tells the whole story:
+
+| date | connections | source | reason |
+|---|---|---|---|
+| 2026-08-10 | 20 | `manual` | — |
+| 2026-08-11 | **5** | `nightly-sync` | `null` |
+
+## The real problem
+
+Someone manually set connections to 20 on 2026-08-10, and the automated **`nightly-sync` job reset it to 5 the very next night**, with no documented reason. The user's "dropped to 5 **again**" fits this pattern: a human keeps bumping it to 20, and the nightly sync keeps clobbering it back to 5. The last entry in the log is 5, so per the log the current value *is* 5 — consistent with the report.
+
+Two caveats the WORK model should keep in mind:
+- The log has only 2 entries, so earlier recurrences of "again" aren't recorded here — the log may be incomplete/rotated.
+- The actual nightly-sync script/config that performs the reset is **not in this directory**, so the durable root-cause fix (stop the sync from overriding) cannot be performed in this workspace.
+
+## Plan for the WORK model
+
+1. **Re-read** `sab_config_history.json` to confirm the latest entry is still `connections: 5` from `nightly-sync` (verify nothing changed since this investigation).
+2. **Do not modify or delete existing entries** — this is an append-only history log.
+3. **Append one corrective entry** to the JSON array in `sab_config_history.json`, restoring the desired value and documenting the cause:
+   ```json
+   {
+     "date": "2026-08-15",
+     "connections": 20,
+     "source": "manual-fix",
+     "reason": "restored to 20 after nightly-sync reset connections to 5 (2026-08-11, reason null); recurring override by nightly-sync"
+   }
+   ```
+   Keep the existing schema/format exactly (array of objects, 2-space indent, valid JSON — mind the comma after the previous last object).
+4. **Verify** the file still parses as valid JSON after the edit (e.g. `python3 -m json.tool sab_config_history.json`).
+5. **Report to the user**: the cause is the `nightly-sync` automation overriding the manual setting, and recommend a follow-up outside this workspace — locate the nightly-sync job/source config and either change its value to 20 or make it stop managing the `connections` field, otherwise the manual fix will be reverted again on the next sync.

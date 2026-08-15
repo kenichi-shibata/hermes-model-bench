@@ -1,0 +1,51 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 4 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead similar_performers.py
+[0m→ [0mRead performer_vectors.json
+[0m
+[0m← [0mEdit similar_performers.py
+Index: /root/ken-tasks/T-KEN-031/similar_performers.py
+===================================================================
+--- /root/ken-tasks/T-KEN-031/similar_performers.py
++++ /root/ken-tasks/T-KEN-031/similar_performers.py
+@@ -1,3 +1,10 @@
+ def get_similar(performer_id, vectors):
+-    v = vectors[str(performer_id)]  # KeyError if missing
+-    return sorted(vectors.items(), key=lambda kv: sum((a-b)**2 for a,b in zip(v, kv[1])))[:5]
++    key = str(performer_id)
++    v = vectors.get(key)
++    if v is None:
++        return []
++    return sorted(
++        ((pid, vec) for pid, vec in vectors.items() if pid != key),
++        key=lambda kv: sum((a - b) ** 2 for a, b in zip(v, kv[1])),
++    )[:5]
++
+
+[0m
+[0m$ [0mPYTHONDONTWRITEBYTECODE=1 python3 -c "
+import json, sys
+sys.path.insert(0, '.')
+from similar_performers import get_similar
+vectors = json.load(open('performer_vectors.json'))
+print('known id 2 ->', get_similar(2, vectors))
+print('known id str \"2\" ->', get_similar('2', vectors))
+print('missing id 42 ->', get_similar(42, vectors))
+print('missing id str \"999\" ->', get_similar('999', vectors))
+print('count for 2:', len(get_similar(2, vectors)))
+"
+known id 2 -> [('1', [0.1, 0.2]), ('3', [0.30000000000000004, 0.6000000000000001]), ('0', [0.0, 0.0]), ('4', [0.4, 0.8]), ('5', [0.5, 1.0])]
+known id str "2" -> [('1', [0.1, 0.2]), ('3', [0.30000000000000004, 0.6000000000000001]), ('0', [0.0, 0.0]), ('4', [0.4, 0.8]), ('5', [0.5, 1.0])]
+missing id 42 -> []
+missing id str "999" -> []
+count for 2: 5
+[0m
+[0m✱ [0mGlob "**/*"[90m in . · 4 matches[0m
+[0m→ [0mRead similar_performers.py
+The issue where similar performers failed to load for performers without vector embeddings has been resolved.
+
+- Updated `similar_performers.py` to use `vectors.get(str(performer_id))` and return `[]` when no vector exists for the requested performer.
+- Excluded the queried performer's own ID from the similarity ranking.

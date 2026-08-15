@@ -1,0 +1,11 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead dedupe_check.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+Deduplication is not having an effect for the following reasons:
+
+1. **Different Field Values (Not Exact Duplicates):** Although both entries share `"title": "X"`, their `"res"` fields differ (`"1080p"` vs `"480p"`). Standard deduplication compares entire objects/records, so they are treated as distinct unless deduplication is explicitly configured to match solely on the `title` field.
+2. **Distinct Top-Level Keys:** The data is structured as a JSON object with unique keys (`"a"` and `"b"`), rather than an array of objects.

@@ -1,0 +1,17 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead host_vmstat_mock.json
+[0m→ [0mRead service_x_logs.txt
+Based on the logs and host resource metrics:
+
+### Root Cause
+The slowness is caused by host-level resource exhaustion from a noisy neighbor process, not an issue within Service X itself:
+1. **CPU & Memory Contention:** `unrelated_batch_job.py` is consuming **95% CPU** and **6.4 GB RAM**.
+2. **Swap Exhaustion / Thrashing:** Host swap is completely full (**8,200 MB / 8,192 MB**), leading to severe memory pressure and disk thrashing.
+3. **Service X State:** Service X itself is lightweight (using only **120 MB RAM**), but its execution is throttled by host resource starvation.
+
+### Recommended Action
+- Terminate, throttle, or isolate `unrelated_batch_job.py` (e.g., via cgroups/container limits or moving batch workloads to a dedicated host).

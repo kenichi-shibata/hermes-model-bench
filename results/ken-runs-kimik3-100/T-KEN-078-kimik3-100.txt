@@ -1,0 +1,33 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead merge_candidates.json
+[0m
+[0m← [0mWrite merged.json
+Wrote file successfully.
+[0m
+The file contains two duplicate records (`a` and `b`) to be merged, keeping `a` as the canonical entry. To not lose data, the play counts must be summed (0 + 15 = 15) rather than just keeping `a`'s value.
+[0m$ [0mpython3 -c "
+import json
+src = json.load(open('merge_candidates.json'))
+out = json.load(open('merged.json'))
+assert out['keep'] == src['keep'] == 'a'
+assert out['play_count'] == src['a_play_count'] + src['b_play_count'] == 15
+print('OK: merged play_count =', out['play_count'])
+"
+OK: merged play_count = 15
+[0m
+Done. Merged into `merged.json`:
+
+```json
+{
+  "keep": "a",
+  "play_count": 15
+}
+```
+
+- Kept `a` as the surviving record (per `"keep": "a"`)
+- **No data lost**: summed both play counts (`a_play_count: 0` + `b_play_count: 15` = **15**) instead of dropping b's 15 plays
+- The original `merge_candidates.json` is untouched, and the sum was verified programmatically.

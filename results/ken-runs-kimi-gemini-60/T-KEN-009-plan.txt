@@ -1,0 +1,38 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead disk_fleet.json
+[0m→ [0mRead CONTEXT_ONLY.md
+## Investigation findings
+
+The working directory contains exactly two files:
+
+- `CONTEXT_ONLY.md` — one line of orientation: "Files: disk_fleet.json (real per-host disk usage across 5 hosts)." No instructions, no expected deliverable, no tests, no scripts.
+- `disk_fleet.json` — the entire dataset (23 lines, valid JSON):
+
+| Host | used_pct | thin_provisioned | notes |
+|------|----------|------------------|-------|
+| host1 | 45 | false | OK |
+| host2 | 38 | false | OK |
+| host3 | **92** | **true** | named `"media-pool"` — CRITICAL |
+| host4 | 22 | false | OK |
+| host5 | 30 | false | OK |
+
+## The real problem
+
+There is **no code problem and nothing to fix in files**. This is a monitoring/analysis task: "check disk fleet" means read the data and report fleet health. The substantive finding is:
+
+- **host3 ("media-pool") is at 92% disk usage — critical** (above the common 90% critical / 80% warning thresholds).
+- It is also **`thin_provisioned: true`**, which makes 92% worse than it looks: thin pools are typically oversubscribed, so exhausting the pool causes abrupt write failures for all volumes drawing from it, not just sloppy performance. This host needs urgent action (free space, expand the pool, or migrate media).
+- host1/host2/host4/host5 are all healthy (22–45%), no action needed.
+
+## Concrete plan for the WORK model
+
+1. **Do not edit, create, or delete any files.** There is no deliverable file, no test harness, and no code in this directory. Creating a report file would be unrequested extra output.
+2. **Verify the data mechanically (optional but recommended):** run one read-only command, e.g. `python3 -c "import json;d=json.load(open('disk_fleet.json'));print({h:v['used_pct'] for h,v in d.items()})"` (or `jq . disk_fleet.json`) to confirm the JSON parses and the numbers match what was read.
+3. **Report to the user in text, concisely:**
+   - Fleet summary: 5 hosts checked; 4 healthy, 1 critical.
+   - **Critical: host3 "media-pool" at 92% used, thin-provisioned** → flag as urgent; explain the thin-provisioning oversubscription risk; recommend remediation (clean up / expand pool / move data) and monitoring/alerting before it hits ~95–100%.
+   - Healthy: host1 45%, host2 38%, host4 22%, host5 30% — all below any warning threshold, no action.
+4. Done. Total expected effort: one optional verification command plus the report.

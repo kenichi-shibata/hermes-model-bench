@@ -1,0 +1,14 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead sab_config.json
+[0m→ [0mRead speed_log.json
+SAB is slow because it's hitting its own configured speed cap.
+
+**Evidence:**
+- `sab_config.json` sets `"max_download_speed_kbps": 500`
+- `speed_log.json` shows every sample pinned at 485–494 kbps — hovering just under 500, never above. That's the classic signature of a rate limiter, not a network problem.
+
+**Conclusion:** The bottleneck is the 500 kbps download speed limit in the config, not your connection count (20 is plenty) or your line.
+
+**Fix:** Raise or remove `max_download_speed_kbps` (e.g., set it to `0` for unlimited, or a much higher value). Want me to update the config?

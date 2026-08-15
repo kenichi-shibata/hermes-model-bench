@@ -1,0 +1,82 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead restore_dry_run.json
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 11:54 ..
+-rw-r--r--   1 root root    28 Aug 15 11:54 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    70 Aug 15 11:54 restore_dry_run.json
+[0m
+[0m$ [0menv
+SHELL=/bin/bash
+AGENT=1
+PWD=/root/ken-tasks/T-KEN-107
+LOGNAME=root
+XDG_SESSION_TYPE=tty
+_=/usr/bin/env
+MOTD_SHOWN=pam
+OPENCODE_PID=1093
+HOME=/root
+OPENCODE=1
+LANG=C
+SSH_CONNECTION=192.168.1.152 48464 192.168.1.226 22
+XDG_SESSION_CLASS=user
+USER=root
+SHLVL=1
+XDG_SESSION_ID=c6
+DEEPSEEK_API_KEY=<REDACTED>
+LC_CTYPE=C.UTF-8
+XDG_RUNTIME_DIR=/run/user/0
+SSH_CLIENT=192.168.1.152 48464 22
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+OPENROUTER_API_KEY=<REDACTED>
+OLDPWD=/root/ken-tasks
+[0m
+[0m$ [0mls -la /tmp
+total 147100
+drwxrwxrwt  8 root root     700 Aug 15 12:36 .
+drwxr-xr-x 18 root root    4096 Aug 15 12:21 ..
+drwxrwxrwt  2 root root      40 Aug 15 12:21 .ICE-unix
+drwxrwxrwt  2 root root      40 Aug 15 12:21 .X11-unix
+drwxrwxrwt  2 root root      40 Aug 15 12:21 .XIM-unix
+-rw-r--r--  1 root root 5576816 Aug 15 12:22 .bcdbfdffb6d5faec-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:23 .bcdbff1eb7a7fabf-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:23 .bcdbff1eb7cff3ff-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:23 .bcdbff1ebfbffefd-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:24 .bcdbff1efff7fb6d-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:24 .bcdbff1fb5f7b22c-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:22 .bcdbff1fffdff7ff-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:24 .bcdbff1fffefff7e-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:25 .bcdbff3ebdb7f73c-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:26 .bcdbff3ebebdffbe-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:25 .bcdbff3ef585f7ef-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:26 .bcdbff3ef5bdb6ff-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:24 .bcdbff3efcfdf2af-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:25 .bcdbff3fbea5bbad-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:26 .bcdbff3fbefff2ed-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:25 .bcdbff3ff6ffbb7e-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:26 .bcdbff3ffdfdf62f-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:29 .bcdbff5ebf8dfbac-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:28 .bcdbff5ef4ffb76f-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:28 .bcdbff5fb5f5b6ee-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:35 .bcdbffbebeddb6ae-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:35 .bcdbffbebf97fbfc-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:36 .bcdbffbefcbfbbbd-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:34 .bcdbffbfb79dbe3e-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:36 .bcdbffbffd9dfbfc-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:35 .bcdbffbffe95f6bf-00000000.so
+-rw-r--r--  1 root root 5576816 Aug 15 12:36 .bcdbffdef4e5be2e-00000000.so
+drwxrwxrwt  2 root root      40 Aug 15 12:21 .font-unix
+drwxr-xr-x  2 root root      40 Aug 15 12:22 opencode
+drwx------  3 root root      60 Aug 15 12:21 systemd-private-de8aca29907e4d3a84cb6edd496781ed-systemd-logind.service-xCkAac
+[0m
+The restore path does not work. 
+
+Although `restore_dry_run.json` reports an `exit_code` of `0`, the restore is incomplete: only 13 out of 15 expected tables were restored (`tables_restored: 13` vs. `tables_expected: 15`), indicating a silent failure where 2 tables are missing.

@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead thin_pool_status.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+No. Physical usage is at 42% (`physical_used_pct: 42`), and allocated capacity is 95% (`allocated_pct_of_physical: 95`), so the thin pool is not tight.

@@ -1,0 +1,15 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead ci_run_log.json
+**No, CI is not passing.**
+
+The log shows 3 runs:
+
+| Run | Status | Notes |
+|-----|--------|-------|
+| 1 | pass | |
+| 2 | pass | |
+| 3 | **fail** | `is_head: true` — most recent run |
+
+Although the first two runs passed, run 3 is flagged as the head (latest) run and it **failed**. The current state of CI is determined by the most recent run, so CI is currently **failing**, despite the earlier passes.

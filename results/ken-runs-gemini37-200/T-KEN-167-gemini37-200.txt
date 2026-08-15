@@ -1,0 +1,13 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead connectivity_trace.json
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Based on `connectivity_trace.json`:
+
+* **DNS Resolution:** Succeeded (`dns_ok: true`)
+* **TCP Connection:** Succeeded (`tcp_connect_ok: true`)
+* **Application Health Check:** Failed due to a timeout (`app_health_check: "timeout"`)
+
+**Cause:** The network and transport layers (DNS and TCP) are functional, but the application service itself is unresponsive or failing to reply to the health check request within the configured timeout period (e.g., due to process hang, heavy load, deadlock, or misconfigured application endpoint).

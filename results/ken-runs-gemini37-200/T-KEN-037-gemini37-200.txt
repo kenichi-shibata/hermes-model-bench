@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead dedupe_merge.py
+[0m→ [0mRead duplicate_groups.json[90m [limit=100][0m
+It is **just flagging**. 
+
+In `dedupe_merge.py`, `flag_duplicates` only sets `item['duplicate'] = True` for `group[1:]` and returns the full list without merging or removing any items.

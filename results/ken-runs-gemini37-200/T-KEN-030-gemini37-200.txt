@@ -1,0 +1,43 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead ratings_api.py
+[0m→ [0mRead ratings_db.json
+[0m✱ [0mGlob "**/*"[90m in . · 3 matches[0m
+[0m
+[0m$ [0mpython3 -c "import json, ratings_api; data = json.load(open('ratings_db.json')); print([ratings_api.get_rating(s) for s in data if s['vote_count'] > 0])"
+[4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+[0m
+[0m$ [0mpython3 -c "print(40/10)"
+4.0
+[0m
+[0m$ [0mpython3 -c "import json, ratings_api; data = json.load(open('ratings_db.json')); print([ratings_api.get_rating(s) for s in data])"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import json, ratings_api; data = json.load(open('ratings_db.json')); print([ratings_api.get_rating(s) for s in data])
+                                                                                ~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/root/ken-tasks/T-KEN-030/ratings_api.py", line 2, in get_rating
+    return scene['total_score'] / scene['vote_count']
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~
+ZeroDivisionError: division by zero
+[0m
+[0m← [0mEdit ratings_api.py
+Index: /root/ken-tasks/T-KEN-030/ratings_api.py
+===================================================================
+--- /root/ken-tasks/T-KEN-030/ratings_api.py
++++ /root/ken-tasks/T-KEN-030/ratings_api.py
+@@ -1,2 +1,4 @@
+ def get_rating(scene):
++    if scene['vote_count'] == 0:
++        return 0
+     return scene['total_score'] / scene['vote_count']
+
+[0m
+[0m$ [0mpython3 -c "import json, ratings_api; data = json.load(open('ratings_db.json')); print([ratings_api.get_rating(s) for s in data])"
+[0, 0, 0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+[0m
+[0m→ [0mRead ratings_api.py
+Fixed the division by zero error in `ratings_api.py` by returning `0` when `vote_count` is `0`.

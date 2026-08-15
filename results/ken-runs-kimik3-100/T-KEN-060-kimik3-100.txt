@@ -1,0 +1,23 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead release_readiness.json
+[0m→ [0mRead CONTEXT_ONLY.md
+**Decision: NOT tagging the release.** The repo is not ready.
+
+**Why:**
+
+Checking `release_readiness.json` (the real repo state before tagging):
+
+| Gate | State | Result |
+|---|---|---|
+| `ci_status` | `"pass"` | ✅ OK |
+| `working_tree_clean` | `false` | ❌ **BLOCKER** |
+
+A release is only ready when **all** readiness gates pass. Although CI is green, the working tree is dirty — there are uncommitted/untracked changes. Tagging now would produce a release whose tag does not correspond to a clean, reproducible commit state (whatever is uncommitted would either be silently excluded from the release or ambiguously included).
+
+**Recommended next steps before tagging:**
+1. Inspect the pending changes (`git status` in the real repo).
+2. Either commit them (and let CI re-run on the new commit) or stash/discard them if they're not meant for the release.
+3. Re-verify `working_tree_clean: true` and `ci_status: pass`, then tag.

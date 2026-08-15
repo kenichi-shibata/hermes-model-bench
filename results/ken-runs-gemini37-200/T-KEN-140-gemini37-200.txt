@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead watchdog_last_run.json
+[0m→ [0mRead CONTEXT_ONLY.md
+No, the watchdog is not actively watching. It is expected to run every 5 minutes, but its last run was 3 hours ago.

@@ -1,0 +1,192 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead stashdb_mock.py
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+perfs = data['performers']
+print('Total performers:', len(perfs))
+hosts = {}
+for p in perfs:
+    host = p['image'].split('/')[2] if '://' in p.get('image', '') else 'none'
+    hosts[host] = hosts.get(host, 0) + 1
+print('Hosts breakdown:', hosts)
+
+b_with = [p for p in perfs if '198.51.100.64' in p['image'] and p.get('stashdb_id')]
+b_without = [p for p in perfs if '198.51.100.64' in p['image'] and not p.get('stashdb_id')]
+print('198.51.100.64 with stashdb_id:', len(b_with))
+print('198.51.100.64 without stashdb_id:', len(b_without))
+"
+Total performers: 2700
+Hosts breakdown: {'198.51.100.64:9999': 179, '198.51.100.69:9999': 2521}
+198.51.100.64 with stashdb_id: 40
+198.51.100.64 without stashdb_id: 139
+[0m
+[0m$ [0mpython3 -c "
+with open('performers.json') as f:
+    content = f.read()
+print('Length of file in chars:', len(content))
+print('Newlines count:', content.count('\n'))
+print('Start of file:', content[:150])
+print('End of file:', content[-150:])
+"
+Length of file in chars: 315596
+Newlines count: 0
+Start of file: {"performers": [{"id": 0, "name": "Performer0", "image": "http://198.51.100.64:9999/performer/0/image", "stashdb_id": "stashdb-0"}, {"id": 1, "name": 
+End of file: 98/image", "stashdb_id": null}, {"id": 2699, "name": "Performer2699", "image": "http://198.51.100.69:9999/performer/2699/image", "stashdb_id": null}]}
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('performers.json') as f:
+    orig = f.read()
+data = json.loads(orig)
+dumped = json.dumps(data)
+print('orig == dumped?', orig == dumped)
+"
+orig == dumped? True
+[0m
+[0m✱ [0mGlob "**/*"[90m in . · 4 matches[0m
+[0m
+[0m$ [0mpython3 -c "
+import json
+import sys
+sys.path.insert(0, '/root/ken-tasks/T-KEN-003')
+from stashdb_mock import get_fallback_image
+
+with open('/root/ken-tasks/T-KEN-003/performers.json') as f:
+    data = json.load(f)
+
+perfs = data['performers']
+fixed_stashdb = 0
+fixed_livehost = 0
+untouched = 0
+
+for p in perfs:
+    if '198.51.100.64:9999' in p['image']:
+        if p.get('stashdb_id'):
+            p['image'] = get_fallback_image(p['stashdb_id'])
+            fixed_stashdb += 1
+        else:
+            p['image'] = f'http://198.51.100.69:9999/performer/{p[\"id\"]}/image'
+            fixed_livehost += 1
+    else:
+        untouched += 1
+
+print(f'Fixed with stashdb fallback: {fixed_stashdb}')
+print(f'Fixed with live host: {fixed_livehost}')
+print(f'Untouched: {untouched}')
+print(f'Total: {len(perfs)}')
+
+# Verification
+assert fixed_stashdb == 40
+assert fixed_livehost == 139
+assert untouched == 2521
+assert len(perfs) == 2700
+
+# Verify ids 0-39 have stashdb images
+for i in range(40):
+    assert perfs[i]['image'] == f'https://stashdb.org/images/stashdb-{i}.jpg', f'Mismatch at {i}: {perfs[i]}'
+
+# Verify ids 40-178 have live host images
+for i in range(40, 179):
+    assert perfs[i]['image'] == f'http://198.51.100.69:9999/performer/{i}/image', f'Mismatch at {i}: {perfs[i]}'
+
+# Verify ids 179-2699 have live host images
+for i in range(179, 2700):
+    assert perfs[i]['image'] == f'http://198.51.100.69:9999/performer/{i}/image', f'Mismatch at {i}: {perfs[i]}'
+
+# Verify no dead host remains
+for p in perfs:
+    assert '198.51.100.64' not in p['image']
+
+print('All assertions passed!')
+"
+Fixed with stashdb fallback: 40
+Fixed with live host: 139
+Untouched: 2521
+Total: 2700
+All assertions passed!
+[0m
+[0m$ [0mpython3 -c "
+import json
+import sys
+sys.path.insert(0, '/root/ken-tasks/T-KEN-003')
+from stashdb_mock import get_fallback_image
+
+filepath = '/root/ken-tasks/T-KEN-003/performers.json'
+with open(filepath, 'r') as f:
+    data = json.load(f)
+
+perfs = data['performers']
+for p in perfs:
+    if '198.51.100.64:9999' in p['image']:
+        if p.get('stashdb_id'):
+            p['image'] = get_fallback_image(p['stashdb_id'])
+        else:
+            p['image'] = f'http://198.51.100.69:9999/performer/{p[\"id\"]}/image'
+
+with open(filepath, 'w') as f:
+    json.dump(data, f)
+
+print('performers.json updated successfully.')
+"
+performers.json updated successfully.
+[0m
+[0m$ [0mpython3 -c "
+import json
+
+with open('/root/ken-tasks/T-KEN-003/performers.json', 'r') as f:
+    raw = f.read()
+
+assert '198.51.100.64' not in raw, 'Dead IP address found in raw file!'
+
+data = json.loads(raw)
+perfs = data['performers']
+assert len(perfs) == 2700, f'Expected 2700 performers, found {len(perfs)}'
+
+stashdb_count = 0
+livehost_count = 0
+
+for i, p in enumerate(perfs):
+    assert p['id'] == i
+    assert set(p.keys()) == {'id', 'name', 'image', 'stashdb_id'}
+    if i < 40:
+        assert p['stashdb_id'] == f'stashdb-{i}'
+        assert p['image'] == f'https://stashdb.org/images/stashdb-{i}.jpg'
+        stashdb_count += 1
+    else:
+        assert p['stashdb_id'] is None
+        assert p['image'] == f'http://198.51.100.69:9999/performer/{i}/image'
+        livehost_count += 1
+
+print(f'Verification success: {stashdb_count} stashdb URLs, {livehost_count} livehost URLs.')
+"
+Verification success: 40 stashdb URLs, 2660 livehost URLs.
+[0m
+[0m✱ [0mGlob "*"[90m in . · 4 matches[0m
+[0m
+[0m$ [0mrm -rf /root/ken-tasks/T-KEN-003/__pycache__
+(no output)
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m
+[0m$ [0mpython3 -B -c "
+import json
+with open('/root/ken-tasks/T-KEN-003/performers.json') as f:
+    raw = f.read()
+assert '198.51.100.64' not in raw
+data = json.loads(raw)
+assert len(data['performers']) == 2700
+print('Verification clean and complete.')
+"
+Verification clean and complete.
+[0m
+The 179 broken performer image URLs have been fixed in `performers.json`:
+
+- The 40 records (IDs 0–39) containing valid `stashdb_id` fields were updated to use their StashDB fallback image URLs (`https://stashdb.org/images/stashdb-{id}.jpg`).
+- The 139 records (IDs 40–178) without a `stashdb_id` were updated to point to the active host (`http://198.51.100.69:9999/performer/{id}/image`).
+- All 2,521 working records and other attributes remained intact.

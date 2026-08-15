@@ -1,0 +1,32 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead download_queue.json
+[0m
+[0m← [0mEdit download_queue.json
+Index: /root/ken-tasks/T-KEN-026/download_queue.json
+===================================================================
+--- /root/ken-tasks/T-KEN-026/download_queue.json
++++ /root/ken-tasks/T-KEN-026/download_queue.json
+@@ -12,11 +12,6 @@
+   {
+     "id": 5,
+     "title": "Scene C Remastered",
+     "content_hash": "ddd"
+-  },
+-  {
+-    "id": 7,
+-    "title": "Scene C v2",
+-    "content_hash": "ccc"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+[0m→ [0mRead download_queue.json
+[0m
+[0m$ [0mpython3 -c "import json; d=json.load(open('download_queue.json')); hashes=[e['content_hash'] for e in d]; assert len(hashes)==len(set(hashes))==3; print('OK', hashes)"
+OK ['aaa', 'ccc', 'ddd']
+[0m
+Duplicate download entry `id: 7` (duplicate content hash `ccc`) has been removed from `download_queue.json`, leaving unique entries `id: 1`, `id: 3`, and `id: 5`.

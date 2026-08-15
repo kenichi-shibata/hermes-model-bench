@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead post_handler.py
+[0m→ [0mRead message_log.json
+`post_handler.py` does not implement idempotency tracking or deduplication, so repeated calls (at 10:00:00 and 10:00:05) directly execute `webhook.send(message)` each time.

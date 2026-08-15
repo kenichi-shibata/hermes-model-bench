@@ -1,0 +1,14 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead refusal_reason.json
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+It refused because the target account has existing watch history (`"reason": "target_has_watch_history"`, `"history_count": 8`).
+
+To prevent the refusal:
+1. **Clear the watch history** for the target account (reset history count to 0).
+2. **Use a clean target profile** with no prior watch history.
+3. **Update the system rule/policy** to allow targets that have watch history if this check is configurable.

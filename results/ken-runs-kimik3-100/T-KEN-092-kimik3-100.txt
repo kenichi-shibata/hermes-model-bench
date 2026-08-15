@@ -1,0 +1,14 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead latency_breakdown.json
+**Networking.**
+
+The breakdown is unambiguous:
+
+| Component | Time | Share of total |
+|---|---|---|
+| `network_roundtrip_ms` | 198 ms | **99%** |
+| `compute_ms` | 2 ms | 1% |
+
+Of the ~200 ms total latency, 198 ms is spent on the network roundtrip while actual computation takes only 2 ms. Optimizing compute (faster code, more CPU, etc.) could save at most 2 ms — a rounding error. Any meaningful improvement has to come from the network side: reducing roundtrips (batching/pipelining requests), moving compute closer to the data (or vice versa), caching, or using a persistent/multiplexed connection instead of paying per-request roundtrip costs.

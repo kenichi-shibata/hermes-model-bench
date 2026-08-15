@@ -1,0 +1,27 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead recall_test_case.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-159
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 11:54 ..
+-rw-r--r--   1 root root    29 Aug 15 11:54 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    63 Aug 15 11:54 recall_test_case.json
+[0m
+Based on `recall_test_case.json`, the contents are:
+
+```json
+{
+  "exact_phrase_recall": false,
+  "paraphrase_recall": true
+}
+```
+
+- **exact_phrase_recall**: `false`
+- **paraphrase_recall**: `true`

@@ -1,0 +1,19 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead tailscale_route_status.json
+**No — you can't reach home right now.**
+
+Here's what the status shows:
+
+- Your **home router peer is offline** — `online: false`, last seen **8 days ago**.
+- That peer is the one advertising your home LAN (`192.168.1.0/24`), i.e., it's the subnet router your phone would use to reach anything at home.
+
+Since the subnet router is down, Tailscale has no working path into `192.168.1.0/24`, so your phone can't reach any home devices (or that network at all) through the tailnet.
+
+**To fix it**, get that device back online:
+1. Check it's powered on and has internet.
+2. Make sure Tailscale is running on it (`tailscaled` / the Tailscale service).
+3. Confirm it's still advertising the route: `tailscale up --advertise-routes=192.168.1.0/24` (and that the route is approved in the admin console).
+
+Once that peer shows `online: true` again, your phone should be able to reach home.

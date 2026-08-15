@@ -1,0 +1,40 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead wanted_list.json
+[0m✱ [0mGlob "**/*"[90m 4 matches[0m
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+[0m
+[0m← [0mWrite groups.json
+Wrote file successfully.
+[0m
+[0m← [0mWrite scenes_db.json
+Wrote file successfully.
+[0m
+[0m← [0mWrite wanted_list.json
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 -c "
+import json
+
+for fname in ['groups.json', 'scenes_db.json', 'wanted_list.json', 'samantha_saint_wicked_catalog.json']:
+    with open(fname) as f:
+        data = json.load(f)
+        print(f'{fname}: valid JSON ({len(data)} items/keys)')
+"
+groups.json: valid JSON (1 items/keys)
+scenes_db.json: valid JSON (10 items/keys)
+wanted_list.json: valid JSON (12 items/keys)
+samantha_saint_wicked_catalog.json: valid JSON (3 items/keys)
+[0m
+[0m→ [0mRead groups.json
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead wanted_list.json
+1. **Scene Grouping vs Re-downloading**: You do not need to re-download the whole movie as a single file. In Stash, part scenes are linked to a **Group** record via `movie_id` and sequenced with `scene_index`. A `groups.json` file has been created with Group ID `1` ("MovieX", unconfirmed title), and `scenes_db.json` records `100`–`105` are now linked with `movie_id: 1` and `scene_index: 1..6`.
+
+2. **Studio Mislabeling (FliXXX vs Digital Playground)**: Scenes `200`–`203` have been updated in `scenes_db.json` with canonical `studio: "Digital Playground"` and preserved distribution metadata as `studio_alias: "FliXXX"`.
+
+3. **Samantha Saint Wicked Catalog**: `wanted_list.json` has been populated with all 12 movie titles from `samantha_saint_wicked_catalog.json` with status `"wanted"`.

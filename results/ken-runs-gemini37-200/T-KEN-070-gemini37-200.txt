@@ -1,0 +1,9 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead post_rate.json
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+It is **spamming the channel**. 
+
+The data shows sustained abnormal burst activity (`"burst": true`) across 15 consecutive intervals ($t=0$ to $t=14$), accounting for over 83% of the recorded events before returning to normal rate limits.

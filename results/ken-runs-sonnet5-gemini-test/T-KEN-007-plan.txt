@@ -1,0 +1,65 @@
+[0m
+> build · anthropic/claude-sonnet-5
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-007
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 15:11 .
+drwxr-xr-x 206 1000 1000 12288 Aug 15 15:18 ..
+-rw-r--r--   1 root root   101 Aug 15 15:11 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   262 Aug 15 15:11 service_logs.txt
+-rw-r--r--   1 root root   135 Aug 15 15:11 upstream_status_mock.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead service_logs.txt
+[0m→ [0mRead upstream_status_mock.json
+## Investigation Summary
+
+This directory contains only 3 files — there is no actual alerting source code, config, or test suite here:
+
+- `CONTEXT_ONLY.md` — one-line pointer explaining the other two files.
+- `service_logs.txt` — 5 log lines from the service itself.
+- `upstream_status_mock.json` — a single JSON record describing the payments-api dependency's status.
+
+There is **no alert-firing code, no threshold config, no rule definitions** anywhere in this sandbox. So "fixing" an alert by editing a file is not possible here — there's nothing to patch. The task is a diagnosis/correlation exercise: cross-reference the two data files and determine whether the service's alerting behavior is consistent with reality.
+
+## Data cross-reference
+
+`service_logs.txt`:
+```
+10:00:01 INFO service healthy
+10:01:01 INFO service healthy
+10:02:01 INFO service healthy
+10:03:01 WARN upstream dependency (payments-api) returned 503
+10:04:01 INFO service healthy (own health check green)
+```
+Checks run every 60s. A WARN fires once at 10:03:01 for a payments-api 503.
+
+`upstream_status_mock.json`:
+```json
+{"payments-api": {"status": "major_outage", "started_at": "2026-08-13T09:55:00Z", "message": "Active incident, provider-side, no ETA"}}
+```
+The outage started at 09:55:00 (8 min before the WARN) and has **no resolution timestamp** — it is still ongoing/unresolved as of the last log entry.
+
+## The actual bug
+
+The WARN at 10:03:01 is genuine and matches the mock incident (correct correlation). The problem is the very next line:
+
+`10:04:01 INFO service healthy (own health check green)`
+
+This log entry reverts to "healthy" one minute later with zero further mention of payments-api, even though the upstream status mock shows the outage is still `major_outage` with `no ETA` (unresolved). Two possible causes, both pointing to the same class of bug:
+
+1. **The health/alert check doesn't re-poll the dependency every cycle** — so at 10:04 it simply didn't check payments-api again, defaulted to "healthy" based on self-status only, and the WARN condition silently cleared without confirming recovery.
+2. **The overall health rollup only reflects "own" process health**, not dependency health — so a single WARN gets logged but never escalates the overall status; the moment the internal check passes, it reports "healthy" and buries the still-active dependency outage.
+
+Either way: **the alert is broken in the sense that it does not persist/escalate for an ongoing, unresolved incident.** It fired once, then self-cleared and reported "healthy" while the real-world dependency was still in major outage with no ETA. This creates false confidence — on-call would see "healthy" in the latest log line and assume the issue is resolved, when `upstream_status_mock.json` proves it is not.
+
+Explicitly ruled out: this is *not* a false-positive/flaky-alert problem (the WARN was accurate and well-timed relative to the real incident). It's a **missing persistence/escalation problem** — one-shot alerting that doesn't track incident state across checks.
+
+## Plan for the WORK model
+
+Since no source code exists in this sandbox to edit, the WORK model's job is to **report the diagnosis, not to edit files**:
+
+1. Do not attempt to create or edit any files in this directory — there is no alerting logic here to patch, and inventing a fix file would misrepresent the sandbox's contents (only logs/mock data exist).
+2. State the verdict clearly: the single WARN was accurate, but the alerting/health-check is effectively broken because it does not persist or re-escalate for a still-open incident — the 10:04:01 "healthy" line contradicts the unresolved `major_outage` status in `upstream_status_mock.json` (no `resolved_at`/ETA).
+3. Cite the specific evidence: `service_logs.txt:4` (the WARN) vs `service_logs.txt:5` (the healthy reversion) vs `upstream_status_mock.json:1` (`"status": "major_outage"`, `"message": "Active incident, provider-side, no ETA"`).
+4. If asked for a conceptual fix recommendation (not a file edit, since no such file exists here): the health-check/alert logic should (a) check dependency status every cycle rather than caching/skipping, and (b) only clear/downgrade a dependency alert when the dependency's own status source reports recovery — not simply because the service's own internal check passed.

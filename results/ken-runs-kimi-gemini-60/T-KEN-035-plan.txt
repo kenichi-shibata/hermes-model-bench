@@ -1,0 +1,80 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead search_engine.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scenes_searchable.json
+[0m→ [0mRead __pycache__
+[0m
+[0m$ [0mpython3 -B -c "
+import json, sys
+sys.path.insert(0, '.')
+from search_engine import search
+scenes = json.load(open('scenes_searchable.json'))
+print('query \"samantha\":', search('samantha', scenes))
+print('query \"Samantha\":', search('Samantha', scenes))
+print('query \"movie\":', search('movie', scenes))
+print('query \"Scene\":', search('Scene', scenes))
+"
+query "samantha": []
+query "Samantha": [{'id': 1, 'title': 'Samantha Saint Movie'}]
+query "movie": []
+query "Scene": [{'id': 2, 'title': 'Other Scene'}]
+[0m
+## Investigation findings
+
+**The real problem: the search is case-sensitive.**
+
+`search_engine.py` (the entire file, 2 lines):
+
+```python
+def search(query, scenes):
+    return [s for s in scenes if query in s['title']]
+```
+
+`query in s['title']` is a case-sensitive substring match. Verified against `scenes_searchable.json` (2 scenes: `"Samantha Saint Movie"`, `"Other Scene"`):
+
+| Query | Result | Expected |
+|---|---|---|
+| `"samantha"` | `[]` | should match scene 1 |
+| `"Samantha"` | matches scene 1 | ✓ |
+| `"movie"` | `[]` | should match scene 1 |
+| `"Scene"` | matches scene 2 | ✓ |
+
+So any query whose capitalization doesn't exactly match the title's capitalization silently returns nothing — that's why "the search bar isn't finding stuff it should."
+
+**What is NOT the problem:**
+- The data file is fine — it only has `id` and `title` fields, so searching `title` only is correct; there are no other fields (description, tags, etc.) being missed.
+- No other code files exist; nothing else calls or wraps `search()`. `CONTEXT_ONLY.md` contains only the file listing, no extra requirements.
+
+## Plan for the WORK model
+
+**Edit exactly one file: `search_engine.py`.**
+
+Replace line 2's case-sensitive comparison with a case-insensitive one:
+
+```python
+def search(query, scenes):
+    return [s for s in scenes if query.lower() in s['title'].lower()]
+```
+
+(Optionally also `.strip()` the query, but the lowercase fix alone addresses the reported bug — keep the change minimal.)
+
+**Verification steps after editing:**
+1. Run the same check I used:
+   ```bash
+   python3 -B -c "
+   import json, sys; sys.path.insert(0, '.')
+   from search_engine import search
+   scenes = json.load(open('scenes_searchable.json'))
+   print(search('samantha', scenes))  # expect scene 1
+   print(search('SAMANTHA', scenes))  # expect scene 1
+   print(search('movie', scenes))     # expect scene 1
+   print(search('other', scenes))     # expect scene 2
+   print(search('zzz', scenes))       # expect []
+   "
+   ```
+2. Confirm lowercase, uppercase, and mixed-case queries all find the right scenes, and a nonsense query still returns `[]`.
+
+No other files need to be touched. Do not modify `scenes_searchable.json` or `CONTEXT_ONLY.md`.

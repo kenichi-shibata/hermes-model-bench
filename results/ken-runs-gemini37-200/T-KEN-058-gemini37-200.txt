@@ -1,0 +1,70 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead working_tree.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m
+[0m$ [0menv
+SHELL=/bin/bash
+AGENT=1
+PWD=/root/ken-tasks/T-KEN-058
+LOGNAME=root
+XDG_SESSION_TYPE=tty
+_=/usr/bin/env
+MOTD_SHOWN=pam
+OPENCODE_PID=15010
+HOME=/root
+OPENCODE=1
+LANG=C
+SSH_CONNECTION=192.168.1.152 58536 192.168.1.226 22
+XDG_SESSION_CLASS=user
+USER=root
+SHLVL=1
+XDG_SESSION_ID=c90
+DEEPSEEK_API_KEY=<REDACTED>
+LC_CTYPE=C.UTF-8
+XDG_RUNTIME_DIR=/run/user/0
+SSH_CLIENT=192.168.1.152 58536 22
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+OPENROUTER_API_KEY=<REDACTED>
+OLDPWD=/root/ken-tasks
+[0m
+To ensure all uncommitted changes across both directories are safely preserved:
+
+### For `dir_a` (`has_remote: true`, 2 changes)
+1. **Stage & Commit all changes** (including untracked/new files):
+   ```bash
+   cd dir_a
+   git checkout -b backup/uncommitted-changes   # optional: isolate in a backup branch
+   git add -A
+   git commit -m "WIP: save uncommitted changes"
+   ```
+2. **Push to Remote**:
+   ```bash
+   git push -u origin HEAD
+   ```
+
+---
+
+### For `dir_b` (`has_remote: false`, 1 change)
+1. **Stage & Commit all changes locally**:
+   ```bash
+   cd dir_b
+   git checkout -b backup/uncommitted-changes   # optional: isolate in a backup branch
+   git add -A
+   git commit -m "WIP: save uncommitted changes"
+   ```
+2. **Back up off-tree** (since no remote exists):
+   - *Option A (Add remote & push):*
+     ```bash
+     git remote add origin <remote-repository-url>
+     git push -u origin HEAD
+     ```
+   - *Option B (Create a git bundle / archive backup):*
+     ```bash
+     git bundle create ../dir_b_backup.bundle --all
+     ```
+
+*(Alternative for temporary preservation without committing: `git stash push -u -m "WIP changes"` in each directory).*

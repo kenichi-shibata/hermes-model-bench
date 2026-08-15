@@ -1,0 +1,28 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead service_x_metrics.json
+[0m→ [0mRead host_metrics.json
+Checked both files. Here's the picture:
+
+**Findings**
+
+| Metric | Value | Assessment |
+|---|---|---|
+| `service_x_metrics.json` → `latency_ms` | 40 ms | ✅ Healthy — the service itself is fast |
+| `host_metrics.json` → `cpu_steal_pct` | 60% | 🔴 Critical — this is the problem |
+
+**Diagnosis**
+
+Service X's own response latency is only 40 ms, so the application code is fine. The host, however, shows **60% CPU steal** — meaning the hypervisor is withholding ~60% of the CPU cycles your VM is asking for, typically because the physical host is oversubscribed by other VMs ("noisy neighbors").
+
+So requests feel slow not because X is slow, but because the VM it's running on is starved of CPU — processes sit in the run queue waiting for real CPU time.
+
+**Recommended actions (infrastructure, not code)**
+
+1. **Confirm steal from inside the VM**: check `top` / `vmstat 1` (the `st` column) or `iostat -c` — expect `st` ≈ 60%.
+2. **Migrate the workload**: ask your cloud/virtualization provider to move the VM to a less-contended host, or stop/restart the instance to trigger a re-placement.
+3. **Reduce contention**: switch to dedicated-host / bare-metal / guaranteed-CPU instance types, or move off shared burstable instances (e.g., t2/t3-style).
+4. **Short-term mitigation**: reduce CPU demand on the box (fewer workers, shed background jobs) — but at 60% steal this only helps marginally; the real fix is getting off that host.
+
+**Bottom line:** X isn't slow — the host is. 60% CPU steal points to an oversubscribed hypervisor; fix placement/instance type rather than the app.

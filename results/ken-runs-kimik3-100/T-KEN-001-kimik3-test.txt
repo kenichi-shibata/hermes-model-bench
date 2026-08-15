@@ -1,0 +1,80 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-001/delegation_live/
+total 28
+drwxr-xr-x 7 root root 4096 Aug 15 13:21 .
+drwxr-xr-x 3 root root 4096 Aug 15 13:21 ..
+drwxr-xr-x 2 root root 4096 Aug 15 13:21 deleg_fake0
+drwxr-xr-x 2 root root 4096 Aug 15 13:21 deleg_fake1
+drwxr-xr-x 2 root root 4096 Aug 15 13:21 deleg_fake2
+drwxr-xr-x 2 root root 4096 Aug 15 13:21 deleg_fake3
+drwxr-xr-x 2 root root 4096 Aug 15 13:21 deleg_fake4
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead gh_repo_list_mock.json
+[0m
+[0m$ [0mfor d in /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake*/; do echo "=== $d ==="; ls -la "$d"; done
+=== /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake0/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 13:21 .
+drwxr-xr-x 7 root root 4096 Aug 15 13:21 ..
+-rw-r--r-- 1 root root   83 Aug 15 13:21 manifest.json
+=== /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake1/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 13:21 .
+drwxr-xr-x 7 root root 4096 Aug 15 13:21 ..
+-rw-r--r-- 1 root root   80 Aug 15 13:21 manifest.json
+=== /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake2/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 13:21 .
+drwxr-xr-x 7 root root 4096 Aug 15 13:21 ..
+-rw-r--r-- 1 root root   83 Aug 15 13:21 manifest.json
+=== /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake3/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 13:21 .
+drwxr-xr-x 7 root root 4096 Aug 15 13:21 ..
+-rw-r--r-- 1 root root   80 Aug 15 13:21 manifest.json
+=== /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake4/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 13:21 .
+drwxr-xr-x 7 root root 4096 Aug 15 13:21 ..
+-rw-r--r-- 1 root root   80 Aug 15 13:21 manifest.json
+[0m
+[0m$ [0mfor d in /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake*/; do echo "=== $d ==="; cat "$d/manifest.json"; echo; done
+=== /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake0/ ===
+{"status": "completed", "created_at": "2026-08-10T10:00:00", "goal": "fake task 0"}
+=== /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake1/ ===
+{"status": "capped", "created_at": "2026-08-10T10:00:00", "goal": "fake task 1"}
+=== /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake2/ ===
+{"status": "completed", "created_at": "2026-08-11T10:00:00", "goal": "fake task 2"}
+=== /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake3/ ===
+{"status": "capped", "created_at": "2026-08-12T10:00:00", "goal": "fake task 3"}
+=== /root/ken-tasks/T-KEN-001/delegation_live/deleg_fake4/ ===
+{"status": "capped", "created_at": "2026-08-12T10:00:00", "goal": "fake task 4"}
+[0m
+Here's what the data shows:
+
+## Delegation status — No, it's actually getting *worse*
+
+Reading the 5 manifests chronologically:
+
+| Date | Runs | Completed | Capped |
+|------|------|-----------|--------|
+| Aug 10 | 2 | 1 (fake0) | 1 (fake1) |
+| Aug 11 | 1 | 1 (fake2) | 0 |
+| Aug 12 | 2 | 0 | **2 (fake3, fake4)** |
+
+- Overall success rate: **2/5 (40%)** — 3 runs ended `capped` rather than `completed`.
+- Trend: after a good day on Aug 11, **both runs on the most recent day (Aug 12) got capped**. So the trajectory is negative, not improving.
+- Caveat: 5 runs is a tiny sample, and every goal is just "fake task N", so I can't tell *why* they're capping (token/time limits, loops, bad prompts) from these manifests alone — there's no detail beyond status/date/goal.
+
+## New repo — No
+
+The repo list contains only:
+- `existing-repo-1` — created 2026-07-01
+- `existing-repo-2` — created 2026-06-15
+
+Nothing new — the most recent repo is from July 1, over 6 weeks ago and well before any of these delegation runs (Aug 10–12). No repo has been created recently, by me or otherwise, at least according to this mock list.

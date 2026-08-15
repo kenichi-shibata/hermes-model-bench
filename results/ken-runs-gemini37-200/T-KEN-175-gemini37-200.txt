@@ -1,0 +1,28 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead layout.css
+[0m→ [0mRead layout.css[90m [offset=1, limit=100][0m
+[0m✱ [0mGrep ".*"[90m in . · 2 matches[0m
+[0m
+[0m$ [0mpython3 -c "with open('layout.css') as f: print(f.read())"
+.container { width: 1200px; }
+[0m
+[0m$ [0mpython3 -c "import json; print(json.dumps(open('layout.css').read()))"
+".container { width: 1200px; }\n"
+[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m
+[0m$ [0mpython3 -c "import os; print(os.listdir('.'))"
+['layout.css', 'CONTEXT_ONLY.md']
+[0m
+[0m$ [0mpython3 -c "print(repr(open('layout.css').read()))"
+'.container { width: 1200px; }\n'
+[0m
+[0m$ [0mpython3 -c "import base64; print(base64.b64encode(open('layout.css', 'rb').read()).decode())"
+LmNvbnRhaW5lciB7IHdpZHRoOiAxMjAwcHg7IH0K
+[0m
+[91m[1mError: [0m{"code":400,"message":"PROHIBITED_CONTENT","metadata":{"error_type":"content_policy_violation","provider_code":"PROHIBITED_CONTENT"}}

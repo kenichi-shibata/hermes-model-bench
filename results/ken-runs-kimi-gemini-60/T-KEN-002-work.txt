@@ -1,0 +1,49 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dedupe.py
+[0m→ [0mRead mirror_groups.json
+[0m
+[0m← [0mEdit dedupe.py
+Index: /root/ken-tasks/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks/T-KEN-002/dedupe.py
++++ /root/ken-tasks/T-KEN-002/dedupe.py
+@@ -8,11 +8,10 @@
+ 
+ 
+ def suggest_keep(candidates):
+     """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    Matches the write path: playability first, then size."""
++    return pick_canonical(candidates)
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+[0m
+[0m$ [0mpython3 -c "
+import json, dedupe
+db = json.load(open('mirror_groups.json'))
+r = dedupe.scan_mirror_group('group_42', db)
+print(r)
+assert r['suggested_keep'] == 'scenes:101' == r['canonical_would_be'], 'MISMATCH'
+print('OK: suggestion now matches canonical')
+"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:101', 'canonical_would_be': 'scenes:101'}
+OK: suggestion now matches canonical
+[0m
+[0m$ [0mpython3 -c "
+import dedupe
+dead = [{'id': 'a', 'playable': False, 'size_gb': 1.0}, {'id': 'b', 'playable': False, 'size_gb': 3.0}]
+assert dedupe.suggest_keep(dead)['id'] == 'b'
+print('OK: all-dead fallback unchanged')
+"
+OK: all-dead fallback unchanged
+[0m
+[0m→ [0mRead dedupe.py
+`dedupe.py` has been updated so `suggest_keep()` delegates directly to `pick_canonical()`, aligning the display ranking with the write path and resolving the duplicate removal suggestion bug. Verified against `mirror_groups.json`.

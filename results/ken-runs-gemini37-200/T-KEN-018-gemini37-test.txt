@@ -1,0 +1,42 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 4 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead indexer_api_mock.py
+[0m→ [0mRead retry_engine.py
+[0m→ [0mRead indexer_api_mock.py
+[0m✱ [0mGrep ".*"[90m in . · 31 matches[0m
+[0m→ [0mRead wanted_backlog.json[90m [limit=100][0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m
+[0m$ [0mpython3 -c '
+import json
+from retry_engine import run_backlog
+
+with open("wanted_backlog.json") as f:
+    items = json.load(f)
+
+results = run_backlog(items)
+print(f"Total: {len(results)}, Resolved: {sum(1 for r in results if r[\"resolved\"])}")
+'
+File "<string>", line 9
+    print(f"Total: {len(results)}, Resolved: {sum(1 for r in results if r[\"resolved\"])}")
+                                                                           ^
+SyntaxError: unexpected character after line continuation character
+[0m
+[0m$ [0mpython3 -c '
+import json
+from retry_engine import run_backlog
+
+with open("wanted_backlog.json") as f:
+    items = json.load(f)
+
+results = run_backlog(items)
+resolved_count = sum(1 for r in results if r["resolved"])
+print(f"Total: {len(results)}, Resolved: {resolved_count}")
+'
+Total: 400, Resolved: 400
+[0m
+[0m✱ [0mGlob "**/*"[90m in . · 6 matches[0m
+The backlog of 400 items has been processed using `retry_engine.run_backlog()`. Naive high-concurrency parallelism (such as 100 agents) was avoided because `indexer_api_mock.py` enforces a rate limit of 5 concurrent requests; all 400 items resolved successfully within safe rate limits.

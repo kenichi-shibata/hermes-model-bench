@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead delta_manifest.json
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+Yes. The delta backup skipped 3 files (48 changed files were detected, but only 45 were included).

@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead embed_builder.py
+[0m→ [0mRead scene_for_embed.json
+[0m✱ [0mGlob "*"[90m 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+`build_embed` looks for the key `'cover_url'` (`scene.get('cover_url')`), but `scene_for_embed.json` stores the image URL under `"thumbnail_url"`, causing `scene.get('cover_url')` to return `None`.

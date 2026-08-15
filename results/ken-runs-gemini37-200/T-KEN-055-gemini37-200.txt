@@ -1,0 +1,17 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead vm_spec.json
+[0m→ [0mRead workload_profile.json
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+**No, the VM does not have enough cores.**
+
+### Breakdown:
+- **VM Capacity:** 2 cores (maximum 200% CPU capacity).
+- **Workload Demand:**
+  - **p50:** 150% CPU (requires ~1.5 cores — within capacity)
+  - **p95:** 380% CPU (requires ~3.8 cores — exceeds capacity by 180%)
+
+### Recommendation:
+The VM requires at least **4 cores** (400% capacity) to handle the p95 workload without throttling.

@@ -1,0 +1,47 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead elo_engine.py
+[0m→ [0mRead match_history.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit elo_engine.py
+Index: /root/ken-tasks/T-KEN-032/elo_engine.py
+===================================================================
+--- /root/ken-tasks/T-KEN-032/elo_engine.py
++++ /root/ken-tasks/T-KEN-032/elo_engine.py
+@@ -1,4 +1,15 @@
++K = 32
++
++
++def _expected(ra, rb):
++    return 1 / (1 + 10 ** ((rb - ra) / 400))
++
++
+ def update(winner, loser, ratings):
+-    ratings[winner] = ratings.get(winner, 1500) + 32
+-    ratings[loser] = ratings.get(loser, 1500) - 32
++    rw = ratings.get(winner, 1500)
++    rl = ratings.get(loser, 1500)
++    ew = _expected(rw, rl)
++    ratings[winner] = rw + K * (1 - ew)
++    ratings[loser] = rl + K * (0 - (1 - ew))
+     return ratings
++
+
+[0m
+[0m$ [0mpython3 -c "
+import elo_engine, json
+ratings = {}
+for m in json.load(open('match_history.json')):
+    ratings = elo_engine.update(m['winner'], m['loser'], ratings)
+print(ratings)"
+{'a': 1531.263693206478, 'b': 1484.0, 'c': 1484.736306793522}
+[0m
+[0m→ [0mRead elo_engine.py
+[0m✱ [0mGlob "**/*"[90m in . · 4 matches[0m
+No, `elo_engine.py` was not working properly—it performed a flat ±32 point swap per match without calculating expected win probabilities based on rating differences. 
+
+The file has been updated to implement the standard Elo formula:
+- Computes expected score: $E_w = \frac{1}{1 + 10^{(R_l - R_w) / 400}}$
+- Updates ratings: $R'_w = R_w + K(1 - E_w)$ and $R'_l = R_l + K(0 - (1 - E_w))$ with $K = 32$ and default rating 1500.

@@ -1,0 +1,13 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead wanted_status_field.json[90m [limit=100][0m
+[0m→ [0mRead scenes_status_field.json[90m [limit=100][0m
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+Yes, the backlog is moving. 
+
+Comparing `wanted_status_field.json` (lagged) to `scenes_status_field.json` (current truth):
+- **Searching:** Decreased from 40 to 3
+- **Found:** Increased from 10 to 47 (37 processed)

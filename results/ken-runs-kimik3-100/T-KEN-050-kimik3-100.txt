@@ -1,0 +1,34 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead pve2_ram_trend.json
+[0m
+[0m$ [0mpython3 -c "
+import json
+d = json.load(open('pve2_ram_trend.json'))
+xs = [p['day'] for p in d]; ys = [p['used_pct'] for p in d]
+n = len(xs)
+mx, my = sum(xs)/n, sum(ys)/n
+slope = sum((x-mx)*(y-my) for x,y in zip(xs,ys)) / sum((x-mx)**2 for x in xs)
+intercept = my - slope*mx
+last = xs[-1], ys[-1]
+for target in (90, 95, 100):
+    day_hit = (target - intercept)/slope
+    print(f'{target}% at day {day_hit:.1f} -> {day_hit - last[0]:.1f} days from latest sample (day {last[0]}, {last[1]}%)')
+"
+90% at day 8.0 -> 2.0 days from latest sample (day 6, 86%)
+95% at day 10.5 -> 4.5 days from latest sample (day 6, 86%)
+100% at day 13.0 -> 7.0 days from latest sample (day 6, 86%)
+[0m
+**Yes — pve2 is on a clear trajectory to run out of RAM, assuming the trend holds.**
+
+Key findings from `pve2_ram_trend.json`:
+
+- **Current usage:** 86% (day 6), up from 74% a week ago
+- **Trend:** perfectly linear, **+2 percentage points per day** — steady, consistent growth (looks like a leak or slowly growing workload, not noise)
+- **Projection:**
+  - **90% in ~2 days** (day 8) — typical "critical" threshold where swapping/performance issues start
+  - **95% in ~4.5 days** (day 10.5)
+  - **100% in ~7 days** (day 13) — full exhaustion, OOM kills likely on a Proxmox host
+
+Verdict: it's not in immediate danger *today*, but it will be critical within 2 days and exhausted within a week. Worth acting now rather than waiting: identify which VM/container is consuming the growth (check `qm` / `pct` guest usage or track down a leaking process), and plan to restart/migrate it or add capacity before day 8.

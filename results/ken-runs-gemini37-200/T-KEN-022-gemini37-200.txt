@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead sab_config.json
+[0m→ [0mRead speed_log.json
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+SAB is throttled by the `max_download_speed_kbps` limit set to 500 in `sab_config.json`. The download speeds in `speed_log.json` (~485–494 kbps) are consistently maxing out against this configured speed cap.

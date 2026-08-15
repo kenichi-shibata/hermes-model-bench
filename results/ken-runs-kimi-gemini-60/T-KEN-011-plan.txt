@@ -1,0 +1,47 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m✱ [0mGlob "**/*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead PerformersGrid.jsx
+[0m→ [0mRead PerformerDetailPage.jsx
+Investigation complete. Both files are tiny (6 and 13 lines), so this was quick. Here is the plan.
+
+## What I found
+
+**`PerformerDetailPage.jsx` (the real bug)**
+- Line 1 imports `Link` from `react-router-dom`, but it is **never used**.
+- Line 10 renders a raw anchor: `<a href="/leaderboard">5-star</a>` — and the inline comment on lines 7–9 explicitly documents the bug: the rank badge links to a generic leaderboard instead of the performer's own page (`/performers/${performer.id}`).
+- Two problems in one line: (a) wrong destination, (b) raw `<a>` causes a full page reload in an SPA instead of client-side routing, with an unused import as the smoking gun.
+
+**`PerformersGrid.jsx` (explicit red herring)**
+- The leading comment states the `slice(0, 60)` "load 60 at a time" behavior is **working as intended**, not a perf bug, even though it looks slow on a 2700-performer dataset. The WORK model must **not** "fix" the slicing. (Note: the comment mentions a "Load more" mechanism that doesn't actually exist in the code — adding it is a legitimate *improvement*, not a bug fix.)
+
+## Concrete plan for the WORK model
+
+### Fix 1 — `PerformerDetailPage.jsx` line 10 (the actual bug)
+Replace:
+```jsx
+<a href="/leaderboard">5-star</a>
+```
+with:
+```jsx
+<Link to={`/performers/${performer.id}`}>5-star</Link>
+```
+This uses the already-imported `Link`, fixing both the wrong destination and the full-reload issue. No import changes needed. Optionally remove the now-obsolete BUG comment on lines 7–9.
+
+### Improvements (secondary, only after Fix 1)
+
+**`PerformersGrid.jsx`:**
+1. Add real incremental rendering matching the documented intent: `const [visibleCount, setVisibleCount] = useState(60);` render `performers.slice(0, visibleCount)`, and a "Load more" button that does `setVisibleCount(c => c + 60)`, hidden once `visibleCount >= performers.length`. This makes the claimed "Load more" comment true without changing the intended 60-at-a-time behavior.
+2. Optional, low-risk: wrap items in a semantic `<ul>/<li>` and/or extract a `PerformerCard` wrapped in `React.memo`. Keep it minimal.
+
+**`PerformerDetailPage.jsx` (optional polish):**
+3. Add a guard for a missing performer: `if (!performer) return null;` (or a "not found" message) before rendering.
+
+### Verification
+- `grep` to confirm `/leaderboard` no longer appears and `Link` is now used in `PerformerDetailPage.jsx`.
+- Confirm `PerformersGrid.jsx` still slices in 60-item increments (no attempt to render all 2700 at once).
+
+**Priority:** Fix 1 is the required change. Improvements 1–3 are optional nice-to-haves; do not touch the grid's batching semantics.

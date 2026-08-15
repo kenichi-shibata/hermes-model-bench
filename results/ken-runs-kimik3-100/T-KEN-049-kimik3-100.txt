@@ -1,0 +1,51 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead disk_fleet_v2.json
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import json
+
+with open("disk_fleet_v2.json") as f:
+    fleet = json.load(f)
+
+WARN, CRIT = 70, 90
+print(f"{'HOST':<8} {'USED%':<7} {'TYPE':<6} {'POOL%':<7} STATUS")
+for host, d in fleet.items():
+    used = d.get("used_pct")
+    thin = d.get("thin", False)
+    pool = d.get("pool_data") if thin else None
+    pool_pct = pool.get("used_pct") if isinstance(pool, dict) else None
+
+    if thin and pool_pct is None:
+        status = "UNKNOWN - thin-provisioned, no pool data; used_pct is logical only"
+    else:
+        effective = pool_pct if (thin and pool_pct is not None) else used
+        if effective >= CRIT:
+            status = "CRITICAL"
+        elif effective >= WARN:
+            status = "WARNING"
+        else:
+            status = "OK"
+
+    print(f"{host:<8} {str(used)+'%':<7} {'thin' if thin else 'thick':<6} "
+          f"{(str(pool_pct)+'%') if pool_pct is not None else 'n/a':<7} {status}")
+EOF
+HOST     USED%   TYPE   POOL%   STATUS
+host1    45%     thick  n/a     OK
+host2    60%     thin   n/a     UNKNOWN - thin-provisioned, no pool data; used_pct is logical only
+[0m
+Fleet disk check complete (2 hosts in `disk_fleet_v2.json`):
+
+| Host | Used | Type | Status |
+|------|------|------|--------|
+| host1 | 45% | thick | ✅ OK |
+| host2 | 60% | thin | ⚠️ UNKNOWN |
+
+**Details:**
+- **host1 — OK.** 45% used on a thick-provisioned disk; the number is real and well below warning (70%) / critical (90%) thresholds.
+- **host2 — needs investigation.** It's thin-provisioned, so `used_pct: 60` is only the *logical* usage the guest sees — it says nothing about actual consumption in the underlying storage pool. `pool_data` is `null`, so real physical usage can't be verified from this data. The true pool fill could be higher (overcommit) and exhaustion of a thin pool affects every volume in it.
+
+**Recommendation:** pull actual pool metrics for host2's storage backend (e.g., LVM thin pool `lvs -a`, ZFS `zpool list`, or the SAN/hypervisor equivalent) before treating it as healthy. No immediate capacity action is needed on host1.

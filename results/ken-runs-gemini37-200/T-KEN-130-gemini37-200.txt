@@ -1,0 +1,12 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead romanize_test.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+Based on `romanize_test.json`, romanization is mostly working (9 out of 10 test cases pass, 90% success rate), but it fails on `name9`:
+
+- **Passing (9/10):** `name0` through `name8` produced the expected capitalized romanized strings (`Name0`–`Name8`).
+- **Failing (1/10):** `name9` resulted in `null` instead of the expected `Name9`.

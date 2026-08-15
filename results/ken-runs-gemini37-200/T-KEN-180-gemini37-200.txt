@@ -1,0 +1,12 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead accessibility_audit.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+Based on `accessibility_audit.json`:
+
+- **Images missing alt text:** 2
+- **Buttons missing accessible label:** 1
+- **Total elements checked:** 40 (3 violations detected)

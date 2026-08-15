@@ -1,0 +1,298 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mls -la
+total 336
+drwxr-xr-x   2 root root   4096 Aug 15 14:11 .
+drwxr-xr-x 205 1000 1000  12288 Aug 15 14:11 ..
+-rw-r--r--   1 root root    126 Aug 15 14:11 CONTEXT_ONLY.md
+-rw-r--r--   1 root root 315596 Aug 15 14:11 performers.json
+-rw-r--r--   1 root root    197 Aug 15 14:11 stashdb_mock.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead stashdb_mock.py
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+print(type(data))
+if isinstance(data, list):
+    print('count:', len(data))
+    print(json.dumps(data[0], indent=2)[:2000])
+elif isinstance(data, dict):
+    print('keys:', list(data.keys())[:20])
+"
+<class 'dict'>
+keys: ['performers']
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+perfs = data['performers']
+print('count:', len(perfs))
+print(json.dumps(perfs[0], indent=2))
+print('---')
+print(json.dumps(perfs[1], indent=2))
+"
+count: 2700
+{
+  "id": 0,
+  "name": "Performer0",
+  "image": "http://198.51.100.64:9999/performer/0/image",
+  "stashdb_id": "stashdb-0"
+}
+---
+{
+  "id": 1,
+  "name": "Performer1",
+  "image": "http://198.51.100.64:9999/performer/1/image",
+  "stashdb_id": "stashdb-1"
+}
+[0m
+[0m$ [0mpython3 -c "
+import json
+from collections import Counter
+with open('performers.json') as f:
+    data = json.load(f)
+perfs = data['performers']
+print('count:', len(perfs))
+
+# Look at image URL patterns
+patterns = Counter()
+broken = []
+for p in perfs:
+    img = p.get('image')
+    if img is None:
+        patterns['None'] += 1
+        broken.append(p)
+    elif not isinstance(img, str):
+        patterns['non-str'] += 1
+        broken.append(p)
+    elif img.strip() == '':
+        patterns['empty'] += 1
+        broken.append(p)
+    else:
+        # categorize
+        key = img.split('/')[2] if '://' in img and len(img.split('/'))>2 else img[:40]
+        patterns[key] += 1
+
+for k,v in patterns.most_common(30):
+    print(repr(k), v)
+print()
+print('broken-ish count:', len(broken))
+"
+count: 2700
+'198.51.100.69:9999' 2521
+'198.51.100.64:9999' 179
+
+broken-ish count: 0
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('performers.json') as f:
+    data = json.load(f)
+perfs = data['performers']
+
+hostA = []  # 198.51.100.64
+hostB = []  # 198.51.100.69
+other = []
+for p in perfs:
+    img = p['image']
+    if '198.51.100.64' in img:
+        hostA.append(p)
+    elif '198.51.100.69' in img:
+        hostB.append(p)
+    else:
+        other.append(p)
+
+print('hostA (198.51.100.64):', len(hostA))
+print('hostB (198.51.100.69):', len(hostB))
+print('other:', len(other))
+
+print()
+print('Sample hostA:')
+for p in hostA[:5]:
+    print(' ', p['id'], p['image'], p.get('stashdb_id'))
+print('Sample hostB:')
+for p in hostB[:5]:
+    print(' ', p['id'], p['image'], p.get('stashdb_id'))
+
+# id ranges
+idsA = [p['id'] for p in hostA]
+print()
+print('hostA id range:', min(idsA), '-', max(idsA))
+print('hostA ids contiguous?', sorted(idsA) == list(range(min(idsA), max(idsA)+1)))
+
+# check stashdb_id presence/format on hostA
+missing_sid = [p for p in hostA if not p.get('stashdb_id')]
+print('hostA missing stashdb_id:', len(missing_sid))
+
+# url path structure
+import re
+pathsA = set()
+for p in hostA:
+    m = re.match(r'http://198\.51\.100\.64:9999(/.*)', p['image'])
+    pathsA.add(re.sub(r'\d+', 'N', m.group(1)) if m else p['image'])
+pathsB = set()
+for p in hostB:
+    m = re.match(r'http://198\.51\.100\.69:9999(/.*)', p['image'])
+    pathsB.add(re.sub(r'\d+', 'N', m.group(1)) if m else p['image'])
+print('hostA path patterns:', pathsA)
+print('hostB path patterns:', pathsB)
+
+# does the path id match performer id?
+mismatchA = [p for p in hostA if f\"/performer/{p['id']}/image\" not in p['image']]
+mismatchB = [p for p in hostB if f\"/performer/{p['id']}/image\" not in p['image']]
+print('hostA path-id mismatches:', len(mismatchA))
+print('hostB path-id mismatches:', len(mismatchB))
+"
+hostA (198.51.100.64): 179
+hostB (198.51.100.69): 2521
+other: 0
+
+Sample hostA:
+  0 http://198.51.100.64:9999/performer/0/image stashdb-0
+  1 http://198.51.100.64:9999/performer/1/image stashdb-1
+  2 http://198.51.100.64:9999/performer/2/image stashdb-2
+  3 http://198.51.100.64:9999/performer/3/image stashdb-3
+  4 http://198.51.100.64:9999/performer/4/image stashdb-4
+Sample hostB:
+  179 http://198.51.100.69:9999/performer/179/image None
+  180 http://198.51.100.69:9999/performer/180/image None
+  181 http://198.51.100.69:9999/performer/181/image None
+  182 http://198.51.100.69:9999/performer/182/image None
+  183 http://198.51.100.69:9999/performer/183/image None
+
+hostA id range: 0 - 178
+hostA ids contiguous? True
+hostA missing stashdb_id: 139
+hostA path patterns: {'/performer/N/image'}
+hostB path patterns: {'/performer/N/image'}
+hostA path-id mismatches: 0
+hostB path-id mismatches: 0
+[0m
+Two distinct image hosts. Let me dig deeper into the patterns.
+The broken set is clearly the 179 records (ids 0–178) pointing at host `198.51.100.64:9999`. Let me check the `stashdb_id` overlap and verify the mock's behavior, since that determines which fix strategy actually works.
+[0m$ [0mpython3 -c "
+import json, sys
+sys.path.insert(0, '.')
+from stashdb_mock import get_fallback_image
+
+with open('performers.json') as f:
+    data = json.load(f)
+perfs = data['performers']
+
+broken = [p for p in perfs if '198.51.100.64' in p['image']]
+ok     = [p for p in perfs if '198.51.100.69' in p['image']]
+
+# stashdb_id coverage
+b_with = [p for p in broken if p.get('stashdb_id')]
+b_without = [p for p in broken if not p.get('stashdb_id')]
+print('broken with stashdb_id:', len(b_with), '-> ids', [p['id'] for p in b_with][:50])
+print('broken without stashdb_id:', len(b_without))
+
+ok_with = [p for p in ok if p.get('stashdb_id')]
+print('ok-host with stashdb_id:', len(ok_with))
+
+# what does the fallback yield for broken records?
+fb_ok = sum(1 for p in broken if get_fallback_image(p.get('stashdb_id')))
+fb_none = sum(1 for p in broken if get_fallback_image(p.get('stashdb_id')) is None)
+print('fallback gives URL for:', fb_ok, '| fallback gives None for:', fb_none)
+print('sample fallback:', get_fallback_image('stashdb-0'))
+
+# any other fields/variants in records?
+keys = set()
+for p in perfs: keys.update(p.keys())
+print('all record keys:', keys)
+
+# any anomalies in the 179 (port, scheme, trailing slash)?
+import re
+weird = [p for p in broken if not re.fullmatch(r'http://198\.51\.100\.64:9999/performer/\d+/image', p['image'])]
+print('weird-format broken URLs:', len(weird), weird[:3])
+
+# stashdb_id format check
+sids = [p['stashdb_id'] for p in b_with]
+print('stashdb_id formats:', set(re.sub(r'\d+','N',s) for s in sids))
+print('id<->sid numeric match all:', all(p['id'] == int(p['stashdb_id'].split('-')[1]) for p in b_with))
+"
+broken with stashdb_id: 40 -> ids [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]
+broken without stashdb_id: 139
+ok-host with stashdb_id: 0
+fallback gives URL for: 40 | fallback gives None for: 139
+sample fallback: https://stashdb.org/images/stashdb-0.jpg
+all record keys: {'stashdb_id', 'image', 'name', 'id'}
+weird-format broken URLs: 0 []
+stashdb_id formats: {'stashdb-N'}
+id<->sid numeric match all: True
+[0m
+[0m$ [0mhead -c 600 performers.json; echo; echo '---'; tail -c 300 performers.json | od -c | tail -5
+{"performers": [{"id": 0, "name": "Performer0", "image": "http://198.51.100.64:9999/performer/0/image", "stashdb_id": "stashdb-0"}, {"id": 1, "name": "Performer1", "image": "http://198.51.100.64:9999/performer/1/image", "stashdb_id": "stashdb-1"}, {"id": 2, "name": "Performer2", "image": "http://198.51.100.64:9999/performer/2/image", "stashdb_id": "stashdb-2"}, {"id": 3, "name": "Performer3", "image": "http://198.51.100.64:9999/performer/3/image", "stashdb_id": "stashdb-3"}, {"id": 4, "name": "Performer4", "image": "http://198.51.100.64:9999/performer/4/image", "stashdb_id": "stashdb-4"}, {"id
+---
+0000360   .   5   1   .   1   0   0   .   6   9   :   9   9   9   9   /
+0000400   p   e   r   f   o   r   m   e   r   /   2   6   9   9   /   i
+0000420   m   a   g   e   "   ,       "   s   t   a   s   h   d   b   _
+0000440   i   d   "   :       n   u   l   l   }   ]   }
+0000454
+[0m
+[0m$ [0mpython3 -c "
+import json
+perfs = json.load(open('performers.json'))['performers']
+ids = [p['id'] for p in perfs]
+print('total:', len(perfs), '| unique ids:', len(set(ids)), '| id range:', min(ids), '-', max(ids))
+print('keys per record consistent:', all(set(p.keys())=={'id','name','image','stashdb_id'} for p in perfs))
+# confirm the ok-host URLs are exactly derivable
+print('all ok-host urls well-formed:', all(p['image']==f\"http://198.51.100.69:9999/performer/{p['id']}/image\" for p in perfs if '100.69' in p['image']))
+print('all broken urls well-formed:', all(p['image']==f\"http://198.51.100.64:9999/performer/{p['id']}/image\" for p in perfs if '100.64' in p['image']))
+"
+total: 2700 | unique ids: 2700 | id range: 0 - 2699
+keys per record consistent: True
+all ok-host urls well-formed: True
+all broken urls well-formed: True
+[0m
+Investigation complete. Here is the diagnosis and the concrete plan for the WORK model.
+
+## Diagnosis — the real problem
+
+`performers.json` holds 2700 performer records (`{"performers": [...]}`, single-line JSON, ids 0–2699, keys: `id`, `name`, `image`, `stashdb_id`). Every image URL is well-formed, but they point at two different hosts:
+
+| Host | Records | Performer ids | Status |
+|---|---|---|---|
+| `http://198.51.100.64:9999/performer/{id}/image` | **179** | 0–178 (contiguous) | **dead host → broken grid images** |
+| `http://198.51.100.69:9999/performer/{id}/image` | 2521 | 179–2699 | working |
+
+The "like 179 broken" is exactly this first group. The path scheme (`/performer/{id}/image`, path id == performer id) is identical on both hosts, so the live server can serve the same paths.
+
+**Critical trap:** the provided `stashdb_mock.get_fallback_image()` only covers **40 of the 179** broken records:
+- ids **0–39** have `stashdb_id: "stashdb-{id}"` → fallback yields `https://stashdb.org/images/stashdb-{id}.jpg`
+- ids **40–178** (139 records) have `stashdb_id: null` → fallback returns `None`
+
+A naive "use the mock for everything" fix would set 139 images to `null`, making things worse. The data is deliberately split: the correct fix is a hybrid.
+
+## Plan for the WORK model
+
+**File to modify:** `/root/ken-tasks/T-KEN-003/performers.json` only. Do not touch `stashdb_mock.py` (import it, don't edit it).
+
+**Step 1 — Write a one-off fix script** (e.g. `/tmp/opencode/fix_images.py`, keep it out of the working dir) that:
+1. Loads `performers.json`.
+2. Imports the helper: `from stashdb_mock import get_fallback_image` (run with workdir `/root/ken-tasks/T-KEN-003` so the import resolves).
+3. For each performer where `image` contains `198.51.100.64:9999` (match on the dead-host string, not on id ranges):
+   - If `stashdb_id` is truthy → `image = get_fallback_image(stashdb_id)` (→ `https://stashdb.org/images/stashdb-{id}.jpg`; 40 records, ids 0–39).
+   - Else → `image = f"http://198.51.100.69:9999/performer/{p['id']}/image"` (rewrite to the live host, same path scheme as the 2521 working records; 139 records, ids 40–178).
+4. Leaves all other records and all other fields (`id`, `name`, `stashdb_id`) untouched.
+5. Writes back with `json.dump(data, f)` using default settings — this reproduces the original format exactly (single line, `", "`/`": "` separators, no trailing newline).
+
+**Step 2 — Run it** with `python3 /tmp/opencode/fix_images.py` from the working directory.
+
+**Step 3 — Verify** (re-load the file and assert, do not just eyeball):
+- Zero occurrences of `198.51.100.64` remain (also confirm with a string search on the raw file).
+- Exactly 40 records have `image == "https://stashdb.org/images/stashdb-{id}.jpg"` and they are precisely ids 0–39.
+- Exactly 139 records have `image == "http://198.51.100.69:9999/performer/{id}/image"` for ids 40–178.
+- The 2521 originally-working records are value-identical to before (compare against a pre-fix in-memory copy or re-derive: `.69` URL matches `id` for ids 179–2699).
+- Total still 2700 records; `id`, `name`, `stashdb_id` unchanged for every record; file still parses as JSON.
+
+**Do NOT:**
+- Apply the StashDB fallback to records with `stashdb_id: null` (it returns `None`).
+- Touch the 2521 working records or reorder/reformat the file.
+- Add new files to the working directory.

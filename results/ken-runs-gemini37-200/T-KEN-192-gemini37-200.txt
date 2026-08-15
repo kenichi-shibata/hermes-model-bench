@@ -1,0 +1,180 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead existing_data_model.py
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m
+[0m$ [0mpython3 --version
+Python 3.13.5
+[0m
+[0m← [0mEdit existing_data_model.py
+Index: /root/ken-tasks/T-KEN-192/existing_data_model.py
+===================================================================
+--- /root/ken-tasks/T-KEN-192/existing_data_model.py
++++ /root/ken-tasks/T-KEN-192/existing_data_model.py
+@@ -1,5 +1,101 @@
++import csv
++import io
++from pathlib import Path
++
++
++def _flatten_performers(performers):
++    if performers is None:
++        return ""
++    if isinstance(performers, (list, tuple, set)):
++        items = []
++        for p in performers:
++            if hasattr(p, "name"):
++                items.append(str(p.name))
++            else:
++                items.append(str(p))
++        return ", ".join(items)
++    return str(performers)
++
++
+ class Scene:
+     def __init__(self, id, title, performers):
+         self.id = id
+         self.title = title
+         self.performers = performers  # a list, needs flattening for CSV
++
++    def to_dict(self):
++        return {
++            "id": self.id,
++            "title": self.title,
++            "performers": _flatten_performers(self.performers),
++        }
++
++    def to_csv_row(self):
++        return [self.id, self.title, _flatten_performers(self.performers)]
++
++    def to_csv(self, file=None):
++        return export_to_csv(self, file=file)
++
++    def export_to_csv(self, file=None):
++        return export_to_csv(self, file=file)
++
++
++def export_to_csv(scenes, file=None, **kwargs):
++    """
++    Export one or more Scene objects (or dictionaries) to CSV format.
++
++    :param scenes: A Scene object, dict, or an iterable of Scene objects/dicts.
++    :param file: A filepath (str or Path), a file-like object, or None to return a CSV string.
++    :return: The CSV string if file is None, otherwise None.
++    """
++    if file is None:
++        file = kwargs.get("filename") or kwargs.get("filepath") or kwargs.get("file_path") or kwargs.get("output")
++
++    if isinstance(scenes, (Scene, dict)):
++        scene_list = [scenes]
++    else:
++        try:
++            scene_list = list(scenes)
++        except TypeError:
++            scene_list = [scenes]
++
++    return_string = file is None
++    if return_string:
++        output = io.StringIO()
++    elif isinstance(file, (str, Path)):
++        output = open(file, "w", newline="", encoding="utf-8")
++    else:
++        output = file
++
++    try:
++        writer = csv.writer(output)
++        writer.writerow(["id", "title", "performers"])
++        for scene in scene_list:
++            if isinstance(scene, Scene):
++                writer.writerow(scene.to_csv_row())
++            elif isinstance(scene, dict):
++                writer.writerow([
++                    scene.get("id", ""),
++                    scene.get("title", ""),
++                    _flatten_performers(scene.get("performers", "")),
++                ])
++            elif isinstance(scene, (list, tuple)):
++                writer.writerow(scene)
++            else:
++                writer.writerow([
++                    getattr(scene, "id", ""),
++                    getattr(scene, "title", ""),
++                    _flatten_performers(getattr(scene, "performers", "")),
++                ])
++
++        if return_string:
++            return output.getvalue()
++    finally:
++        if isinstance(file, (str, Path)):
++            output.close()
++
++
++export_scenes_to_csv = export_to_csv
++export_csv = export_to_csv
++to_csv = export_to_csv
++
+
+[0m
+[0m$ [0mpython3 -c "
+import existing_data_model as edm
+
+s1 = edm.Scene(1, 'Opening', ['Alice', 'Bob'])
+s2 = edm.Scene(2, 'Climax, The', ['Charlie', 'Dave'])
+s3 = edm.Scene(3, 'Ending', [])
+
+csv_out = edm.export_to_csv([s1, s2, s3])
+print('Generated CSV:\n' + csv_out)
+
+assert s1.to_csv_row() == [1, 'Opening', 'Alice, Bob']
+assert s1.to_dict() == {'id': 1, 'title': 'Opening', 'performers': 'Alice, Bob'}
+assert s3.to_csv_row() == [3, 'Ending', '']
+
+# Test file export
+import tempfile
+with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.csv') as tf:
+    tmpname = tf.name
+
+edm.export_to_csv([s1, s2], tmpname)
+with open(tmpname, 'r') as f:
+    content = f.read()
+print('File content:\n' + content)
+
+import os
+os.remove(tmpname)
+print('All assertions passed!')
+"
+Generated CSV:
+id,title,performers
+1,Opening,"Alice, Bob"
+2,"Climax, The","Charlie, Dave"
+3,Ending,
+
+File content:
+id,title,performers
+1,Opening,"Alice, Bob"
+2,"Climax, The","Charlie, Dave"
+
+All assertions passed!
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m
+[0m$ [0mrm -rf /root/ken-tasks/T-KEN-192/__pycache__
+(no output)
+[0m
+[0m→ [0mRead existing_data_model.py
+[0m
+[0m$ [0mpython3 -m py_compile /root/ken-tasks/T-KEN-192/existing_data_model.py && rm -rf /root/ken-tasks/T-KEN-192/__pycache__
+(no output)
+[0m
+CSV export functionality has been added to `existing_data_model.py`.
+
+### Added Capabilities
+- **`export_to_csv(scenes, file=None)`** (aliases: `export_scenes_to_csv`, `export_csv`, `to_csv`): Exports single instances or iterables of `Scene` objects to a CSV file path, file-like object, or returns the CSV string if no file target is specified.
+- **`Scene` Methods**:
+  - `to_csv_row()`: Returns row data with flattened performers list (`[id, title, performers]`).
+  - `to_dict()`: Returns a dictionary representation with flattened performers.
+  - `to_csv(file=None)` / `export_to_csv(file=None)`: Exports the individual scene.

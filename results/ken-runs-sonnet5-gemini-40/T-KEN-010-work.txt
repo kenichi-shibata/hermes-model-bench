@@ -1,0 +1,15 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead bot.py
+[0m→ [0mRead follow_log.json
+[0m→ [0mRead bot.py
+[0m→ [0mRead bot.py[90m [offset=1, limit=100][0m
+[0m✱ [0mGrep ".*"[90m in . · 100 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 4 matches[0m
+There is no bug or recursive follow occurring in the codebase:
+
+1. **No recursive following logic:** In `bot.py`, `track_studio_or_performer()` only registers tracks via `db.add_track()` and does not invoke `db.follow_discord()`. Tracking and following are completely decoupled.
+2. **No follow records found:** The follow history in `follow_log.json` contains only verified manual follows (`legit_perf_0` through `legit_perf_19`). There are no records for "Codey Steele" or "Cherry Kiss".
+3. **Discord actions:** There is no active Discord API integration or follow removal functionality within this codebase. Any follows seen directly on Discord were not triggered by this bot.

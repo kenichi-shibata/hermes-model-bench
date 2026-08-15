@@ -1,0 +1,28 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead elo_engine.py
+[0m→ [0mRead match_history.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+No, it is not working correctly. 
+
+### Issues:
+1. **Flat rating adjustments**: It adds and subtracts a fixed 32 points on every match instead of calculating the expected match outcome based on rating differences:
+   $$E_A = \frac{1}{1 + 10^{(R_B - R_A)/400}}$$
+2. **Misuse of K-factor**: 32 is being treated as a flat score change rather than the maximum scaling factor ($K$) in $\Delta R = K \cdot (1 - E_A)$.
+
+### Standard Elo Implementation:
+```python
+def update(winner, loser, ratings, k=32):
+    r_w = ratings.get(winner, 1500)
+    r_l = ratings.get(loser, 1500)
+    
+    expected_w = 1 / (1 + 10 ** ((r_l - r_w) / 400))
+    expected_l = 1 - expected_w
+    
+    ratings[winner] = r_w + k * (1 - expected_w)
+    ratings[loser] = r_l + k * (0 - expected_l)
+    return ratings
+```

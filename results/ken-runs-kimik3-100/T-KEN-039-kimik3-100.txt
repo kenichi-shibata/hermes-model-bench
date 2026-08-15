@@ -1,0 +1,147 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mls -la
+total 32
+drwxr-xr-x   3 root root  4096 Aug 15 12:06 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root    82 Aug 15 13:35 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 15 12:06 __pycache__
+-rw-r--r--   1 root root   200 Aug 15 13:35 card_builder.py
+-rw-r--r--   1 root root   228 Aug 15 13:35 scenes_translation.json
+[0m
+[0m→ [0mRead card_builder.py
+[0m→ [0mRead scenes_translation.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mls -la __pycache__ && file __pycache__/*
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 12:06 .
+drwxr-xr-x 3 root root 4096 Aug 15 12:06 ..
+-rw-r--r-- 1 root root  559 Aug 15 12:06 card_builder.cpython-313.pyc
+__pycache__/card_builder.cpython-313.pyc: Byte-compiled Python module for CPython 3.13 (magic: 3571), timestamp-based, .py timestamp: Sat Aug 15 11:54:30 2026 UTC, .py size: 200 bytes
+[0m
+[0m$ [0mpython3 -c "
+import dis, marshal, importlib.util, sys
+f = open('__pycache__/card_builder.cpython-313.pyc','rb')
+f.read(16)
+code = marshal.load(f)
+dis.dis(code)
+" 2>&1 | head -80
+0           RESUME                   0
+
+  1           LOAD_CONST               4 ((True,))
+              LOAD_CONST               1 (<code object build_card at 0x7df5460eb130, file "/root/ken-tasks/T-KEN-039/card_builder.py", line 1>)
+              MAKE_FUNCTION
+              SET_FUNCTION_ATTRIBUTE   1 (defaults)
+              STORE_NAME               0 (build_card)
+
+  5           LOAD_CONST               2 (<code object romanize at 0x7df54615f830, file "/root/ken-tasks/T-KEN-039/card_builder.py", line 5>)
+              MAKE_FUNCTION
+              STORE_NAME               1 (romanize)
+              RETURN_CONST             3 (None)
+
+Disassembly of <code object build_card at 0x7df5460eb130, file "/root/ken-tasks/T-KEN-039/card_builder.py", line 1>:
+  1           RESUME                   0
+
+  2           LOAD_FAST                1 (translate)
+              TO_BOOL
+              POP_JUMP_IF_FALSE       17 (to L1)
+
+  3           LOAD_GLOBAL              1 (romanize + NULL)
+              LOAD_FAST                0 (scene)
+              LOAD_CONST               1 ('name_jp')
+              BINARY_SUBSCR
+              CALL                     1
+              LOAD_FAST                0 (scene)
+              LOAD_CONST               2 ('name_en')
+              STORE_SUBSCR
+
+  4   L1:     LOAD_FAST                0 (scene)
+              RETURN_VALUE
+
+Disassembly of <code object romanize at 0x7df54615f830, file "/root/ken-tasks/T-KEN-039/card_builder.py", line 5>:
+  5           RESUME                   0
+              LOAD_CONST               1 ('彩月七緒')
+              LOAD_CONST               2 ('Nanao Ayatsuki')
+              BUILD_MAP                1
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_FAST                0 (s)
+              LOAD_CONST               0 (None)
+              CALL                     2
+              RETURN_VALUE
+[0m
+[0m← [0mWrite card_builder.py
+Wrote file successfully.
+[0m
+The `.pyc` matches the current source, so the bug is in the code itself. Analysis:
+
+**Root cause:** `build_card` unconditionally overwrites `scene['name_en']` with the result of `romanize(...)`, and `romanize` silently returns `None` for any performer missing from its tiny hardcoded table. So any performer not in the dict gets `name_en` clobbered to `null` — even if the scene already had a translation. That's why cards keep showing up with missing translations.
+
+**Fix:** only write `name_en` when a real translation exists, and warn (instead of silently nulling) when none is available.
+[0m$ [0mpython3 - <<'EOF'
+import json, logging
+from card_builder import build_card
+
+logging.basicConfig(level=logging.WARNING)
+
+with open('scenes_translation.json', encoding='utf-8') as f:
+    scenes = json.load(f)
+
+scenes = [build_card(s) for s in scenes]
+
+with open('scenes_translation.json', 'w', encoding='utf-8') as f:
+    json.dump(scenes, f, ensure_ascii=False, indent=2)
+    f.write('\n')
+
+print(json.dumps(scenes, ensure_ascii=False, indent=2))
+EOF
+[
+  {
+    "id": 1,
+    "name_jp": "彩月七緒",
+    "name_en": "Nanao Ayatsuki",
+    "call_site": "trending"
+  },
+  {
+    "id": 2,
+    "name_jp": "彩月七緒",
+    "name_en": "Nanao Ayatsuki",
+    "call_site": "resume"
+  }
+]
+[0m
+Now repair the existing data by rebuilding each card:
+[0m$ [0mpython3 - <<'EOF'
+import logging, json
+from card_builder import build_card
+
+logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
+
+# 1. known performer -> translated
+print(build_card({'name_jp': '彩月七緒', 'name_en': None}))
+# 2. unknown performer with no translation -> warns, but does NOT write null
+print(build_card({'name_jp': '不明 太郎'}))
+# 3. unknown performer WITH existing translation -> preserved, not clobbered
+print(build_card({'name_jp': '不明 太郎', 'name_en': 'Taro Fumei'}))
+# 4. translate=False -> untouched
+print(build_card({'name_jp': '彩月七緒', 'name_en': None}, translate=False))
+# 5. data file round-trips clean
+print(json.load(open('scenes_translation.json', encoding='utf-8')))
+EOF
+WARNING: missing translation for '不明 太郎'
+{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}
+{'name_jp': '不明 太郎'}
+{'name_jp': '不明 太郎', 'name_en': 'Taro Fumei'}
+{'name_jp': '彩月七緒', 'name_en': None}
+[{'id': 1, 'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki', 'call_site': 'trending'}, {'id': 2, 'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki', 'call_site': 'resume'}]
+[0m
+Both scenes are now translated. Final check — verify the regression behavior (unknown performer must not get nuked to `null`, existing translations must survive):
+Fixed. All cases verified:
+
+- **Root cause in `card_builder.py`:** `build_card` blindly assigned `scene['name_en'] = romanize(...)`, and `romanize` returned `None` for anyone missing from its hardcoded table — silently clobbering cards with `null` (and destroying any pre-existing translation).
+- **Fix:** `name_en` is only written when a real translation exists; missing lookups now log a warning instead of writing `null`, and an existing `name_en` is never overwritten with `None`.
+- **Data repaired:** `scenes_translation.json` — both scenes (call sites `trending` and `resume`) now have `"name_en": "Nanao Ayatsuki"`.
+- **Verified:** known performer translates; unknown performer warns and keeps the field absent (no `null`); existing translations survive; `translate=False` leaves the scene untouched.
+
+To permanently close the "again" recurrence, the single-entry `_ROMANIZED` table would need to be backed by the real performer translation source — flagging that since the sandbox only contains this stub.

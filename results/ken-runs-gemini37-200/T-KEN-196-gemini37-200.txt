@@ -1,0 +1,217 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead fragile_function.py
+[0m→ [0mRead failure_log.json_note
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+[0m
+[0m$ [0mpython3 -m pip list
+/usr/bin/python3: No module named pip
+[0m
+[0m$ [0mpython3 -c "import requests; print(requests.__file__)"
+/usr/lib/python3/dist-packages/requests/__init__.py
+[0m
+[0m$ [0mpython3 -c "import urllib3; print(urllib3.__file__)"
+/usr/lib/python3/dist-packages/urllib3/__init__.py
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-196
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 11:54 ..
+-rw-r--r--   1 root root    94 Aug 15 11:54 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    98 Aug 15 11:54 failure_log.json_note
+-rw-r--r--   1 root root    70 Aug 15 11:54 fragile_function.py
+[0m
+[0m$ [0mpython3 -c "
+import requests
+from requests.exceptions import ConnectionError, Timeout
+
+print('requests version:', requests.__version__)
+"
+requests version: 2.32.3
+[0m
+[0m$ [0mpython3 -c "
+import unittest
+from unittest.mock import patch, MagicMock
+import requests
+from requests.exceptions import ConnectionError, Timeout
+
+TRANSIENT_STATUS_CODES = {429, 500, 502, 503, 504}
+TRANSIENT_EXCEPTIONS = (
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+    ConnectionError,
+    TimeoutError,
+)
+
+def call_flaky_api(url=None, max_retries=3, backoff_factor=1, **kwargs):
+    if url is None:
+        url = globals().get('url', 'https://api.example.com/data')
+    if 'timeout' not in kwargs:
+        kwargs['timeout'] = 10
+
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, **kwargs)
+            if response.status_code in TRANSIENT_STATUS_CODES and attempt < max_retries - 1:
+                sleep_time = backoff_factor * (2 ** attempt)
+                import time
+                time.sleep(sleep_time)
+                continue
+            return response
+        except TRANSIENT_EXCEPTIONS as exc:
+            if attempt < max_retries - 1:
+                sleep_time = backoff_factor * (2 ** attempt)
+                import time
+                time.sleep(sleep_time)
+            else:
+                raise exc
+
+# Test 1: 404 does not retry
+with patch('requests.get') as mock_get:
+    mock_resp = MagicMock()
+    mock_resp.status_code = 404
+    mock_get.return_value = mock_resp
+    res = call_flaky_api('http://test.com', backoff_factor=0)
+    assert mock_get.call_count == 1
+    assert res.status_code == 404
+    print('Test 1 (404 no retry) passed!')
+
+# Test 2: ConnectionError retries and succeeds
+with patch('requests.get') as mock_get:
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_get.side_effect = [requests.exceptions.ConnectionError(), requests.exceptions.Timeout(), mock_resp]
+    res = call_flaky_api('http://test.com', backoff_factor=0)
+    assert mock_get.call_count == 3
+    assert res.status_code == 200
+    print('Test 2 (ConnectionError / Timeout retries) passed!')
+
+# Test 3: 503 retries and succeeds
+with patch('requests.get') as mock_get:
+    mock_503 = MagicMock(status_code=503)
+    mock_200 = MagicMock(status_code=200)
+    mock_get.side_effect = [mock_503, mock_200]
+    res = call_flaky_api('http://test.com', backoff_factor=0)
+    assert mock_get.call_count == 2
+    assert res.status_code == 200
+    print('Test 3 (503 retry) passed!')
+
+# Test 4: Exhaust retries on connection error
+with patch('requests.get') as mock_get:
+    mock_get.side_effect = requests.exceptions.ConnectionError('Failed')
+    try:
+        call_flaky_api('http://test.com', max_retries=3, backoff_factor=0)
+        assert False, 'Should have raised'
+    except requests.exceptions.ConnectionError:
+        assert mock_get.call_count == 3
+        print('Test 4 (Exhaust retries raises) passed!')
+"
+Test 1 (404 no retry) passed!
+Test 2 (ConnectionError / Timeout retries) passed!
+Test 3 (503 retry) passed!
+Test 4 (Exhaust retries raises) passed!
+[0m
+[0m← [0mEdit fragile_function.py
+Index: /root/ken-tasks/T-KEN-196/fragile_function.py
+===================================================================
+--- /root/ken-tasks/T-KEN-196/fragile_function.py
++++ /root/ken-tasks/T-KEN-196/fragile_function.py
+@@ -1,2 +1,34 @@
+-def call_flaky_api():
+-    return requests.get(url)  # no retry at all
++import time
++import requests
++from requests.exceptions import ConnectionError, Timeout
++
++TRANSIENT_STATUS_CODES = {429, 500, 502, 503, 504}
++TRANSIENT_EXCEPTIONS = (
++    requests.exceptions.ConnectionError,
++    requests.exceptions.Timeout,
++    ConnectionError,
++    TimeoutError,
++)
++
++def call_flaky_api(url=None, max_retries=3, backoff_factor=1, **kwargs):
++    if url is None:
++        url = globals().get("url", "https://api.example.com/data")
++    if "timeout" not in kwargs:
++        kwargs["timeout"] = 10
++
++    for attempt in range(max_retries):
++        try:
++            response = requests.get(url, **kwargs)
++            # Transient server errors can be retried
++            if response.status_code in TRANSIENT_STATUS_CODES and attempt < max_retries - 1:
++                sleep_time = backoff_factor * (2 ** attempt)
++                time.sleep(sleep_time)
++                continue
++            return response
++        except TRANSIENT_EXCEPTIONS as exc:
++            if attempt < max_retries - 1:
++                sleep_time = backoff_factor * (2 ** attempt)
++                time.sleep(sleep_time)
++            else:
++                raise exc
++
+
+[0m
+[0m→ [0mRead fragile_function.py
+[0m
+[0m$ [0mpython3 -m py_compile /root/ken-tasks/T-KEN-196/fragile_function.py
+(no output)
+[0m
+[0m$ [0mpython3 -c "
+import unittest
+from unittest.mock import patch, MagicMock
+import fragile_function
+
+# Test 1: standard success
+with patch('fragile_function.requests.get') as mock_get:
+    mock_resp = MagicMock(status_code=200)
+    mock_get.return_value = mock_resp
+    res = fragile_function.call_flaky_api('http://example.com/test')
+    assert res.status_code == 200
+    assert mock_get.call_count == 1
+
+# Test 2: global url variable when called with no args
+fragile_function.url = 'http://example.com/global'
+with patch('fragile_function.requests.get') as mock_get:
+    mock_resp = MagicMock(status_code=200)
+    mock_get.return_value = mock_resp
+    res = fragile_function.call_flaky_api()
+    assert res.status_code == 200
+    mock_get.assert_called_with('http://example.com/global', timeout=10)
+
+# Test 3: transient error (timeout) then success
+with patch('fragile_function.requests.get') as mock_get:
+    mock_resp = MagicMock(status_code=200)
+    mock_get.side_effect = [fragile_function.Timeout('timeout error'), mock_resp]
+    res = fragile_function.call_flaky_api(backoff_factor=0)
+    assert res.status_code == 200
+    assert mock_get.call_count == 2
+
+# Test 4: non-transient error (404) returns immediately
+with patch('fragile_function.requests.get') as mock_get:
+    mock_resp = MagicMock(status_code=404)
+    mock_get.return_value = mock_resp
+    res = fragile_function.call_flaky_api(backoff_factor=0)
+    assert res.status_code == 404
+    assert mock_get.call_count == 1
+
+# Test 5: transient 500 error retried
+with patch('fragile_function.requests.get') as mock_get:
+    mock_500 = MagicMock(status_code=500)
+    mock_200 = MagicMock(status_code=200)
+    mock_get.side_effect = [mock_500, mock_200]
+    res = fragile_function.call_flaky_api(backoff_factor=0)
+    assert res.status_code == 200
+    assert mock_get.call_count == 2
+
+print('All unit tests passed successfully!')
+"
+All unit tests passed successfully!
+[0m
+Added retry logic with exponential backoff to `fragile_function.py` for transient connection errors, timeouts, and 5xx/429 status codes while avoiding retries on permanent errors (e.g., 404).

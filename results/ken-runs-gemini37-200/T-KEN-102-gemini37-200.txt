@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead backup_run_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+Based on `backup_run_log.json`, the backup **started** at `2026-08-13T00:00`, but there is **no record of completion or success** (the status remains `"started"` with `"hours_since": 6`).

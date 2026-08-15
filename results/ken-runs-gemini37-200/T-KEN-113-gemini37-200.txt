@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead cap_rate_history.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+Yes. The current week's cap rate is **15%**, which is 3x higher than the baseline cap rate of **5%**.

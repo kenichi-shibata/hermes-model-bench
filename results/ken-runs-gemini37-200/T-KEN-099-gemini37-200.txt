@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead permission_context.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+Permission is requested because the action is an irreversible bulk delete (`bulk_delete`, `reversible: false`) affecting 40 records. Explicit confirmation is required to prevent accidental and permanent data loss.

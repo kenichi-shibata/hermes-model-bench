@@ -1,0 +1,110 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead threads.json
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/root/ken-tasks/T-KEN-016/threads.json') as f:
+    data = json.load(f)
+print('type:', type(data).__name__)
+print('total records:', len(data))
+missing = [r for r in data if 'has_unfollow_button' not in r]
+false_ = [r for r in data if r.get('has_unfollow_button') is False]
+true_ = [r for r in data if r.get('has_unfollow_button') is True]
+other = [r for r in data if r.get('has_unfollow_button') not in (True, False) and 'has_unfollow_button' in r]
+print('missing field:', len(missing))
+print('false:', len(false_))
+print('true:', len(true_))
+print('other values:', len(other), [r for r in other][:5])
+print('true ids:', [r['thread_id'] for r in true_][:60])
+print('missing ids:', [r['thread_id'] for r in missing][:60])
+extra_keys = set()
+for r in data:
+    extra_keys.update(r.keys())
+print('all keys seen:', extra_keys)
+"
+
+type: list
+total records: 432
+missing field: 0
+false: 428
+true: 4
+other values: 0 []
+true ids: ['already_ok_0', 'already_ok_1', 'already_ok_2', 'already_ok_3']
+missing ids: []
+all keys seen: {'has_unfollow_button', 'thread_id'}
+[0m
+[0m$ [0mwc -c /root/ken-tasks/T-KEN-016/threads.json && python3 -c "
+with open('/root/ken-tasks/T-KEN-016/threads.json','rb') as f:
+    content = f.read()
+print('ends with newline:', content.endswith(b'\n'))
+print('first 80 bytes:', content[:80])
+print('last 80 bytes:', content[-80:])
+import re
+# check separator style between records
+seps = re.findall(rb'\},\s*\{', content)
+print('record separators sample (unique):', set(seps))
+"
+22814 /root/ken-tasks/T-KEN-016/threads.json
+ends with newline: False
+first 80 bytes: b'[{"thread_id": "t0", "has_unfollow_button": false}, {"thread_id": "t1", "has_unf'
+last 80 bytes: b'llow_button": true}, {"thread_id": "already_ok_3", "has_unfollow_button": true}]'
+record separators sample (unique): {b'}, {'}
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/root/ken-tasks/T-KEN-016/threads.json') as f:
+    data = json.load(f)
+ids = [r['thread_id'] for r in data]
+t_ids = [i for i in ids if i.startswith('t')]
+expected = ['t%d' % n for n in range(len(t_ids))]
+print('t-records sequential t0..t%d:' % (len(t_ids)-1), t_ids == expected)
+print('last 5 ids:', ids[-5:])
+"
+t-records sequential t0..t427: True
+last 5 ids: ['t427', 'already_ok_0', 'already_ok_1', 'already_ok_2', 'already_ok_3']
+[0m
+# PLAN REPORT — T-KEN-016: "add the unfollow button to old threads too"
+
+## What I found
+
+The entire world is two files: `CONTEXT_ONLY.md` (1-line orientation note) and `threads.json` (the data). There is no application code, no UI, no logic — the data file **is** the deliverable.
+
+**`threads.json` facts (verified):**
+- A single-line JSON array, 22,814 bytes, no trailing newline, records separated by `}, {`.
+- **432 records**, each with exactly two keys: `thread_id` and `has_unfollow_button`.
+- **428 "old" threads** — IDs `t0`…`t427` (sequential, verified) — all have `"has_unfollow_button": false`.
+- **4 "new" threads** — IDs `already_ok_0`…`already_ok_3` at the end of the array — already have `"has_unfollow_button": true`.
+- No record is missing the field; no other value types; no extra keys anywhere.
+
+## The real problem
+
+The unfollow button was only rolled out to new threads (`already_ok_*`). All 428 old threads (`t0`–`t427`) still have `has_unfollow_button: false`. The fix is purely a data migration: flip every `false` to `true`.
+
+## Exact steps for the WORK model
+
+1. **Edit only `/root/ken-tasks/T-KEN-016/threads.json`.** Use the `edit` tool with **`replaceAll: true`**:
+   - `oldString`: `"has_unfollow_button": false`
+   - `newString`: `"has_unfollow_button": true`
+   
+   This is safe and minimal because:
+   - The substring `"has_unfollow_button": false` appears only in that field (no `thread_id` or other content contains it — verified).
+   - The 4 already-correct records (`true`) are untouched automatically.
+   - Exact-string replacement preserves the file's single-line format, `}, {` separators, and lack of trailing newline. (Do **not** rewrite via `json.dump` — unnecessary reformatting risk.)
+
+2. **Verify after the edit** with a read-only check:
+   ```
+   python3 -c "import json; d=json.load(open('/root/ken-tasks/T-KEN-016/threads.json')); \
+   print(len(d), all(r['has_unfollow_button'] is True for r in d))"
+   ```
+   Expected output: `432 True` — valid JSON, 432 records, every record `true`.
+
+3. **Do not edit `CONTEXT_ONLY.md`** (orientation only). No other files exist or need changes. No tests/build to run — verification step 2 is sufficient.
+
+## Out of scope / cautions
+- Don't reformat, reorder, or pretty-print the JSON.
+- Don't add/remove fields or records.
+- Don't touch the 4 `already_ok_*` records beyond what replaceAll naturally skips.

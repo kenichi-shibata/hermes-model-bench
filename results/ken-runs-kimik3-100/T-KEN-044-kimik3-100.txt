@@ -1,0 +1,69 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root   101 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   128 Aug 15 13:35 title_translate.py
+-rw-r--r--   1 root root   736 Aug 15 13:35 titles_data.json
+[0m
+[0m→ [0mRead title_translate.py
+[0m→ [0mRead titles_data.json
+[0m→ [0mRead CONTEXT_ONLY.md
+The situation is clear: `titles_data.json` has 10 entries with only `title_jp`. The `translate()` function handles translation but returns `None` for garbled (U+FFFD) titles. I'll wire the translator to the data file and add `title_en` to each entry.
+[0m
+[0m← [0mEdit title_translate.py
+Index: /root/ken-tasks/T-KEN-044/title_translate.py
+===================================================================
+--- /root/ken-tasks/T-KEN-044/title_translate.py
++++ /root/ken-tasks/T-KEN-044/title_translate.py
+@@ -1,5 +1,15 @@
++import json
++
+ def translate(title):
+     return romanize_lib(title)
+ def romanize_lib(t):
+     if '�' in t: return None
+     return t + ' (EN)'
++
++if __name__ == '__main__':
++    with open('titles_data.json', encoding='utf-8') as f:
++        data = json.load(f)
++    for entry in data:
++        entry['title_en'] = translate(entry['title_jp'])
++    with open('titles_data.json', 'w', encoding='utf-8') as f:
++        json.dump(data, f, ensure_ascii=False, indent=2)
+
+[0m
+[0m$ [0mpython3 title_translate.py && python3 -c "
+import json
+data = json.load(open('titles_data.json', encoding='utf-8'))
+for e in data:
+    print(e['id'], repr(e['title_jp']), '->', repr(e.get('title_en')))
+assert all('title_en' in e for e in data), 'missing title_en'
+assert sum(e['title_en'] is None for e in data) == 2, 'expected exactly 2 untranslatable'
+print('OK: all entries processed; 2 garbled entries marked null')
+"
+0 'いいタイトル' -> 'いいタイトル (EN)'
+1 'いいタイトル' -> 'いいタイトル (EN)'
+2 'いいタイトル' -> 'いいタイトル (EN)'
+3 'いいタイトル' -> 'いいタイトル (EN)'
+4 'いいタイトル' -> 'いいタイトル (EN)'
+5 'いいタイトル' -> 'いいタイトル (EN)'
+6 'いいタイトル' -> 'いいタイトル (EN)'
+7 'いいタイトル' -> 'いいタイトル (EN)'
+8 '���' -> None
+9 '���' -> None
+OK: all entries processed; 2 garbled entries marked null
+[0m
+[0m→ [0mRead titles_data.json
+Done. Summary of changes:
+
+- **`title_translate.py`**: added a `__main__` block that loads `titles_data.json`, runs each `title_jp` through the existing `translate()` function, and writes a `title_en` field back into each entry.
+- **`titles_data.json`**: all 10 entries now have `title_en`:
+  - IDs 0–7: translated → `"いいタイトル (EN)"`
+  - IDs 8–9: garbled source (`\ufffd\ufffd\ufffd`), correctly returned `null` by the translator — genuinely untranslatable, as flagged in the context.
+
+Verified by running the script and asserting every entry has a `title_en` key with exactly 2 `null` values for the garbled ones.

@@ -1,0 +1,9 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead keep_logic.json
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m 2 matches[0m
+**No.** Since both files are playable, file **b** (4.8 GB) is likely the higher quality/bitrate copy and should typically be kept over file **a** (1.2 GB), unless the explicit objective is minimizing storage space.

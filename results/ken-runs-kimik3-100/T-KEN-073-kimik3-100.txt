@@ -1,0 +1,20 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead embed_builder.py
+[0m→ [0mRead scene_for_embed.json
+Key mismatch.
+
+- `embed_builder.py:2` reads `scene.get('cover_url')`
+- `scene_for_embed.json` only has `thumbnail_url` (there's no `cover_url` key)
+
+So `scene.get('cover_url')` returns `None`, and the embed ends up as `{'image': None}` — no image.
+
+Fix is one line — either read the key that actually exists:
+
+```python
+def build_embed(scene):
+    return {'image': scene.get('thumbnail_url')}
+```
+
+or rename the field in the JSON to `cover_url`, whichever side is the source of truth. Want me to apply the fix?

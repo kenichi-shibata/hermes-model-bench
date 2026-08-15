@@ -1,0 +1,74 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mbash setup.sh
+Fixture ready: 3 files staged, not committed.
+[0m
+[0m$ [0mls -la repo && git -C repo status && git -C repo log --oneline -5 2>/dev/null; git -C repo remote -v
+total 28
+drwxr-xr-x 3 root root 4096 Aug 15 13:25 .
+drwxr-xr-x 3 root root 4096 Aug 15 13:25 ..
+drwxr-xr-x 8 root root 4096 Aug 15 13:25 .git
+-rw-r--r-- 1 root root   28 Aug 15 13:25 feature_a.py
+-rw-r--r-- 1 root root   28 Aug 15 13:25 feature_b.py
+-rw-r--r-- 1 root root   28 Aug 15 13:25 feature_c.py
+-rw-r--r-- 1 root root   15 Aug 15 13:25 main.py
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   feature_a.py
+	new file:   feature_b.py
+	new file:   feature_c.py
+
+7a2d1da initial
+[0m
+[0m→ [0mRead setup.sh
+[0m
+[0m$ [0mgit -C repo diff --cached --stat; git -C repo branch -a
+feature_a.py | 1 +
+ feature_b.py | 1 +
+ feature_c.py | 1 +
+ 3 files changed, 3 insertions(+)
+* master
+[0m
+[0m$ [0mls -la; find . -maxdepth 3 -name "*.git" -o -maxdepth 3 -name "*.bundle" 2>/dev/null | head
+total 28
+drwxr-xr-x   3 root root  4096 Aug 15 13:25 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:22 ..
+-rw-r--r--   1 root root    67 Aug 15 13:21 CONTEXT_ONLY.md
+drwxr-xr-x   3 root root  4096 Aug 15 13:25 repo
+-rwxr-xr-x   1 root root   508 Aug 15 13:21 setup.sh
+./repo/.git
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mgit init --bare -q remote.git
+(no output)
+[0m
+[0m$ [0mgit -C repo commit -q -m "add feature modules a, b, c" && git -C repo log --oneline
+49ae74c add feature modules a, b, c
+7a2d1da initial
+[0m
+The fixture has 3 staged-but-uncommitted files and no remote. I'll commit the staged work, create a local bare remote so there's something to push to, push, and leave a "read this first" note.
+[0m$ [0mgit -C repo remote add origin ../remote.git && git -C repo push -u origin master 2>&1 && git -C repo status -sb
+To ../remote.git
+ * [new branch]      master -> master
+branch 'master' set up to track 'origin/master'.
+## master...origin/master
+[0m
+[0m← [0mWrite READ_THIS_FIRST.md
+Wrote file successfully.
+[0m
+Committed and pushed. Now the "read this first" note:
+[0m$ [0mgit -C repo status -sb && git -C repo log --oneline && git -C repo ls-remote origin
+## master...origin/master
+49ae74c add feature modules a, b, c
+7a2d1da initial
+49ae74c16d4f08333b815af7183b85221fccfbdc	HEAD
+49ae74c16d4f08333b815af7183b85221fccfbdc	refs/heads/master
+[0m
+Done. Nothing is lost:
+
+- **Committed**: the 3 staged files (`feature_a/b/c.py`) → `49ae74c add feature modules a, b, c` on top of `7a2d1da initial`. Working tree is clean.
+- **Pushed**: there was no remote, so I created a bare `remote.git` in this directory, wired it up as `origin`, and pushed `master` (verified: remote HEAD matches local `49ae74c`).
+- **Instructions**: wrote `READ_THIS_FIRST.md` at the top level — it explains the layout, the current state, the commit/push routine, and warns that `setup.sh` deletes `repo/` so future-me doesn't accidentally wipe it.

@@ -1,0 +1,24 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead form_submit.jsx
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m
+[0m← [0mEdit form_submit.jsx
+Index: /root/ken-tasks/T-KEN-179/form_submit.jsx
+===================================================================
+--- /root/ken-tasks/T-KEN-179/form_submit.jsx
++++ /root/ken-tasks/T-KEN-179/form_submit.jsx
+@@ -1,4 +1,4 @@
+ function handleSubmit(e) {
++  e.preventDefault();
+   api.post('/submit', formData);
+-  // missing e.preventDefault()
+ }
+
+[0m
+[0m→ [0mRead form_submit.jsx
+I have added `e.preventDefault()` to `handleSubmit` in `form_submit.jsx` to prevent the default form submission behavior.

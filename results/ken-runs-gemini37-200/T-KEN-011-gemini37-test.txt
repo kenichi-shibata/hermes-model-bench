@@ -1,0 +1,33 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead PerformersGrid.jsx
+[0m→ [0mRead PerformerDetailPage.jsx
+[0m✱ [0mGlob "**/.*"[90m 0 matches[0m
+[0m✱ [0mGlob "**/*"[90m 3 matches[0m
+[0m
+[0m← [0mEdit PerformerDetailPage.jsx
+Index: /root/ken-tasks/T-KEN-011/PerformerDetailPage.jsx
+===================================================================
+--- /root/ken-tasks/T-KEN-011/PerformerDetailPage.jsx
++++ /root/ken-tasks/T-KEN-011/PerformerDetailPage.jsx
+@@ -3,11 +3,8 @@
+ export default function PerformerDetailPage({ performer }) {
+   return (
+     <div>
+       <h1>{performer.name}</h1>
+-      {/* BUG: clicking the rank badge goes to a generic leaderboard,
+-          not this performer's own page. Should link to
+-          /performers/${performer.id} */}
+-      <a href="/leaderboard">5-star</a>
++      <Link to={`/performers/${performer.id}`}>5-star</Link>
+     </div>
+   );
+ }
+
+[0m
+[0m→ [0mRead PerformerDetailPage.jsx
+[0m→ [0mRead PerformersGrid.jsx
+Fixed the bug in `PerformerDetailPage.jsx` by updating the rank badge link to use React Router's `Link` component targeting `/performers/${performer.id}`. `PerformersGrid.jsx` was verified to be working as intended.

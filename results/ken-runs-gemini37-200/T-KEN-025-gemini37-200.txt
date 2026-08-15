@@ -1,0 +1,9 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scene_claim.json
+[0m→ [0mRead indexer_freshness.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+The scene is from **site_c**, whose indexer last ran 2 hours ago and runs on a 6-hour interval. It won't show up until the next scheduled index run in approximately 4 hours.

@@ -1,0 +1,9 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead api_trace.json[90m [limit=2000, offset=1][0m
+The API is bottlenecked by an **N+1 query problem**: it executes **500 individual database queries** taking ~8 ms each, which accounts for **4,000 ms (89%)** of the 4,500 ms total response time. 
+
+Batching or eager-loading these into a single query/JOIN will reduce the latency.

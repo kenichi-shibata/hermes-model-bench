@@ -1,0 +1,14 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead error_correlation.json
+**Code problem** — almost certainly a bad deploy.
+
+Evidence in the file:
+
+1. **Tight temporal correlation**: `deploy_at` 10:00 → `error_spike_at` 10:01. Errors began ~1 minute after the deploy went out.
+2. **`infra_metrics_stable: true`**: CPU/memory/disk/network showed no anomalies, which rules out infra causes (resource exhaustion, network issues, hardware, etc.).
+
+Conclusion: the deploy introduced the errors — this points to a bug in the shipped code (or its config), not infrastructure.
+
+One caveat: correlation ≠ causation — an external dependency *could* have changed at the same moment — but given only this data, the deploy is the prime suspect. Recommended action: roll back the 10:00 deploy and diff that release for the culprit.

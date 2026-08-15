@@ -1,0 +1,9 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead error_correlation.json
+This is a **code problem**. 
+
+The error spike began immediately after deployment (`10:01` vs deploy at `10:00`) while infrastructure metrics remained stable (`infra_metrics_stable: true`).

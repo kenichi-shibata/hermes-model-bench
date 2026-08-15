@@ -1,0 +1,8 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead single_case_data.json
+[0m→ [0mRead .
+The source field `name_jp` is `null` (missing), so there is no Japanese text available to translate into `name_en`.

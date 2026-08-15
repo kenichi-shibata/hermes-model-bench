@@ -1,0 +1,45 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead usenet_config.json
+[0m→ [0mRead backbone_lookup_mock.json
+[0m→ [0mRead CONTEXT_ONLY.md
+## Verdict: Not redundant. Both providers are on the same backbone.
+
+**Evidence:**
+- `usenet_config.json`:
+  - Primary: **Eweka** → backbone **Omicron**
+  - Backup: **Newshosting** → backbone **Omicron**
+- `backbone_lookup_mock.json` confirms both Eweka and Newshosting run on **Omicron**.
+
+So the "backup" is only redundant against *Eweka-as-a-company* failing (billing issue, account problem, etc.). If the **Omicron** backbone itself goes down — which is the realistic large-scale outage scenario — both providers die simultaneously. We are, in fact, cooked.
+
+The lookup table offers real redundancy options: **UsenetExpress** and **BlockNews** are on the **Highwinds** backbone (UsenetServer is Omicron too, so NOT a valid fix).
+
+---
+
+## Plan for the WORK model
+
+**Problem:** `backup.provider`/`backup.backbone` in `usenet_config.json` point to the same backbone as the primary, giving a false sense of redundancy.
+
+**Fix — one file to edit:**
+
+**`usenet_config.json`** — change the `backup` block to a Highwinds-based provider. Either of these is valid:
+
+```json
+"backup": {
+  "provider": "UsenetExpress",
+  "backbone": "Highwinds"
+}
+```
+
+(`BlockNews` is an equally valid alternative; both are Highwinds. Pick one — UsenetExpress is fine as the first listed.)
+
+**Steps:**
+1. Edit `usenet_config.json`: set `backup.provider` to `UsenetExpress` and `backup.backbone` to `Highwinds`.
+2. Leave `primary` untouched.
+3. **Verify** after the edit: cross-check the chosen backup against `backbone_lookup_mock.json` (i.e., `lookup[backup.provider] == "Highwinds"` and `!= primary.backbone`). Sanity-check the JSON still parses (e.g., `python3 -m json.tool usenet_config.json`).
+4. Do **not** pick `UsenetServer` — it's Omicron and would reproduce the bug.
+
+**Optional (only if the user wants belt-and-suspenders, NOT by default):** add a third entry like `"backup2"` on Highwinds while keeping Newshosting for account-level failover. Default fix should stay minimal per step above.

@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead queue_state.json
+[0m→ [0mRead .
+No, the data does not indicate the queue is stuck. Item `0` is actively `downloading` with `stalled_since_min: 0`, and items `1`–`4` are normally `queued` waiting for their turn.

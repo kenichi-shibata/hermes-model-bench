@@ -1,0 +1,11 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead delegation_trend.json
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Delegation performance has been declining over the past 3 days:
+
+- **Day 1:** 90% completed
+- **Day 2:** 70% completed
+- **Day 3:** 40% completed

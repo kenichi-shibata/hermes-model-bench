@@ -1,0 +1,58 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-008
+total 32
+drwxr-xr-x   2 root root  4096 Aug 15 14:11 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 14:11 ..
+-rw-r--r--   1 root root   165 Aug 15 14:11 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   342 Aug 15 14:11 samantha_saint_wicked_catalog.json
+-rw-r--r--   1 root root  1188 Aug 15 14:11 scenes_db.json
+-rw-r--r--   1 root root     2 Aug 15 14:11 wanted_list.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead wanted_list.json
+## Investigation findings
+
+**Files present (all read):**
+- `scenes_db.json` — 10 scene records:
+  - IDs **100–105**: "MovieX Part 1"–"MovieX Part 6", studio `Wicked`, all with `movie_id: null` → ungrouped movie parts.
+  - IDs **200–203**: "Misattributed Scene 1–4", `studio: "FliXXX"` but each carries `real_studio: "Digital Playground"` → the FliXXX/Digital Playground flip-flop, confirmed in data.
+- `samantha_saint_wicked_catalog.json` — performer "Samantha Saint", studio "Wicked", **12 movies** ("Wicked Movie 1"–"Wicked Movie 12").
+- `wanted_list.json` — `[]` (empty queue). This file is the "download" mechanism in this sandbox: queueing an item here = downloading it.
+
+## Answers to the user's questions
+
+1. **Can we group the movie parts into a stash "group"?** Yes. The schema already has a `movie_id` field on every scene — it's just `null`. Grouping = assigning all six MovieX parts the same `movie_id`. No download needed; it's a metadata fix.
+2. **If we can't, can we download the whole movie?** Moot — grouping works. (Fallback would be queueing all 6 parts in `wanted_list.json`; not needed.)
+3. **FliXXX flip-flop:** Real problem, confirmed. Fix by rewriting `studio` to the canonical `real_studio` value ("Digital Playground") on scenes 200–203 so they stop bouncing between studios.
+4. **Samantha Saint @ Wicked:** Queue all 12 movies from the catalog into `wanted_list.json`.
+
+## Concrete plan for the WORK model
+
+**Step 1 — Edit `scenes_db.json` (group the movie parts):**
+- For scenes id `100`–`105`: set `"movie_id": 1000` (shared group id, chosen outside the existing scene-id range 100–203) and add `"movie_title": "MovieX"` so the group is self-describing (no separate groups table exists).
+
+**Step 2 — Edit `scenes_db.json` (fix studio misattribution):**
+- For scenes id `200`–`203`: change `"studio": "FliXXX"` → `"studio": "Digital Playground"` (source of truth = each record's own `real_studio` field). Leave the `real_studio` field in place as an alias breadcrumb; do not delete it.
+
+**Step 3 — Write `wanted_list.json` (download queue):**
+- Replace `[]` with 12 entries, one per catalog movie, using this schema (queue is empty, so we define it):
+```json
+[
+  {"type": "movie", "title": "Wicked Movie 1", "studio": "Wicked", "performer": "Samantha Saint"},
+  ...through "Wicked Movie 12"
+]
+```
+
+**Step 4 — Verify:**
+- Run `python3 -m json.tool scenes_db.json` and `python3 -m json.tool wanted_list.json` (or `jq .`) to confirm both files still parse.
+- Sanity checks: exactly 6 scenes share `movie_id` 1000; zero scenes have `studio: "FliXXX"`; wanted list has exactly 12 entries, all studio "Wicked".
+
+**Do NOT:** create new files, add extra catalog entries beyond the 12, queue the MovieX parts (grouping supersedes the whole-movie download fallback), or touch `CONTEXT_ONLY.md`.
+
+Expected end state: 6 scenes grouped under one MovieX group, 4 scenes canonically re-attributed to Digital Playground, 12 Samantha Saint Wicked movies queued for download.

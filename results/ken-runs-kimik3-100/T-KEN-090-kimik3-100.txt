@@ -1,0 +1,40 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead mem_by_process.json
+[0m→ [0mRead .
+[0m→ [0mRead CONTEXT_ONLY.md
+## Diagnosis: memory leak — steady linear growth
+
+The data in `mem_by_process.json` shows RSS climbing with a perfectly constant slope:
+
+| Hour | RSS (MB) | Δ per 6h |
+|------|----------|----------|
+| 0    | 200      | —        |
+| 6    | 440      | +240     |
+| 12   | 680      | +240     |
+| 18   | 920      | +240     |
+| 24   | 1160     | +240     |
+| 30   | 1400     | +240     |
+| 36   | 1640     | +240     |
+| 42   | 1880     | +240     |
+
+**Key findings:**
+
+- **Leak rate: 40 MB/hour (~0.67 MB/min), exactly constant.** Not a traffic spike or one-off — a steady, unbounded leak.
+- **No plateaus, no drops.** A healthy process shows sawtooth behavior (GC cycles, cache eviction, buffers being freed). Memory that only ever goes up = allocations that are never released.
+- **Growth is 9.4× the baseline** (200 → 1880 MB) in under 2 days.
+
+**Projection if unfixed:** ~2 GB at hour 48, ~4 GB around hour 96 (day 4), OOM shortly after depending on available RAM.
+
+**Likely culprits** (constant-rate leaks usually mean per-request or per-tick allocation without cleanup):
+- Unbounded in-memory cache or map/list that only grows
+- Event listeners or subscribers accumulating
+- Unclosed DB connections, file handles, or HTTP sessions
+- Retained objects in a long-lived queue or buffer
+
+**Recommended next steps:**
+1. **Identify the process** — the JSON has no name field, so check live: `ps aux --sort=-rss | head`
+2. **Profile the heap** to find the retaining object (Node: `--inspect` + heap snapshot; Python: `tracemalloc`; Go: `pprof`; Java: `jmap`)
+3. **Mitigate now**: set a memory cap with auto-restart (e.g., systemd `MemoryMax=` + `Restart=always`) to stop it taking down the host while you fix the root cause
+4. **Check what deployed ~42+ hours ago** — the leak almost certainly started with a recent change.

@@ -1,0 +1,68 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead search_engine.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scenes_searchable.json
+[0m
+[0m← [0mEdit search_engine.py
+Index: /root/ken-tasks/T-KEN-035/search_engine.py
+===================================================================
+--- /root/ken-tasks/T-KEN-035/search_engine.py
++++ /root/ken-tasks/T-KEN-035/search_engine.py
+@@ -1,2 +1,5 @@
+ def search(query, scenes):
+-    return [s for s in scenes if query in s['title']]
++    query = (query or '').strip().lower()
++    if not query:
++        return []
++    return [s for s in scenes if query in s.get('title', '').lower()]
+
+[0m
+The problem is clear: `search()` does a case-sensitive substring match on `title` only, so queries like `samantha` or `SAINT` fail to match `"Samantha Saint Movie"`. Let me fix it with case normalization (and whitespace stripping), then verify.
+[0m$ [0mpython3 - <<'EOF'
+import json
+from search_engine import search
+
+scenes = json.load(open('scenes_searchable.json'))
+
+def check(query, expected_ids):
+    ids = [s['id'] for s in search(query, scenes)]
+    status = 'PASS' if ids == expected_ids else 'FAIL'
+    print(f"{status}  query={query!r:25} -> ids={ids} (expected {expected_ids})")
+
+check('samantha', [1])     # lowercase should now match
+check('SAMANTHA', [1])     # uppercase
+check('Saint', [1])        # mixed case, mid-word
+check('  saint  ', [1])    # surrounding whitespace
+check('movie', [1])        # case-insensitive substring
+check('scene', [2])        # matches second scene
+check('', [])              # empty query returns nothing
+check('zzz', [])           # no match
+EOF
+PASS  query='samantha'                -> ids=[1] (expected [1])
+PASS  query='SAMANTHA'                -> ids=[1] (expected [1])
+PASS  query='Saint'                   -> ids=[1] (expected [1])
+PASS  query='  saint  '               -> ids=[1] (expected [1])
+PASS  query='movie'                   -> ids=[1] (expected [1])
+PASS  query='scene'                   -> ids=[2] (expected [2])
+PASS  query=''                        -> ids=[] (expected [])
+PASS  query='zzz'                     -> ids=[] (expected [])
+[0m
+Fixed and verified. The search bar wasn't finding things because of two issues in `search_engine.py`:
+
+1. **Case-sensitive matching** — `query in s['title']` meant `samantha` or `SAINT` never matched `"Samantha Saint Movie"`. This was the main "not finding stuff it should" bug.
+2. **No input normalization** — leading/trailing whitespace or an empty query behaved badly, and a scene missing a `title` key would crash the search with a `KeyError`.
+
+The fix (minimal, same function signature):
+
+```python
+def search(query, scenes):
+    query = (query or '').strip().lower()
+    if not query:
+        return []
+    return [s for s in scenes if query in s.get('title', '').lower()]
+```
+
+Verified against `scenes_searchable.json`: case-insensitive queries (`samantha`, `SAMANTHA`, `Saint`), padded queries (`  saint  `), partial matches (`movie`, `scene`), and empty/non-matching queries all behave correctly.

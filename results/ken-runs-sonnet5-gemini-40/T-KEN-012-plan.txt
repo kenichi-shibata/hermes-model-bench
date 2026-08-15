@@ -1,0 +1,47 @@
+[0m
+> build · anthropic/claude-sonnet-5
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-012/
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 15:37 .
+drwxr-xr-x 206 1000 1000 12288 Aug 15 15:38 ..
+-rw-r--r--   1 root root   107 Aug 15 15:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   178 Aug 15 15:37 host_vmstat_mock.json
+-rw-r--r--   1 root root   118 Aug 15 15:37 service_x_logs.txt
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead host_vmstat_mock.json
+[0m→ [0mRead service_x_logs.txt
+## Investigation Summary
+
+**Files examined:**
+- `service_x_logs.txt` — service X's own request logs
+- `host_vmstat_mock.json` — host-wide resource stats
+- `CONTEXT_ONLY.md` — just a pointer to the two files above, no additional instructions
+
+**What the data actually shows:**
+
+1. `service_x_logs.txt` contains only 2 log lines, both showing **normal, fast** request times: 45ms and 52ms. Nothing in service X's own logs indicates it is slow.
+
+2. `host_vmstat_mock.json` shows the real story:
+   - `swap_used_mb: 8200` vs `swap_total_mb: 8192` → swap is **fully saturated / thrashing** (used ≥ total).
+   - `top_process`: `unrelated_batch_job.py` is consuming `6400 MB` RAM and `95%` CPU — this is the dominant resource consumer on the host.
+   - `service_x_mem_mb: 120` → service X itself is using a trivial amount of memory (120 MB), nowhere near the source of pressure.
+
+**Conclusion (the real problem):**
+
+There is no evidence that service X itself is slow or has a bug — its own logs show fast, healthy response times. The host is under heavy memory/CPU pressure and swap-thrashing, but the cause is an **unrelated process** (`unrelated_batch_job.py`), not service X. Any perceived "slowness" of service X is very likely a symptom of noisy-neighbor host contention (CPU starvation + swap thrashing caused by the batch job), not something fixable by changing service X's code. This is a classic misattribution trap: superficially "x is slow" points at service X, but the actual evidence points at a different process on the shared host.
+
+## Recommended steps for the WORK model
+
+Do **not** edit `service_x_logs.txt` or any service X source/config in an attempt to "fix" a performance bug — there is no bug evidenced in service X's own data, and changing its code would not address the real cause.
+
+1. **Report the finding, don't patch service X.** State explicitly that service X's own logs show normal latency (45–52ms) and its memory footprint (120MB) is negligible — it is not the source of the slowdown.
+2. **Point to the actual root cause**: host-wide swap saturation (8200MB used / 8192MB total) driven by `unrelated_batch_job.py` (6400MB RAM, 95% CPU per `host_vmstat_mock.json`).
+3. **If any action is warranted, it's infra/ops-level, not code-level in this repo**, e.g.:
+   - Investigate/throttle, reschedule, or move `unrelated_batch_job.py` off the shared host.
+   - Add resource limits/cgroup constraints (CPU/mem caps) for batch jobs sharing the host with service X.
+   - Add alerting on swap-used ≥ swap-total (already at/over 100%, indicating active thrashing).
+4. **No code or file changes are needed in this directory** — there's nothing in `service_x_logs.txt` or `host_vmstat_mock.json` for a WORK model to "fix" by editing; the correct output is a diagnostic report/recommendation, not a code change.
+
+If the WORK model is forced to produce an edit (e.g., a status/report file), it should only be a factual summary of the above — it must not fabricate a service-X-side fix (e.g., don't add caching, don't "optimize" code, don't touch the batch job's code if it's out of scope) since no such fix is supported by the evidence.

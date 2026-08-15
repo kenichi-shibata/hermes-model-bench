@@ -1,0 +1,52 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead indexer_api_mock.py
+[0m→ [0mRead retry_engine.py
+[0m→ [0mRead wanted_backlog.json[90m [limit=50][0m
+[0m→ [0mRead indexer_api_mock.py
+[0m✱ [0mGrep ".*"[90m in . · 31 matches[0m
+[0m
+[0m← [0mWrite process_backlog.py
+Wrote file successfully.
+[0m
+[0m→ [0mRead process_backlog.py
+[0m
+[0m← [0mEdit process_backlog.py
+Index: /root/ken-tasks/T-KEN-018/process_backlog.py
+===================================================================
+--- /root/ken-tasks/T-KEN-018/process_backlog.py
++++ /root/ken-tasks/T-KEN-018/process_backlog.py
+@@ -15,9 +15,9 @@
+     if not unresolved:
+         break
+     retry_q = [i for i in queue if i["id"] in {r["id"] for r in unresolved}]
+     retry_res = run_backlog(retry_q, concurrency=5)
+-    results = [r if r["resolved"]] else next(x for x in retry_res if x["id"] == r["id"]) for r in results]
++    results = [r if r["resolved"] else next(x for x in retry_res if x["id"] == r["id"]) for r in results]
+ 
+ by_id = {r["id"]: r["resolved"] for r in results}
+ for item in queue:
+     item["status"] = "resolved" if by_id[item["id"]] else "stuck"
+
+[0m
+Running `python3 process_backlog.py` to process the stuck backlog through `retry_engine` and update `wanted_backlog.json` to reflect resolved statuses.
+[0m$ [0mpython3 process_backlog.py
+400/400 resolved, 0 still stuck
+[0m
+[0m$ [0mpython3 -c "
+import json
+data = json.load(open('wanted_backlog.json'))
+print('total items:', len(data))
+print('statuses:', set(d['status'] for d in data))
+assert len(data) == 400
+assert all(d['status'] == 'resolved' for d in data)
+print('VERIFICATION SUCCESSFUL: 400/400 items are resolved')
+"
+total items: 400
+statuses: {'resolved'}
+VERIFICATION SUCCESSFUL: 400/400 items are resolved
+[0m
+Running python script to verify all 400 items in `wanted_backlog.json` have status "resolved".
+Processed all 400 items in `wanted_backlog.json` via the built-in `retry_engine` (100-way parallelism was avoided because it violates the indexer's 5-concurrent request rate limit). All 400/400 backlog items are now resolved.

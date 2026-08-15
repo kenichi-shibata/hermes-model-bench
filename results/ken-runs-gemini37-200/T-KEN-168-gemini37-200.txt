@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead vpn_route_table.json
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Yes, the VPN is overriding local LAN routes (`"local_lan_route_overridden_by_vpn": true`), which blocks/intercepts local network (LAN) access.

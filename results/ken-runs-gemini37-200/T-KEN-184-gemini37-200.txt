@@ -1,0 +1,4 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[91m[1mError: [0m{"code":400,"message":"PROHIBITED_CONTENT","metadata":{"error_type":"content_policy_violation","provider_code":"PROHIBITED_CONTENT"}}

@@ -1,0 +1,12 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead webhook_delivery_log.json
+[0m→ [0mRead CONTEXT_ONLY.md
+Partially — the evidence is mixed:
+
+- **`outbound_call_status: 200`** — the webhook HTTP request *was sent* and the receiving endpoint acknowledged it successfully.
+- **`message_appeared_in_channel: false`** — however, the expected end effect never happened: no message actually appeared in the target channel.
+
+**Conclusion:** The webhook fired at the transport level (delivered with a 200 response), but end-to-end delivery **cannot be confirmed** — the message never landed in the channel. A 200 only proves the endpoint accepted the request, not that it processed it correctly. Possible causes: the receiving app accepted-then-dropped the payload, an async job failed silently, wrong channel/target config, or an auth/permission issue on the channel side. If you're debugging this, check the receiver's internal logs rather than the delivery log.

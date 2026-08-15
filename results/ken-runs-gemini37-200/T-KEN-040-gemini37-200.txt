@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead r18_status_mock.json
+[0m→ [0mRead CONTEXT_ONLY.md
+Yes, R18 is currently blocked. The circuit breaker is open (`breaker_open: true`) due to `cloudflare_block` with 6 consecutive failures and 300 seconds of cooldown remaining.

@@ -1,0 +1,32 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead studio_catalog_page1.json
+[0m→ [0mRead studio_catalog_page2.json
+[0m→ [0mRead wanted_list.json
+[0m→ [0mRead CONTEXT_ONLY.md
+## Plan Report
+
+### What I found in the directory
+
+- **`studio_catalog_page1.json`** — a JSON array of 10 objects, `id` 0–9, each shaped `{"id": N, "title": "Scene N"}`, 2-space indented.
+- **`studio_catalog_page2.json`** — a JSON array of 5 objects, `id` 10–14, same shape and formatting.
+- **`wanted_list.json`** — currently just `[]` (empty array, 1 line).
+- **`CONTEXT_ONLY.md`** — one line of orientation text matching the task description; contains no additional instructions, traps, or extra files.
+
+### The real problem
+
+There is no bug or hidden complication. "Grab everything from this studio" means: the studio's full catalog is split across the two page files (15 items total, ids 0–14, disjoint, no duplicates), and the wanted list is empty. The task is simply to populate `wanted_list.json` with all 15 items from both pages, in order.
+
+### Concrete steps for the WORK model
+
+1. **Read** `studio_catalog_page1.json` and `studio_catalog_page2.json` (already verified valid JSON arrays; ids are disjoint: 0–9 and 10–14).
+2. **Concatenate** the two arrays in page order (page1 first, then page2), yielding 15 entries with ids 0–14 in ascending order. Preserve the exact object shape: `{"id": <int>, "title": "Scene <N>"}`.
+3. **Overwrite** `wanted_list.json` with the combined array, formatted as valid JSON with 2-space indentation to match the style of the source catalog files. Result should start with `{"id": 0, "title": "Scene 0"}` and end with `{"id": 14, "title": "Scene 14"}`.
+4. **Do not modify** `studio_catalog_page1.json`, `studio_catalog_page2.json`, or `CONTEXT_ONLY.md` — only `wanted_list.json` changes.
+5. **Verify** after writing:
+   - `wanted_list.json` parses as valid JSON (e.g., `python3 -c "import json; d=json.load(open('wanted_list.json')); print(len(d))"` → should print `15`).
+   - The ids are exactly `[0, 1, 2, ..., 14]` with no gaps or duplicates.
+
+No deduplication logic, pagination chasing, or error handling is needed — the wanted list is empty, the two pages are complete and non-overlapping, and there are no other files or page pointers in the directory.

@@ -1,0 +1,34 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead host_wide_vmstat.json
+[0m→ [0mRead one_service_metrics.json
+## Diagnosis: The host is resource-starved — it's not any one service
+
+### What the host-wide stats show 🔴
+
+| Signal | Value | Verdict |
+|---|---|---|
+| Swap usage | **7800 / 8192 MB (~95%)** | Critical — the host is out of real memory and leaning almost entirely on swap |
+| Top CPU consumer | `unrelated_batch_job.py` @ **95% CPU** | One runaway/unrelated process is saturating the CPU |
+
+### What the single service shows 🟢 (and why it's misleading)
+
+- `latency_ms: 45`, `error_rate: 0.001` — looks perfectly healthy.
+- But that's **one service's self-reported metrics**. It doesn't capture time spent waiting for CPU scheduling or stalled on swap-in — or that service may simply be getting lucky / not representative of the rest of the host.
+
+### Root cause
+
+The "slow across the board" feeling is **host-level contention**, not an app bug:
+
+1. **Memory pressure → swap thrashing.** With ~95% of swap consumed, the kernel is constantly paging memory to/from disk. Every process on the box pays that latency tax, even healthy ones.
+2. **CPU saturation by an unrelated workload.** `unrelated_batch_job.py` at 95% CPU is starving everything else of scheduler time (and is a prime suspect for the memory footprint driving the swapping).
+
+### Recommended actions
+
+1. **Investigate/kill or nice `unrelated_batch_job.py`** — it's the top CPU consumer and likely the memory hog. Check its RSS (`ps -o pid,rss,comm -p <pid>`) before killing.
+2. **Check what's actually in swap** (`vmstat 1 5`, watch `si`/`so` columns — non-zero values confirm active thrashing).
+3. **Add headroom**: either reduce the batch job's concurrency/memory, move it off this host, or increase RAM/swap.
+4. **Alert on host metrics, not just service metrics** — this incident is invisible if you only watch per-service latency/error dashboards. Add alerts for swap usage and host CPU steal/saturation.
+
+**Bottom line:** the healthy-looking service is a red herring. The host is swap-thrashing with 95% CPU eaten by an unrelated batch job — fix the noisy neighbor and the memory pressure, and the board-wide slowness goes away.

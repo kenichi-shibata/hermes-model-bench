@@ -1,0 +1,20 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead wanted_status_field.json
+[0m→ [0mRead scenes_status_field.json
+[0m→ [0mRead CONTEXT_ONLY.md
+**Yes — the backlog is moving (nearly drained). The `wanted` field is just stale.**
+
+| Field | searching | found | total |
+|---|---|---|---|
+| `wanted_status_field.json` (lags) | 40 | 10 | 50 |
+| `scenes_status_field.json` (truth) | 3 | 47 | 50 |
+
+Reading:
+- Both fields cover the same 50-item population, so they're directly comparable.
+- The lagging `wanted` field implies a backlog of 40 still pending — that is **not** the current reality.
+- The current-truth `scenes` field shows the backlog has burned down to **3 remaining** with **47 found** (94% processed).
+
+Conclusion: the backlog is moving fine; the `wanted` status field simply hasn't caught up — it under-reports progress by 37 items. Don't trust `wanted_status_field.json` for backlog decisions; use `scenes_status_field.json`.

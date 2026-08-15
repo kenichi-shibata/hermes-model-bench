@@ -1,0 +1,75 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead similar_performers.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead performer_vectors.json
+[0m→ [0mRead __pycache__
+[0m
+[0m$ [0mPYTHONDONTWRITEBYTECODE=1 python3 -c "
+import json, sys
+sys.path.insert(0, '.')
+from similar_performers import get_similar
+vectors = json.load(open('performer_vectors.json'))
+print('known id 2 ->', get_similar(2, vectors))
+try:
+    get_similar(42, vectors)
+except Exception as e:
+    print('missing id 42 ->', type(e).__name__, e)
+"
+known id 2 -> [('2', [0.2, 0.4]), ('1', [0.1, 0.2]), ('3', [0.30000000000000004, 0.6000000000000001]), ('0', [0.0, 0.0]), ('4', [0.4, 0.8])]
+missing id 42 -> KeyError '42'
+[0m
+Let me quickly confirm the current runtime behavior (read-only, no files written):
+## PLAN REPORT — "similar performers not loading for some of them"
+
+### What I found (investigation summary)
+
+The directory contains:
+- **`similar_performers.py`** — the only code file, 3 lines:
+  ```python
+  def get_similar(performer_id, vectors):
+      v = vectors[str(performer_id)]  # KeyError if missing
+      return sorted(vectors.items(), key=lambda kv: sum((a-b)**2 for a,b in zip(v, kv[1])))[:5]
+  ```
+- **`performer_vectors.json`** — vectors only for IDs `"0"`–`"6"`. As the context notes, some performers have **no vector** in this data.
+- `CONTEXT_ONLY.md` (just restates the file list) and a stale `__pycache__` — nothing else relevant.
+
+### The real problem (confirmed by execution)
+
+There are **two defects**, in priority order:
+
+1. **Primary (the reported bug):** Line 2 does `vectors[str(performer_id)]` with no guard. For any performer whose ID is absent from the vectors file (exactly the "some performers missing vectors" case), this raises `KeyError`, so similar performers fail to load *at all* for those performers. Verified: `get_similar(42, vectors)` → `KeyError: '42'`.
+
+2. **Secondary (correctness):** The sort includes the queried performer itself (distance 0, always ranked first), so the "similar performers" list is polluted with self and only returns 4 actual others. Verified: `get_similar(2, ...)` returns `('2', ...)` as its first hit. This isn't the load failure, but it's a latent bug in the same lines the fix will touch.
+
+(Non-issues, no action needed: `zip()` silently truncates on mismatched vector lengths — all current vectors are 2-D; Euclidean distance without the sqrt is fine for ranking.)
+
+### Exact steps for the WORK model
+
+1. **Edit only `similar_performers.py`. Do NOT touch `performer_vectors.json`** — the missing vectors are a data reality; the code must cope with them.
+
+2. Rewrite the function to handle a missing vector gracefully and exclude self. Suggested implementation (matches existing minimalist style):
+
+   ```python
+   def get_similar(performer_id, vectors):
+       key = str(performer_id)
+       v = vectors.get(key)
+       if v is None:
+           return []  # performer has no vector -> no similar performers, don't crash
+       return sorted(
+           ((pid, vec) for pid, vec in vectors.items() if pid != key),
+           key=lambda kv: sum((a - b) ** 2 for a, b in zip(v, kv[1])),
+       )[:5]
+   ```
+
+   - Use `.get()` instead of direct indexing; return `[]` on missing (preferred over raising — the caller/UI should show "no similar performers available" rather than error out).
+   - Filter `pid != key` so the performer is excluded from its own similar list, yielding up to 5 genuine others.
+
+3. **Verify** (no test files exist; check manually with `PYTHONDONTWRITEBYTECODE=1`):
+   - `get_similar(2, vectors)` → 5 results, none of them ID `"2"`, ordered nearest-first.
+   - `get_similar(999, vectors)` (missing ID) → `[]`, no exception.
+   - `get_similar("0", vectors)` (string input) → works, since IDs are normalized with `str()`.
+
+That's it — one tiny file, one targeted change, no data edits.

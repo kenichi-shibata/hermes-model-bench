@@ -1,0 +1,20 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead disk_fleet.json
+**Disk Fleet Status — 5 hosts checked**
+
+| Host | Used | Thin Prov. | Status |
+|------|------|-----------|--------|
+| host1 | 45% | no | ✅ OK |
+| host2 | 38% | no | ✅ OK |
+| host3 (`media-pool`) | **92%** | yes | 🔴 CRITICAL |
+| host4 | 22% | no | ✅ OK |
+| host5 | 30% | no | ✅ OK |
+
+**Fleet average:** 45.4% used — healthy overall.
+
+**⚠️ One alert:**
+- **host3 / media-pool at 92%** — critically full. Compounding the risk: it's **thin-provisioned**, so if the pool is overcommitted, actual physical space could run out abruptly rather than degrading gracefully. Recommend immediate action: expand the pool, migrate data off, or prune content.
+
+The remaining four hosts (22–45%) are all well within safe thresholds — no action needed.

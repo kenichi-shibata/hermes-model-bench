@@ -1,0 +1,26 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead sab_config.json
+[0m→ [0mRead speed_log.json
+[0m
+[0m← [0mEdit sab_config.json
+Index: /root/ken-tasks/T-KEN-022/sab_config.json
+===================================================================
+--- /root/ken-tasks/T-KEN-022/sab_config.json
++++ /root/ken-tasks/T-KEN-022/sab_config.json
+@@ -1,4 +1,4 @@
+ {
+-  "max_download_speed_kbps": 500,
++  "max_download_speed_kbps": 0,
+   "connections": 20
+ }
+\ No newline at end of file
+
+[0m
+[0m→ [0mRead sab_config.json
+SABnzbd was slow because `max_download_speed_kbps` was capped at `500` in `sab_config.json`, which directly matches the ~485–494 kbps throughput pinned in `speed_log.json`. 
+
+`sab_config.json` has been updated to set `"max_download_speed_kbps": 0` (unlimited).

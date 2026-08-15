@@ -1,0 +1,13 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead mem_by_process.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+Based on `mem_by_process.json`, the process has a **linear memory leak**:
+
+- **Initial RSS:** 200 MB (hour 0)
+- **Current RSS:** 1880 MB (hour 42)
+- **Growth rate:** Strictly linear increase of **40 MB/hour** (+240 MB every 6 hours)
+- **Conclusion:** Memory is not being released/garbage collected over time, indicating an unbounded leak that will eventually lead to an Out-Of-Memory (OOM) crash if not restarted or fixed.

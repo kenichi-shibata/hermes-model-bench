@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead pr_diff_stats.json
+Yes. Out of 200 total lines changed, only 15 lines are the actual fix, while 185 lines (92.5%) are reformatting.

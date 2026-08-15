@@ -1,0 +1,59 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m✱ [0mGlob "**/*"[90m in . · 4 matches[0m
+[0m→ [0mRead dedupe_merge.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead duplicate_groups.json
+Let me quickly verify the compiled bytecode matches the source (to rule out any hidden logic), without modifying anything.
+[0m
+[0m$ [0mstrings __pycache__/dedupe_merge.cpython-313.pyc
+duplicate
+group
+items
+)/root/ken-tasks/T-KEN-037/dedupe_merge.py
+flag_duplicatesr	
+<module>r
+[0m
+[0m$ [0mpython3 -B -c "
+import json, sys
+sys.dont_write_bytecode = True
+from dedupe_merge import flag_duplicates
+groups = json.load(open('duplicate_groups.json'))
+result = flag_duplicates([dict(g) for g in groups])
+print('input length :', len(groups))
+print('output length:', len(result))
+print('output       :', json.dumps(result))
+"
+input length : 2
+output length: 2
+output       : [{"id": 1, "duplicate": false}, {"id": 2, "duplicate": true}]
+[0m
+Investigation complete. Here is the plan.
+
+## Verdict: it's only flagging, not merging
+
+**Evidence:**
+- `dedupe_merge.py` is 5 lines: `flag_duplicates(group)` loops over `group[1:]`, sets `item['duplicate'] = True`, and returns the **entire group unmodified**. The trailing comment even admits it: `# never actually removes/merges anything`.
+- Empirical run against the real data confirms it: 2 items in → 2 items out; the only change is `{"id": 2}` gets `duplicate: true`. No records removed, no fields combined.
+- The `.pyc` in `__pycache__` matches the source — no hidden logic.
+- Secondary finding: **nothing calls this function** — no `__main__`, no CLI, no other scripts in the directory. And `duplicate_groups.json` (a flat list of 2 items, both `duplicate: false`) looks like unprocessed input.
+
+## The real problem
+
+If "dedupe" is supposed to mean *merge each duplicate group down to one canonical record*, the current code does not do that — it only annotates. Additionally, there is no entry point, so even the flagging never runs.
+
+## Concrete steps for the WORK model
+
+1. **Edit `dedupe_merge.py`** — replace the flag-only logic with real merging:
+   - Add `merge_group(group) -> dict`: take `group[0]` as the canonical survivor, then fold in the remaining items by filling in keys the survivor is missing (or that are `None`/empty) from the duplicates; optionally record `"merged_from": [ids...]`. Return a **single dict**, not the group.
+   - Add `dedupe(groups) -> list`: return `[merge_group(g) for g in groups]` so one record comes out per group.
+   - Keep or delete `flag_duplicates` — nothing in the directory calls it, so either is safe; deleting keeps the file honest about what it does.
+2. **Add a minimal entry point** in the same file (`if __name__ == "__main__":`) that loads `duplicate_groups.json`, runs `dedupe`, and prints the merged result to stdout. Do **not** overwrite `duplicate_groups.json` — it is input-shaped data; persistence wasn't requested.
+3. **Verify by running** (no new test files needed; a one-liner suffices):
+   - `python3 -B dedupe_merge.py` → expect **1** merged record from the 2-item group, e.g. `{"id": 1, "duplicate": false, "merged_from": [2]}` (exact shape per step 1).
+   - Edge-case checks inline: empty group, single-item group, and items with disjoint keys (survivor should gain the missing keys).
+4. **Report** the before/after: before = 2 records out with a flag; after = 1 merged record per group.
+
+The only file to modify is `dedupe_merge.py`. No other files need changes.

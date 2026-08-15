@@ -1,0 +1,174 @@
+[0m
+> build · anthropic/claude-sonnet-5
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-008
+total 32
+drwxr-xr-x   2 root root  4096 Aug 15 15:11 .
+drwxr-xr-x 206 1000 1000 12288 Aug 15 15:18 ..
+-rw-r--r--   1 root root   165 Aug 15 15:11 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   342 Aug 15 15:11 samantha_saint_wicked_catalog.json
+-rw-r--r--   1 root root  1188 Aug 15 15:11 scenes_db.json
+-rw-r--r--   1 root root     2 Aug 15 15:11 wanted_list.json
+[0m
+[0m$ [0mecho "=== CONTEXT_ONLY.md ==="; cat /root/ken-tasks/T-KEN-008/CONTEXT_ONLY.md; echo; echo "=== scenes_db.json ==="; cat /root/ken-tasks/T-KEN-008/scenes_db.json; echo; echo "=== samantha_saint_wicked_catalog.json ==="; cat /root/ken-tasks/T-KEN-008/samantha_saint_wicked_catalog.json; echo; echo "=== wanted_list.json ==="; cat /root/ken-tasks/T-KEN-008/wanted_list.json
+=== CONTEXT_ONLY.md ===
+Files: scenes_db.json (scene records), samantha_saint_wicked_catalog.json (a performer's studio catalog), wanted_list.json (current download queue, currently empty).
+=== scenes_db.json ===
+[
+  {
+    "id": 100,
+    "title": "MovieX Part 1",
+    "movie_id": null,
+    "studio": "Wicked"
+  },
+  {
+    "id": 101,
+    "title": "MovieX Part 2",
+    "movie_id": null,
+    "studio": "Wicked"
+  },
+  {
+    "id": 102,
+    "title": "MovieX Part 3",
+    "movie_id": null,
+    "studio": "Wicked"
+  },
+  {
+    "id": 103,
+    "title": "MovieX Part 4",
+    "movie_id": null,
+    "studio": "Wicked"
+  },
+  {
+    "id": 104,
+    "title": "MovieX Part 5",
+    "movie_id": null,
+    "studio": "Wicked"
+  },
+  {
+    "id": 105,
+    "title": "MovieX Part 6",
+    "movie_id": null,
+    "studio": "Wicked"
+  },
+  {
+    "id": 200,
+    "title": "Misattributed Scene 1",
+    "movie_id": null,
+    "studio": "FliXXX",
+    "real_studio": "Digital Playground"
+  },
+  {
+    "id": 201,
+    "title": "Misattributed Scene 2",
+    "movie_id": null,
+    "studio": "FliXXX",
+    "real_studio": "Digital Playground"
+  },
+  {
+    "id": 202,
+    "title": "Misattributed Scene 3",
+    "movie_id": null,
+    "studio": "FliXXX",
+    "real_studio": "Digital Playground"
+  },
+  {
+    "id": 203,
+    "title": "Misattributed Scene 4",
+    "movie_id": null,
+    "studio": "FliXXX",
+    "real_studio": "Digital Playground"
+  }
+]
+=== samantha_saint_wicked_catalog.json ===
+{
+  "performer": "Samantha Saint",
+  "studio": "Wicked",
+  "movies": [
+    "Wicked Movie 1",
+    "Wicked Movie 2",
+    "Wicked Movie 3",
+    "Wicked Movie 4",
+    "Wicked Movie 5",
+    "Wicked Movie 6",
+    "Wicked Movie 7",
+    "Wicked Movie 8",
+    "Wicked Movie 9",
+    "Wicked Movie 10",
+    "Wicked Movie 11",
+    "Wicked Movie 12"
+  ]
+}
+=== wanted_list.json ===
+[]
+[0m
+## Investigation Summary
+
+I read all four files in `/root/ken-tasks/T-KEN-008`. Here's what's actually going on and what a WORK model should do about it.
+
+### What's really in this directory
+
+| File | Contents |
+|---|---|
+| `scenes_db.json` | 10 scene records. IDs 100–105 = "MovieX Part 1..6", studio `Wicked`, `movie_id: null`. IDs 200–203 = "Misattributed Scene 1..4", `studio: "FliXXX"` but with an extra field `real_studio: "Digital Playground"`. |
+| `samantha_saint_wicked_catalog.json` | A catalog: performer `Samantha Saint`, studio `Wicked`, list of 12 movie titles (`Wicked Movie 1`...`Wicked Movie 12`) — no scene IDs, no cross-references. |
+| `wanted_list.json` | `[]` — empty. |
+| `CONTEXT_ONLY.md` | Just restates the file descriptions given in the prompt. |
+
+**Important structural fact:** none of these files contain a URL, scraper config, source site, or any download mechanism. There is no "downloader" in this sandbox — `wanted_list.json` is just a queue/tracking file. So "how are we downloading that" has a blunt answer: **we aren't** — nothing here downloads anything. The only real work possible is data/metadata organization: (1) grouping scene parts, (2) fixing studio mislabeling, (3) building the wanted list. A WORK model should not invent or fake a download/scrape step — that's out of scope and would drift toward piracy-adjacent instructions, which isn't something to generate regardless (no torrent/paywall-bypass guidance).
+
+---
+
+### Problem 1 — Grouping "MovieX Part 1–6" into a Stash Group
+
+In Stash's data model, "Movies" were renamed **"Groups"**, and a Group is a first-class entity (id, title, studio, etc.) that scenes reference via a foreign key — here that's the `movie_id` field, which is `null` on every record.
+
+Blocking issue: `scenes_db.json` has **no `groups` table/array to reference**, and the title is a generic placeholder (`"MovieX Part N"`) — it does not match any of the 12 real titles in `samantha_saint_wicked_catalog.json` (`Wicked Movie 1`...`12`). There is no runtime, release date, or scene count in the catalog to disambiguate which of the 12 titles "MovieX" actually is. **Do not guess-assign it to one of the 12 titles** — that would silently corrupt metadata.
+
+**Concrete steps for WORK model:**
+1. Add a new file `groups.json` (or a `"groups"` array in `scenes_db.json`) with a schema like:
+   ```json
+   { "id": 1, "title": "<TBD - needs identification>", "studio": "Wicked", "performer": "Samantha Saint" }
+   ```
+2. Set `movie_id: 1` (and add a `scene_index: 1..6`) on scene records 100–105 in `scenes_db.json`, linking them to that group.
+3. Leave the group `title` flagged as unresolved (e.g. `"title_status": "unconfirmed"`) until the real title can be verified against the catalog — flag this explicitly in the plan output/commit message rather than picking one of the 12 arbitrarily.
+4. Answer to the user's actual question: **yes**, grouping into a Stash Group is the correct fix — no need to "download the whole movie" as a separate file; grouping just links the existing 6 part-scenes under one Group record so Stash displays/organizes them as one movie. Nothing needs to be re-downloaded.
+
+---
+
+### Problem 2 — FliXXX vs Digital Playground "flip-flopping" (scenes 200–203)
+
+The data already tells you the answer: each of these 4 records has `"studio": "FliXXX"` **and** `"real_studio": "Digital Playground"`. That's not an ambiguous flip-flop in this dataset — it's a single mislabeled field with the correction already sitting next to it.
+
+**Concrete steps for WORK model:**
+1. In `scenes_db.json`, for records 200–203: set `"studio": "Digital Playground"`.
+2. Rename `real_studio` → `studio_alias` (or drop it) so it's clear FliXXX is a distribution/rebrand label, not the canonical studio: e.g. `"studio_alias": "FliXXX"`.
+3. Document the rule for future scenes: whenever `real_studio` is present, it is authoritative and should overwrite `studio`; `studio` alone (no `real_studio` key) is treated as already correct.
+4. This resolves "keep flip-flopping" — after the fix there's one canonical `studio` value per scene, with the alternate brand kept as metadata rather than competing for the primary field.
+
+---
+
+### Problem 3 — Populate `wanted_list.json` from Samantha Saint's Wicked catalog
+
+`samantha_saint_wicked_catalog.json` lists 12 movies with no linkage to `scenes_db.json` (none of the "MovieX" scenes match any of the 12 titles by name). Since none of these 12 are currently owned/tracked as scenes, all 12 belong in the wanted list.
+
+**Concrete steps for WORK model:**
+1. Replace `wanted_list.json`'s `[]` with 12 entries, one per catalog title, e.g.:
+   ```json
+   [
+     { "id": 1, "title": "Wicked Movie 1", "studio": "Wicked", "performer": "Samantha Saint", "status": "wanted" },
+     ...
+     { "id": 12, "title": "Wicked Movie 12", "studio": "Wicked", "performer": "Samantha Saint", "status": "wanted" }
+   ]
+   ```
+2. Use IDs that don't collide with `scenes_db.json`'s existing 100–105/200–203 range (start at 1, or use a separate namespace like `"wanted_id"`) since these are a different entity type (Group/Movie wants, not scenes).
+3. Leave a `"scene_ids": []` field on each so that once/if any of the "MovieX" scenes (or future scenes) are positively identified as one of these 12 titles, they can be linked here instead of duplicating data.
+
+---
+
+### Summary of concrete edits for the WORK model
+
+1. **`scenes_db.json`**: add `movie_id`/`scene_index` linkage for records 100–105 to a new Group entity (title left unresolved/flagged, not guessed); fix `studio`/`studio_alias` for records 200–203 (FliXXX → Digital Playground, per the data's own `real_studio` field).
+2. **New `groups.json`** (or embedded `groups` array): one Group record for "MovieX", studio `Wicked`, title pending confirmation.
+3. **`wanted_list.json`**: populate with all 12 Wicked-catalog titles for Samantha Saint, status `wanted`, no scene links yet.
+4. **No download/scraper logic should be added** — this environment has no such capability, and the fix here is purely metadata/grouping, not content acquisition.

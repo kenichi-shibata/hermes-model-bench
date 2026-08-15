@@ -1,0 +1,61 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead download_queue.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit download_queue.json
+Index: /root/ken-tasks/T-KEN-026/download_queue.json
+===================================================================
+--- /root/ken-tasks/T-KEN-026/download_queue.json
++++ /root/ken-tasks/T-KEN-026/download_queue.json
+@@ -12,11 +12,6 @@
+   {
+     "id": 5,
+     "title": "Scene C Remastered",
+     "content_hash": "ddd"
+-  },
+-  {
+-    "id": 7,
+-    "title": "Scene C v2",
+-    "content_hash": "ccc"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+Found the duplicates: IDs 3 and 7 share content_hash `"ccc"`. ID 5 ("Scene C Remastered") has a similar title but a distinct hash `"ddd"`, so it's a genuinely different file and stays. I'll remove the later duplicate (id 7) and keep the first occurrence.
+[0m$ [0mpython3 -c "
+import json
+q = json.load(open('download_queue.json'))
+hashes = [e['content_hash'] for e in q]
+assert len(hashes) == len(set(hashes)), 'dupes remain'
+print(json.dumps(q, indent=2))
+print('OK: no duplicate content hashes')
+"
+[
+  {
+    "id": 1,
+    "title": "Scene A",
+    "content_hash": "aaa"
+  },
+  {
+    "id": 3,
+    "title": "Scene C (1)",
+    "content_hash": "ccc"
+  },
+  {
+    "id": 5,
+    "title": "Scene C Remastered",
+    "content_hash": "ddd"
+  }
+]
+OK: no duplicate content hashes
+[0m
+Done. Cleaned up `download_queue.json`:
+
+- **Removed:** id 7 ("Scene C v2", hash `ccc`) — exact duplicate of id 3 by content hash; kept the first occurrence (id 3).
+- **Kept:** id 5 ("Scene C Remastered") — despite the similar title, its hash `ddd` is distinct, so it's a genuinely different download.
+
+The queue now has 3 entries with unique content hashes, verified as valid JSON with no remaining dupes.

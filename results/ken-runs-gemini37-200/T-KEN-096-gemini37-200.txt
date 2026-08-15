@@ -1,0 +1,12 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead refusal_context.json
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+The refusal is **overly cautious**.
+
+### Reason:
+- Both inputs `a` and `b` are identical (`{"data": "x"}`).
+- Because there are no conflicting keys, incompatible data types, or value discrepancies between `a` and `b`, the merge operation can resolve cleanly without collision. 
+- Triggering `"generic_merge_guard"` here is a false positive / overly defensive check.

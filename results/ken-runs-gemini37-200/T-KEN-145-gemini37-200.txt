@@ -1,0 +1,5 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead page_analysis.json
+No. It was a real outage lasting 5 minutes that affected 340 requests (`was_real_outage: true`).

@@ -1,0 +1,13 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead check_history.json
+The false positive rate for the check is **25%** (0.25).
+
+### Breakdown:
+- **Total Triggers:** 40
+- **True Positives (`was_real_issue: true`):** 30
+- **False Positives (`was_real_issue: false`):** 10
+- **Calculation:** 10 / 40 = 0.25 (25%)

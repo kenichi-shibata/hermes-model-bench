@@ -1,0 +1,11 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead network_symptoms.json
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+Analysis of `network_symptoms.json`:
+
+- **`10.0.1.0/24`**: **Healthy** — 0% packet loss.
+- **`10.0.2.0/24`**: **Degraded** — 50% packet loss (indicates link flapping, interface errors/duplex mismatch, congestion drops, or asymmetric routing failure on this subnet).

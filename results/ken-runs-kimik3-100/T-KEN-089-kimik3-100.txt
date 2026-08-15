@@ -1,0 +1,35 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead swap_stats.json
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 204 1000 1000 12288 Aug 15 13:35 ..
+-rw-r--r--   1 root root    23 Aug 15 13:35 CONTEXT_ONLY.md
+-rw-r--r--   1 root root    48 Aug 15 13:35 swap_stats.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mfree -m; echo "---"; swapon --show 2>/dev/null || echo "no swapon output"
+total        used        free      shared  buff/cache   available
+Mem:            1536         683         655         261         458         852
+Swap:            512           0         512
+---
+NAME TYPE    SIZE USED PRIO
+none virtual 512M   0B    0
+[0m
+Swap check complete — verdict: **swap is not the culprit.**
+
+**From `swap_stats.json`:**
+- `swap_used_mb`: **0**
+- `swap_total_mb`: 4096
+
+**Live system confirmation (`free -m`):**
+- Swap: 512 MB total, **0 MB used**, 512 MB free
+- RAM: 1536 MB total, 852 MB available — no memory pressure forcing swaps
+
+**Conclusion:** The system isn't touching swap at all (0 bytes used). If the app is slow or misbehaving, swapping/paging is ruled out — don't blame "the app is swapping." Look elsewhere (CPU, I/O, lock contention, app-level leaks, etc.).
+
+One minor note: the JSON claims 4096 MB total swap while the live host shows 512 MB — the file may be stale or from a different environment. But since both agree on **0 used**, the diagnosis stands either way.

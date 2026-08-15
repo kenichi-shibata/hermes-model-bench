@@ -1,0 +1,229 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead wanted_list.json
+[0m✱ [0mGlob "*"[90m in . · 4 matches[0m
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -1,66 +1,72 @@
+ [
+   {
+     "id": 100,
+     "title": "MovieX Part 1",
+-    "movie_id": null,
++    "movie_id": 1000,
++    "movie_title": "MovieX",
+     "studio": "Wicked"
+   },
+   {
+     "id": 101,
+     "title": "MovieX Part 2",
+-    "movie_id": null,
++    "movie_id": 1000,
++    "movie_title": "MovieX",
+     "studio": "Wicked"
+   },
+   {
+     "id": 102,
+     "title": "MovieX Part 3",
+-    "movie_id": null,
++    "movie_id": 1000,
++    "movie_title": "MovieX",
+     "studio": "Wicked"
+   },
+   {
+     "id": 103,
+     "title": "MovieX Part 4",
+-    "movie_id": null,
++    "movie_id": 1000,
++    "movie_title": "MovieX",
+     "studio": "Wicked"
+   },
+   {
+     "id": 104,
+     "title": "MovieX Part 5",
+-    "movie_id": null,
++    "movie_id": 1000,
++    "movie_title": "MovieX",
+     "studio": "Wicked"
+   },
+   {
+     "id": 105,
+     "title": "MovieX Part 6",
+-    "movie_id": null,
++    "movie_id": 1000,
++    "movie_title": "MovieX",
+     "studio": "Wicked"
+   },
+   {
+     "id": 200,
+     "title": "Misattributed Scene 1",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 201,
+     "title": "Misattributed Scene 2",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 202,
+     "title": "Misattributed Scene 3",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 203,
+     "title": "Misattributed Scene 4",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+[0m← [0mEdit wanted_list.json
+Index: /root/ken-tasks/T-KEN-008/wanted_list.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/wanted_list.json
++++ /root/ken-tasks/T-KEN-008/wanted_list.json
+@@ -1,1 +1,74 @@
+-[]
+\ No newline at end of file
++[
++  {
++    "type": "movie",
++    "title": "Wicked Movie 1",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 2",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 3",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 4",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 5",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 6",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 7",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 8",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 9",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 10",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 11",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  },
++  {
++    "type": "movie",
++    "title": "Wicked Movie 12",
++    "studio": "Wicked",
++    "performer": "Samantha Saint"
++  }
++]
+\ No newline at end of file
+
+[0m
+[0m$ [0mpython3 -c '
+import json
+
+with open("scenes_db.json") as f:
+    scenes = json.load(f)
+with open("wanted_list.json") as f:
+    wanted = json.load(f)
+with open("samantha_saint_wicked_catalog.json") as f:
+    catalog = json.load(f)
+
+print("scenes count:", len(scenes))
+movie_ids = [s.get("movie_id") for s in scenes if s["id"] in range(100, 106)]
+print("movie_ids for 100-105:", movie_ids)
+assert len(movie_ids) == 6 and len(set(movie_ids)) == 1 and movie_ids[0] is not None
+
+flixxx_scenes = [s for s in scenes if s.get("studio") == "FliXXX"]
+print("flixxx scenes count:", len(flixxx_scenes))
+assert len(flixxx_scenes) == 0
+
+dp_scenes = [s for s in scenes if s["id"] in range(200, 204)]
+print("dp scenes studios:", [s.get("studio") for s in dp_scenes])
+assert all(s.get("studio") == "Digital Playground" for s in dp_scenes)
+
+print("wanted count:", len(wanted))
+assert len(wanted) == 12
+assert all(w["studio"] == "Wicked" and w["performer"] == "Samantha Saint" for w in wanted)
+assert [w["title"] for w in wanted] == catalog["movies"]
+
+print("ALL CHECKS PASSED")
+'
+scenes count: 10
+movie_ids for 100-105: [1000, 1000, 1000, 1000, 1000, 1000]
+flixxx scenes count: 0
+dp scenes studios: ['Digital Playground', 'Digital Playground', 'Digital Playground', 'Digital Playground']
+wanted count: 12
+ALL CHECKS PASSED
+[0m
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead wanted_list.json
+All tasks have been executed and verified:
+
+1. **Grouped Movie Parts**: In `scenes_db.json`, assigned shared `movie_id: 1000` and `movie_title: "MovieX"` to scenes 100–105.
+2. **Fixed Studio Attribution**: In `scenes_db.json`, updated `studio` from `"FliXXX"` to canonical `"Digital Playground"` for scenes 200–203 while retaining `real_studio`.
+3. **Queued Catalog Downloads**: Populated `wanted_list.json` with all 12 Samantha Saint movies from `samantha_saint_wicked_catalog.json`.

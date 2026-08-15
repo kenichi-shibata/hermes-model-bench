@@ -1,0 +1,56 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead new_scene_flag.py
+[0m→ [0mRead scenes_flagged.json
+The bug is clear from these two files. Let me verify the behavior, then fix it.
+[0m
+[0m$ [0mpython3 -c "
+import json, datetime
+from new_scene_flag import is_new
+scenes = json.load(open('scenes_flagged.json'))
+for s in scenes:
+    print('id:', s['id'], '| release_date:', s['release_date'], '| ingested_at:', s['ingested_at'], '| is_new ->', is_new(s))
+print('today:', datetime.date.today())
+"
+id: 1 | release_date: 2020-01-01 | ingested_at: 2026-08-10T00:00:00 | is_new -> True
+today: 2026-08-15
+[0m
+[0m← [0mEdit new_scene_flag.py
+Index: /root/ken-tasks/T-KEN-047/new_scene_flag.py
+===================================================================
+--- /root/ken-tasks/T-KEN-047/new_scene_flag.py
++++ /root/ken-tasks/T-KEN-047/new_scene_flag.py
+@@ -1,4 +1,4 @@
+ import datetime
+ def is_new(scene):
+-    ingested = datetime.datetime.fromisoformat(scene['ingested_at'])
+-    return (datetime.datetime.now() - ingested).days < 7
++    released = datetime.date.fromisoformat(scene['release_date'])
++    return (datetime.date.today() - released).days < 7
+
+[0m
+[0m$ [0mpython3 -c "
+import json
+from new_scene_flag import is_new
+scenes = json.load(open('scenes_flagged.json'))
+for s in scenes:
+    print('id:', s['id'], '| release_date:', s['release_date'], '| is_new ->', is_new(s))
+# sanity check: a genuinely recent release should still flag as new
+print('recent release test ->', is_new({'release_date': '2026-08-12'}))
+"
+id: 1 | release_date: 2020-01-01 | is_new -> False
+recent release test -> True
+[0m
+**Why old scenes showed as new:** `is_new()` was measuring "newness" by `ingested_at` (when the scene was added to your system) instead of `release_date` (when the scene actually came out). Scene id 1 was released 2020-01-01 but ingested 2026-08-10 — only 5 days ago — so the `< 7 days` check flagged it as new. Any old catalog content gets flagged "new" every time it's re-ingested.
+
+**Fix applied** in `new_scene_flag.py` — it now checks `release_date`:
+
+```python
+import datetime
+def is_new(scene):
+    released = datetime.date.fromisoformat(scene['release_date'])
+    return (datetime.date.today() - released).days < 7
+```
+
+Verified: the 2020 scene now returns `False`, and a scene released 2026-08-12 still correctly returns `True`.

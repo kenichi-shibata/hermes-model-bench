@@ -1,0 +1,100 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m 4 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead wanted_list.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead scenes_db.json[90m [offset=1, limit=100][0m
+[0m✱ [0mGlob ".*"[90m 0 matches[0m
+[0m
+[0m← [0mEdit wanted_list.json
+Index: /root/ken-tasks/T-KEN-008/wanted_list.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/wanted_list.json
++++ /root/ken-tasks/T-KEN-008/wanted_list.json
+@@ -1,1 +1,14 @@
+-[]
+\ No newline at end of file
++[
++  "Wicked Movie 1",
++  "Wicked Movie 2",
++  "Wicked Movie 3",
++  "Wicked Movie 4",
++  "Wicked Movie 5",
++  "Wicked Movie 6",
++  "Wicked Movie 7",
++  "Wicked Movie 8",
++  "Wicked Movie 9",
++  "Wicked Movie 10",
++  "Wicked Movie 11",
++  "Wicked Movie 12"
++]
+\ No newline at end of file
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks/T-KEN-008/scenes_db.json
++++ /root/ken-tasks/T-KEN-008/scenes_db.json
+@@ -38,29 +38,29 @@
+   {
+     "id": 200,
+     "title": "Misattributed Scene 1",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 201,
+     "title": "Misattributed Scene 2",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 202,
+     "title": "Misattributed Scene 3",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 203,
+     "title": "Misattributed Scene 4",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+[0m→ [0mRead wanted_list.json
+[0m→ [0mRead scenes_db.json
+### 1. Handling Multi-Part Movie Scenes in Stash
+* **Grouping into a Stash "Group" (Movie):** 
+  * Yes, Stash natively supports grouping multi-part scenes using the **Groups** (formerly "Movies") feature.
+  * Create a Group (e.g., *MovieX*), link each scene part (IDs 100–105) to that Group, and set the **Scene Index** (1 through 6) to preserve chronological order.
+* **Downloading Individual Parts vs. Full Movie:**
+  * **Individual Parts:** Download each part as a separate file, import each as an individual scene, and link them under the same Group.
+  * **Full Movie:** If you prefer a single file or parts are unavailable, you can download the entire movie as one release and import it as a single scene associated with the Group metadata.
+
+---
+
+### 2. FliXXX vs. Digital Playground Metadata Conflict
+* **Cause:** FliXXX is a network/distributor brand hosting Digital Playground productions. Scrapers alternate between tagging the distribution network (*FliXXX*) and the original production studio (*Digital Playground*).
+* **Fix Applied:** 
+  * Updated `scenes_db.json` (IDs 200–203) so the canonical `studio` is set to **`Digital Playground`**.
+  * In Stash, configure **Digital Playground** as the primary studio and set **FliXXX** as a network or studio alias to prevent scraper flip-flopping.
+
+---
+
+### 3. Samantha Saint's Wicked Movies Queue
+* Loaded all 12 movies from `samantha_saint_wicked_catalog.json` into `wanted_list.json`:
+  * *Wicked Movie 1* through *Wicked Movie 12*

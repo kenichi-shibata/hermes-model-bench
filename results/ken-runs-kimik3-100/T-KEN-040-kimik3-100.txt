@@ -1,0 +1,12 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead r18_status_mock.json
+**Yes, r18 is blocked again.** Per the status file:
+
+- **Breaker open:** `true`
+- **Reason:** Cloudflare block
+- **Consecutive fails:** 6
+- **Cooldown remaining:** 300s (5 minutes)
+
+Recommendation: don't retry r18 until the cooldown expires. After ~5 minutes you can attempt a single probe — if it succeeds, the breaker should reset; if it fails again, expect the cooldown to restart (and likely escalate). This is the 6th consecutive failure, so repeated immediate retries will just keep tripping the breaker.

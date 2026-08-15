@@ -1,0 +1,551 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead movie_grouping.py
+[0m→ [0mRead scenes_movie_parts.json
+[0m
+[0m$ [0mpython3 -c "
+import dis, marshal
+with open('__pycache__/movie_grouping.cpython-313.pyc', 'rb') as f:
+    code = marshal.loads(f.read()[16:])
+dis.dis(code)
+"
+0           RESUME                   0
+
+  1           LOAD_CONST               0 (0)
+              LOAD_CONST               1 (None)
+              IMPORT_NAME              0 (re)
+              STORE_NAME               0 (re)
+
+  3           LOAD_NAME                0 (re)
+              LOAD_ATTR                2 (compile)
+              PUSH_NULL
+
+  4           LOAD_CONST               2 ("\n    [\\s\\-:—–]*                                   # optional separator\n    [\\(\\[]?                                      # optional opening bracket\n    (?:part|pt\\.?|vol\\.?|volume|episode|ep\\.?)   # 'part' keyword\n    [\\s\\.]*\n    (?:\\d+|[ivxlcdm]+)                           # number or roman numeral\n    [\\)\\]]?                                      # optional closing bracket\n    \\s*$\n    ")
+
+ 13           LOAD_NAME                0 (re)
+              LOAD_ATTR                4 (IGNORECASE)
+              LOAD_NAME                0 (re)
+              LOAD_ATTR                6 (VERBOSE)
+              BINARY_OP                7 (|)
+
+  3           CALL                     2
+              STORE_NAME               4 (PART_SUFFIX_RE)
+
+ 17           LOAD_CONST               3 (<code object base_title at 0x7574eb017930, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 17>)
+              MAKE_FUNCTION
+              STORE_NAME               5 (base_title)
+
+ 22           LOAD_CONST               4 (<code object group_scenes at 0x7574eae99480, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 22>)
+              MAKE_FUNCTION
+              STORE_NAME               6 (group_scenes)
+
+ 38           LOAD_CONST               5 (<code object assign_movie_ids at 0x407bcaf0, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 38>)
+              MAKE_FUNCTION
+              STORE_NAME               7 (assign_movie_ids)
+
+ 57           LOAD_CONST               6 (<code object find_ungrouped at 0x7574eae74db0, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 57>)
+              MAKE_FUNCTION
+              STORE_NAME               8 (find_ungrouped)
+              RETURN_CONST             1 (None)
+
+Disassembly of <code object base_title at 0x7574eb017930, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 17>:
+ 17           RESUME                   0
+
+ 19           LOAD_GLOBAL              0 (PART_SUFFIX_RE)
+              LOAD_ATTR                3 (sub + NULL|self)
+              LOAD_CONST               1 ('')
+              LOAD_FAST                0 (title)
+              COPY                     1
+              TO_BOOL
+              POP_JUMP_IF_TRUE         2 (to L1)
+              POP_TOP
+              LOAD_CONST               1 ('')
+      L1:     CALL                     2
+              LOAD_ATTR                5 (strip + NULL|self)
+              CALL                     0
+              RETURN_VALUE
+
+Disassembly of <code object group_scenes at 0x7574eae99480, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 22>:
+ 22           RESUME                   0
+
+ 29           BUILD_MAP                0
+              STORE_FAST               1 (groups)
+
+ 30           LOAD_FAST                0 (scenes)
+              GET_ITER
+      L1:     FOR_ITER                82 (to L3)
+              STORE_FAST               2 (scene)
+
+ 31           LOAD_FAST                2 (scene)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               1 ('movie_id')
+              CALL                     1
+              STORE_FAST               3 (key)
+
+ 32           LOAD_FAST                3 (key)
+              POP_JUMP_IF_NOT_NONE    26 (to L2)
+
+ 33           LOAD_GLOBAL              3 (base_title + NULL)
+              LOAD_FAST                2 (scene)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               2 ('title')
+              CALL                     1
+              CALL                     1
+              STORE_FAST               3 (key)
+
+ 34   L2:     LOAD_FAST                1 (groups)
+              LOAD_ATTR                5 (setdefault + NULL|self)
+              LOAD_FAST                3 (key)
+              BUILD_LIST               0
+              CALL                     2
+              LOAD_ATTR                7 (append + NULL|self)
+              LOAD_FAST                2 (scene)
+              CALL                     1
+              POP_TOP
+              JUMP_BACKWARD           84 (to L1)
+
+ 30   L3:     END_FOR
+              POP_TOP
+
+ 35           LOAD_FAST                1 (groups)
+              RETURN_VALUE
+
+Disassembly of <code object assign_movie_ids at 0x407bcaf0, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 38>:
+  38            RESUME                   0
+
+  44            LOAD_FAST                0 (scenes)
+                GET_ITER
+                LOAD_FAST_AND_CLEAR      1 (s)
+                SWAP                     2
+        L1:     BUILD_LIST               0
+                SWAP                     2
+                GET_ITER
+        L2:     FOR_ITER                46 (to L5)
+                STORE_FAST               1 (s)
+                LOAD_GLOBAL              1 (isinstance + NULL)
+                LOAD_FAST                1 (s)
+                LOAD_ATTR                3 (get + NULL|self)
+                LOAD_CONST               1 ('movie_id')
+                CALL                     1
+                LOAD_GLOBAL              4 (int)
+                CALL                     2
+                TO_BOOL
+        L3:     POP_JUMP_IF_TRUE         2 (to L4)
+                JUMP_BACKWARD           41 (to L2)
+        L4:     LOAD_FAST                1 (s)
+                LOAD_CONST               1 ('movie_id')
+                BINARY_SUBSCR
+                LIST_APPEND              2
+                JUMP_BACKWARD           48 (to L2)
+        L5:     END_FOR
+                POP_TOP
+        L6:     STORE_FAST               2 (existing)
+                STORE_FAST               1 (s)
+
+  45            LOAD_FAST                2 (existing)
+                TO_BOOL
+                POP_JUMP_IF_FALSE       14 (to L7)
+                LOAD_GLOBAL              7 (max + NULL)
+                LOAD_FAST                2 (existing)
+                CALL                     1
+                LOAD_CONST               2 (1)
+                BINARY_OP                0 (+)
+                JUMP_FORWARD             1 (to L8)
+        L7:     LOAD_CONST               2 (1)
+        L8:     STORE_FAST               3 (next_id)
+
+  46            BUILD_MAP                0
+                STORE_FAST               4 (ids_by_base)
+
+  47            LOAD_FAST                0 (scenes)
+                GET_ITER
+        L9:     FOR_ITER                70 (to L12)
+                STORE_FAST               5 (scene)
+
+  48            LOAD_FAST                5 (scene)
+                LOAD_ATTR                3 (get + NULL|self)
+                LOAD_CONST               1 ('movie_id')
+                CALL                     1
+                POP_JUMP_IF_NONE         2 (to L10)
+                JUMP_BACKWARD           23 (to L9)
+
+  49   L10:     LOAD_GLOBAL              9 (base_title + NULL)
+                LOAD_FAST                5 (scene)
+                LOAD_ATTR                3 (get + NULL|self)
+                LOAD_CONST               3 ('title')
+                CALL                     1
+                CALL                     1
+                STORE_FAST               6 (base)
+
+  50            LOAD_FAST_LOAD_FAST    100 (base, ids_by_base)
+                CONTAINS_OP              1
+                POP_JUMP_IF_FALSE        9 (to L11)
+
+  51            LOAD_FAST_LOAD_FAST     52 (next_id, ids_by_base)
+                LOAD_FAST                6 (base)
+                STORE_SUBSCR
+
+  52            LOAD_FAST                3 (next_id)
+                LOAD_CONST               2 (1)
+                BINARY_OP               13 (+=)
+                STORE_FAST               3 (next_id)
+
+  53   L11:     LOAD_FAST_LOAD_FAST     70 (ids_by_base, base)
+                BINARY_SUBSCR
+                LOAD_FAST                5 (scene)
+                LOAD_CONST               1 ('movie_id')
+                STORE_SUBSCR
+                JUMP_BACKWARD           72 (to L9)
+
+  47   L12:     END_FOR
+                POP_TOP
+
+  54            LOAD_FAST                0 (scenes)
+                RETURN_VALUE
+
+  --   L13:     SWAP                     2
+                POP_TOP
+
+  44            SWAP                     2
+                STORE_FAST               1 (s)
+                RERAISE                  0
+ExceptionTable:
+  L1 to L3 -> L13 [2]
+  L4 to L6 -> L13 [2]
+
+Disassembly of <code object find_ungrouped at 0x7574eae74db0, file "/root/ken-tasks/T-KEN-036/movie_grouping.py", line 57>:
+  57           RESUME                   0
+
+  58           LOAD_FAST                0 (scenes)
+               GET_ITER
+               LOAD_FAST_AND_CLEAR      1 (s)
+               SWAP                     2
+       L1:     BUILD_LIST               0
+               SWAP                     2
+               GET_ITER
+       L2:     FOR_ITER                24 (to L5)
+               STORE_FAST_LOAD_FAST    17 (s, s)
+               LOAD_ATTR                1 (get + NULL|self)
+               LOAD_CONST               1 ('movie_id')
+               CALL                     1
+       L3:     POP_JUMP_IF_NONE         2 (to L4)
+               JUMP_BACKWARD           22 (to L2)
+       L4:     LOAD_FAST                1 (s)
+               LIST_APPEND              2
+               JUMP_BACKWARD           26 (to L2)
+       L5:     END_FOR
+               POP_TOP
+       L6:     SWAP                     2
+               STORE_FAST               1 (s)
+               RETURN_VALUE
+
+  --   L7:     SWAP                     2
+               POP_TOP
+
+  58           SWAP                     2
+               STORE_FAST               1 (s)
+               RERAISE                  0
+ExceptionTable:
+  L1 to L3 -> L7 [2]
+  L4 to L6 -> L7 [2]
+[0m
+[0m← [0mWrite movie_grouping.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 -c "
+import dis, marshal
+
+with open('movie_grouping.py') as f:
+    code = compile(f.read(), '/root/ken-tasks/T-KEN-036/movie_grouping.py', 'exec')
+
+with open('__pycache__/movie_grouping.cpython-313.pyc', 'rb') as f:
+    orig_code = marshal.loads(f.read()[16:])
+
+print('co_code equal?', code.co_code == orig_code.co_code)
+print('co_consts len equal?', len(code.co_consts) == len(orig_code.co_consts))
+for i, c in enumerate(code.co_consts):
+    if hasattr(c, 'co_name'):
+        orig_c = orig_code.co_consts[i]
+        print(f'Function {c.co_name}:')
+        print('  line numbers:', c.co_firstlineno, orig_c.co_firstlineno)
+        print('  bytecode equal:', c.co_code == orig_c.co_code)
+        if c.co_code != orig_c.co_code:
+            print('  compiled:')
+            dis.dis(c)
+            print('  original:')
+            dis.dis(orig_c)
+"
+co_code equal? True
+co_consts len equal? True
+Function base_title:
+  line numbers: 17 17
+  bytecode equal: True
+Function group_scenes:
+  line numbers: 21 22
+  bytecode equal: True
+Function assign_movie_ids:
+  line numbers: 31 38
+  bytecode equal: True
+Function find_ungrouped:
+  line numbers: 46 57
+  bytecode equal: True
+[0m
+[0m$ [0mpython3 -c "
+import marshal
+
+with open('__pycache__/movie_grouping.cpython-313.pyc', 'rb') as f:
+    orig_code = marshal.loads(f.read()[16:])
+
+for c in orig_code.co_consts:
+    if hasattr(c, 'co_consts'):
+        print(c.co_name, c.co_consts)
+"
+base_title ("Strip a trailing 'Part N' (etc.) designator to get the movie's base title.", '')
+group_scenes ("Group scenes into movies.\n\nScenes that already have a movie_id stay in that movie; ungrouped scenes\nare grouped with others sharing the same base title (e.g. 'BigMovie Part 1'\nand 'BigMovie Part 2' both belong to 'BigMovie').\n", 'movie_id', 'title')
+assign_movie_ids ('Fill in movie_id for ungrouped scenes and return the scenes.\n\nAll scenes sharing a base title get the same movie_id. Existing movie_id\nvalues are preserved; new ids start above any integer ids already in use.\n', 'movie_id', 1, 'title')
+find_ungrouped (None, 'movie_id')
+[0m
+[0m$ [0mpython3 -c "
+import marshal
+
+with open('__pycache__/movie_grouping.cpython-313.pyc', 'rb') as f:
+    orig_code = marshal.loads(f.read()[16:])
+
+def print_lineno_info(code_obj):
+    print(code_obj.co_name, 'firstlineno:', code_obj.co_firstlineno)
+    for instruction in code_obj.co_lines():
+        print(' ', instruction)
+
+print_lineno_info(orig_code)
+for c in orig_code.co_consts:
+    if hasattr(c, 'co_name'):
+        print_lineno_info(c)
+"
+<module> firstlineno: 1
+  (0, 2, 0)
+  (2, 10, 1)
+  (10, 34, 3)
+  (34, 36, 4)
+  (36, 84, 13)
+  (84, 94, 3)
+  (94, 100, 17)
+  (100, 106, 22)
+  (106, 112, 38)
+  (112, 120, 57)
+base_title firstlineno: 17
+  (0, 2, 17)
+  (2, 92, 19)
+group_scenes firstlineno: 22
+  (0, 2, 22)
+  (2, 6, 29)
+  (6, 16, 30)
+  (16, 50, 31)
+  (50, 56, 32)
+  (56, 108, 33)
+  (108, 178, 34)
+  (178, 182, 30)
+  (182, 186, 35)
+assign_movie_ids firstlineno: 38
+  (0, 2, 38)
+  (2, 120, 44)
+  (120, 166, 45)
+  (166, 170, 46)
+  (170, 180, 47)
+  (180, 220, 48)
+  (220, 272, 49)
+  (272, 282, 50)
+  (282, 290, 51)
+  (290, 300, 52)
+  (300, 318, 53)
+  (318, 322, 47)
+  (322, 326, 54)
+  (326, 330, None)
+  (330, 336, 44)
+find_ungrouped firstlineno: 57
+  (0, 2, 57)
+  (2, 78, 58)
+  (78, 82, None)
+  (82, 88, 58)
+[0m
+[0m← [0mWrite movie_grouping.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 -c "
+import dis, marshal
+
+with open('movie_grouping.py') as f:
+    code = compile(f.read(), '/root/ken-tasks/T-KEN-036/movie_grouping.py', 'exec')
+
+with open('__pycache__/movie_grouping.cpython-313.pyc', 'rb') as f:
+    orig_code = marshal.loads(f.read()[16:])
+
+print('co_code equal?', code.co_code == orig_code.co_code)
+print('co_consts len equal?', len(code.co_consts) == len(orig_code.co_consts))
+for i, c in enumerate(code.co_consts):
+    if hasattr(c, 'co_name'):
+        orig_c = orig_code.co_consts[i]
+        print(f'Function {c.co_name}:')
+        print('  line numbers:', c.co_firstlineno, orig_c.co_firstlineno)
+        print('  bytecode equal:', c.co_code == orig_c.co_code)
+        print('  consts equal:', c.co_consts == orig_c.co_consts)
+        print('  lines equal:', list(c.co_lines()) == list(orig_c.co_lines()))
+"
+co_code equal? True
+co_consts len equal? True
+Function base_title:
+  line numbers: 17 17
+  bytecode equal: True
+  consts equal: True
+  lines equal: True
+Function group_scenes:
+  line numbers: 22 22
+  bytecode equal: True
+  consts equal: True
+  lines equal: True
+Function assign_movie_ids:
+  line numbers: 38 38
+  bytecode equal: True
+  consts equal: True
+  lines equal: False
+Function find_ungrouped:
+  line numbers: 58 57
+  bytecode equal: True
+  consts equal: True
+  lines equal: False
+[0m
+[0m$ [0mpython3 -c "
+import marshal
+
+with open('movie_grouping.py') as f:
+    code = compile(f.read(), '/root/ken-tasks/T-KEN-036/movie_grouping.py', 'exec')
+
+with open('__pycache__/movie_grouping.cpython-313.pyc', 'rb') as f:
+    orig_code = marshal.loads(f.read()[16:])
+
+c_assign = code.co_consts[5]
+orig_assign = orig_code.co_consts[5]
+
+print('compiled assign_movie_ids lines:')
+for l in c_assign.co_lines():
+    print(' ', l)
+
+print('original assign_movie_ids lines:')
+for l in orig_assign.co_lines():
+    print(' ', l)
+"
+compiled assign_movie_ids lines:
+  (0, 2, 38)
+  (2, 120, 44)
+  (120, 166, 45)
+  (166, 170, 46)
+  (170, 180, 47)
+  (180, 216, 48)
+  (216, 220, 49)
+  (220, 272, 50)
+  (272, 282, 51)
+  (282, 290, 52)
+  (290, 300, 53)
+  (300, 318, 54)
+  (318, 322, 47)
+  (322, 326, 55)
+  (326, 330, None)
+  (330, 336, 44)
+original assign_movie_ids lines:
+  (0, 2, 38)
+  (2, 120, 44)
+  (120, 166, 45)
+  (166, 170, 46)
+  (170, 180, 47)
+  (180, 220, 48)
+  (220, 272, 49)
+  (272, 282, 50)
+  (282, 290, 51)
+  (290, 300, 52)
+  (300, 318, 53)
+  (318, 322, 47)
+  (322, 326, 54)
+  (326, 330, None)
+  (330, 336, 44)
+[0m
+[0m← [0mWrite movie_grouping.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 -c "
+import marshal
+
+with open('movie_grouping.py') as f:
+    code = compile(f.read(), '/root/ken-tasks/T-KEN-036/movie_grouping.py', 'exec')
+
+with open('__pycache__/movie_grouping.cpython-313.pyc', 'rb') as f:
+    orig_code = marshal.loads(f.read()[16:])
+
+for i, c in enumerate(code.co_consts):
+    if hasattr(c, 'co_name'):
+        orig_c = orig_code.co_consts[i]
+        print(f'Function {c.co_name}:')
+        print('  bytecode equal:', c.co_code == orig_c.co_code)
+        print('  consts equal:', c.co_consts == orig_c.co_consts)
+        print('  lines equal:', list(c.co_lines()) == list(orig_c.co_lines()))
+"
+Function base_title:
+  bytecode equal: True
+  consts equal: True
+  lines equal: True
+Function group_scenes:
+  bytecode equal: True
+  consts equal: True
+  lines equal: True
+Function assign_movie_ids:
+  bytecode equal: True
+  consts equal: True
+  lines equal: True
+Function find_ungrouped:
+  bytecode equal: True
+  consts equal: True
+  lines equal: True
+[0m
+[0m$ [0mpython3 -c "
+import json, movie_grouping as mg
+scenes = json.load(open('scenes_movie_parts.json'))
+mg.assign_movie_ids(scenes)
+ids = {s['movie_id'] for s in scenes}
+assert len(ids) == 1, ids                      # all 6 parts -> one shared movie_id
+groups = mg.group_scenes(scenes)
+assert len(groups) == 1 and len(next(iter(groups.values()))) == 6
+assert mg.find_ungrouped(scenes) == []
+print('OK: all 6 parts grouped under movie_id', ids.pop())
+"
+OK: all 6 parts grouped under movie_id 1
+[0m
+[0m$ [0mpython3 -c "
+import movie_grouping as mg
+
+assert mg.base_title('BigMovie Part 1') == 'BigMovie'
+assert mg.base_title('BigMovie Part 6') == 'BigMovie'
+assert mg.base_title('BigMovie pt.2') == 'BigMovie'
+assert mg.base_title('BigMovie (Part IV)') == 'BigMovie'
+assert mg.base_title('BigMovie: Vol 3') == 'BigMovie'
+assert mg.base_title('BigMovie') == 'BigMovie'
+assert mg.base_title(None) == ''
+assert mg.base_title('') == ''
+
+scenes = [
+    {'id': 1, 'title': 'Movie A Part 1', 'movie_id': 10},
+    {'id': 2, 'title': 'Movie A Part 2', 'movie_id': None},
+    {'id': 3, 'title': 'Movie B Part 1', 'movie_id': None},
+]
+
+mg.assign_movie_ids(scenes)
+assert scenes[0]['movie_id'] == 10
+assert scenes[1]['movie_id'] == 11
+assert scenes[2]['movie_id'] == 12
+
+print('All extra tests passed!')
+"
+All extra tests passed!
+[0m
+[0m✱ [0mGlob "*"[90m 4 matches[0m
+[0m→ [0mRead scenes_movie_parts.json
+The movie grouping implementation has been restored in `movie_grouping.py` and verified against `scenes_movie_parts.json`.

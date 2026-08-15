@@ -1,0 +1,84 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead backbone_lookup_mock.json
+[0m→ [0mRead usenet_config.json
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-020
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 15:37 .
+drwxr-xr-x 206 1000 1000 12288 Aug 15 15:38 ..
+-rw-r--r--   1 root root   149 Aug 15 15:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   141 Aug 15 15:37 backbone_lookup_mock.json
+-rw-r--r--   1 root root   149 Aug 15 15:37 usenet_config.json
+[0m
+[0m← [0mEdit usenet_config.json
+Index: /root/ken-tasks/T-KEN-020/usenet_config.json
+===================================================================
+--- /root/ken-tasks/T-KEN-020/usenet_config.json
++++ /root/ken-tasks/T-KEN-020/usenet_config.json
+@@ -3,8 +3,8 @@
+     "provider": "Eweka",
+     "backbone": "Omicron"
+   },
+   "backup": {
+-    "provider": "Newshosting",
+-    "backbone": "Omicron"
++    "provider": "UsenetExpress",
++    "backbone": "Highwinds"
+   }
+ }
+\ No newline at end of file
+
+[0m
+[0m$ [0mpython3 -c '
+import json
+
+with open("/root/ken-tasks/T-KEN-020/usenet_config.json") as f:
+    config = json.load(f)
+
+with open("/root/ken-tasks/T-KEN-020/backbone_lookup_mock.json") as f:
+    lookup = json.load(f)
+
+primary_provider = config["primary"]["provider"]
+primary_backbone = config["primary"]["backbone"]
+backup_provider = config["backup"]["provider"]
+backup_backbone = config["backup"]["backbone"]
+
+assert lookup[primary_provider] == primary_backbone, "Primary backbone mismatch with lookup table"
+assert lookup[backup_provider] == backup_backbone, "Backup backbone mismatch with lookup table"
+assert primary_backbone != backup_backbone, f"Not redundant: both on {primary_backbone}"
+
+print(f"Validation successful: Primary ({primary_provider} -> {primary_backbone}) and Backup ({backup_provider} -> {backup_backbone}) are on distinct backbones.")
+'
+Validation successful: Primary (Eweka -> Omicron) and Backup (UsenetExpress -> Highwinds) are on distinct backbones.
+[0m
+[0m→ [0mRead usenet_config.json
+### Assessment
+
+The original setup was **not truly redundant**:
+- While `Eweka` and `Newshosting` were listed as primary and backup, both reside on the **Omicron** backbone according to `backbone_lookup_mock.json`.
+- The configuration was self-consistent (provider labels accurately reflected their backbones), but infrastructure-wise, an outage or issue on Omicron would take down both primary and backup simultaneously.
+
+---
+
+### Changes Applied
+
+`usenet_config.json` has been updated to use an independent backbone for the backup provider:
+
+```json
+{
+  "primary": {
+    "provider": "Eweka",
+    "backbone": "Omicron"
+  },
+  "backup": {
+    "provider": "UsenetExpress",
+    "backbone": "Highwinds"
+  }
+}
+```
+
+- **Validation:** Verified programmatically against `backbone_lookup_mock.json` that provider backbone mappings match and `primary.backbone != backup.backbone`.

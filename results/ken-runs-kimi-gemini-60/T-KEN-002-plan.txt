@@ -1,0 +1,92 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 14:11 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 14:11 ..
+-rw-r--r--   1 root root    87 Aug 15 14:11 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   813 Aug 15 14:11 dedupe.py
+-rw-r--r--   1 root root   127 Aug 15 14:11 mirror_groups.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dedupe.py
+[0m→ [0mRead mirror_groups.json
+All three files are read. Let me verify the actual runtime behavior before writing the plan (read-only execution, no file changes).
+[0m
+[0m$ [0mpython3 -c "
+import json, dedupe
+db = json.load(open('mirror_groups.json'))
+for gid in db:
+    print(scan := dedupe.scan_mirror_group(gid, db))
+"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+[0m
+Investigation complete. Here is the plan.
+
+---
+
+## PLAN: Fix duplicate-removal suggestion bug in stashfeeds dedupe engine
+
+### The real problem (confirmed, reproducible)
+
+`dedupe.py` has **two inconsistent ranking functions**, and the buggy one is what users see:
+
+- **`pick_canonical()`** (lines 3–7) — the real write-path ranking. Correct: filters to `playable` candidates first, then picks the largest by `size_gb`.
+- **`suggest_keep()`** (lines 10–14) — the display-only ranking shown on the review page. **Buggy** (its own docstring admits it): it ranks by `size_gb` alone with no playability check, so it can recommend keeping a proven-dead file over a playable smaller one.
+
+**Verified with the real data** in `mirror_groups.json` (`group_42`: `scenes:100` = 5.2 GB but `playable: false`; `scenes:101` = 1.8 GB, `playable: true`):
+
+```
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+```
+
+The review page tells the user to keep `scenes:100` — the **dead, unplayable file** — while the actual write path would keep `scenes:101`, the working one. Anyone trusting the suggestion risks keeping a broken file and deleting the good one. This is a genuine bug, not a style issue.
+
+### Exact steps for the WORK model
+
+**Edit exactly one file: `dedupe.py`. Do not touch `mirror_groups.json` (data is fine) or `CONTEXT_ONLY.md` (orientation only).**
+
+1. **Fix `suggest_keep()` (lines 10–14)** by delegating to `pick_canonical()` so the display ranking can never drift from the write-path ranking again. Replace the whole function:
+
+   ```python
+   def suggest_keep(candidates):
+       """DISPLAY-ONLY ranking shown on the review page.
+       Matches the write path: playability first, then size."""
+       return pick_canonical(candidates)
+   ```
+
+   (Delegation, not copy-pasted logic — this keeps the two rankings permanently in sync and is the minimal change. Fallback behavior when *no* candidate is playable is preserved, since `pick_canonical` already handles it.)
+
+2. **Verify** by running (from the task directory):
+
+   ```bash
+   python3 -c "
+   import json, dedupe
+   db = json.load(open('mirror_groups.json'))
+   r = dedupe.scan_mirror_group('group_42', db)
+   print(r)
+   assert r['suggested_keep'] == 'scenes:101' == r['canonical_would_be'], 'MISMATCH'
+   print('OK: suggestion now matches canonical')
+   "
+   ```
+
+   Expected: `suggested_keep` flips from `scenes:100` → `scenes:101`, matching `canonical_would_be`.
+
+3. **Sanity-check the fallback path** (all-dead group still returns the largest file, unchanged behavior):
+
+   ```bash
+   python3 -c "
+   import dedupe
+   dead = [{'id': 'a', 'playable': False, 'size_gb': 1.0}, {'id': 'b', 'playable': False, 'size_gb': 3.0}]
+   assert dedupe.suggest_keep(dead)['id'] == 'b'
+   print('OK: all-dead fallback unchanged')
+   "
+   ```
+
+### Notes / non-goals
+
+- No test suite exists in this project, so no test file needs to be added; the inline verification above is sufficient.
+- Pre-existing edge case (not part of this fix): `max()` on an empty candidate list raises `ValueError` in both functions. Out of scope — the data always has candidates, and changing that would be beyond the minimal fix.

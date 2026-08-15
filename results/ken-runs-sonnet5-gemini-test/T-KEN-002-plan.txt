@@ -1,0 +1,95 @@
+[0m
+> build · anthropic/claude-sonnet-5
+[0m
+[0m$ [0mpwd && ls -la
+/root/ken-tasks/T-KEN-002
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 15:11 .
+drwxr-xr-x 206 1000 1000 12288 Aug 15 15:11 ..
+-rw-r--r--   1 root root    87 Aug 15 15:11 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   813 Aug 15 15:11 dedupe.py
+-rw-r--r--   1 root root   127 Aug 15 15:11 mirror_groups.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead dedupe.py
+[0m→ [0mRead mirror_groups.json
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-002 && python3 -c "
+import json, dedupe
+db = json.load(open('mirror_groups.json'))
+for gid in db:
+    print(dedupe.scan_mirror_group(gid, db))
+"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+[0m
+[0m$ [0mcd /root/ken-tasks/T-KEN-002 && grep -rn "suggest_keep\|pick_canonical\|scan_mirror_group" . 2>/dev/null
+./dedupe.py:3:def pick_canonical(candidates):
+./dedupe.py:10:def suggest_keep(candidates):
+./dedupe.py:17:def scan_mirror_group(group_id, db):
+./dedupe.py:21:        "suggested_keep": suggest_keep(candidates)["id"],
+./dedupe.py:22:        "canonical_would_be": pick_canonical(candidates)["id"],
+[0m
+## Investigation Summary
+
+**Files in this task:**
+- `dedupe.py` — dedupe engine with two ranking functions (`pick_canonical` for the real write path, `suggest_keep` for the review-page display) and `scan_mirror_group` which reports both.
+- `mirror_groups.json` — one real duplicate group, `group_42`, containing:
+  - `scenes:100` — `playable: false`, `size_gb: 5.2`
+  - `scenes:101` — `playable: true`, `size_gb: 1.8`
+
+**Reproduced the bug directly against the real data:**
+
+```
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+```
+
+## The Real Problem
+
+This is a confirmed, live bug — not hypothetical. `suggest_keep()` (dedupe.py:10-14) ranks candidates by `size_gb` alone with **no playability filter**, while `pick_canonical()` (dedupe.py:3-7), the function that governs the actual write path, filters for `playable` candidates first and only falls back to the full pool if none are playable.
+
+On the real `group_42` data this produces a dangerous divergence:
+- The review page tells the user to keep `scenes:100` — a **5.2GB dead/unplayable file**.
+- The actual write-path logic would keep `scenes:101` — the correct **1.8GB playable file**.
+
+If a user acts on the displayed suggestion (deleting the "non-suggested" file), they'd delete the only playable copy and keep a broken mirror, while the system's own canonical logic disagrees with what it told the user. This is exactly the scenario the code comment at dedupe.py:12-13 already flags as a known bug ("no playability check at all... can recommend a proven-dead file over a playable smaller one") — it's not a false alarm, the shipped code matches the comment's warning exactly.
+
+## Concrete Fix Steps for the WORK Model
+
+**1. Edit `dedupe.py`, `suggest_keep` function (lines 10-14):**
+
+Give it the same playability-first filter that `pick_canonical` uses, so the display recommendation can never contradict the real write-path decision. Recommended change:
+
+```python
+def suggest_keep(candidates):
+    """DISPLAY-ONLY ranking shown on the review page.
+    Applies the same playability-first rule as pick_canonical so the
+    review page never recommends a dead file over a playable one."""
+    playable = [c for c in candidates if c["playable"]]
+    pool = playable if playable else candidates
+    return max(pool, key=lambda c: c["size_gb"])
+```
+
+Also update/remove the now-stale docstring line that describes the bug ("BUG: no playability check at all...") since it will no longer be true.
+
+- Note: this makes `suggest_keep`'s body identical to `pick_canonical`'s body. The WORK model can choose either:
+  - (a) duplicate the corrected logic inline (keeps the two functions independent in case display and write-path logic are intended to diverge on other criteria later), or
+  - (b) simplify `suggest_keep` to just `return pick_canonical(candidates)` to eliminate duplication entirely.
+  
+  Given `scan_mirror_group` reports both `suggested_keep` and `canonical_would_be` as separate fields (dedupe.py:19-22), option (a) is slightly safer/more conservative since it preserves the two-function structure the codebase already chose, in case there's a future reason for the display ranking to diverge. Either is functionally correct for fixing this bug — pick whichever fits the surrounding code's intent, but (a) is the minimal-risk choice.
+
+**2. Verify the fix** by re-running against the real data:
+
+```bash
+python3 -c "
+import json, dedupe
+db = json.load(open('mirror_groups.json'))
+for gid in db:
+    print(dedupe.scan_mirror_group(gid, db))
+"
+```
+
+Expected result after fix: `suggested_keep` and `canonical_would_be` both equal `scenes:101` for `group_42`.
+
+**3. (Optional, recommended) Add a regression test** — e.g. a small `test_dedupe.py` using the same shape as `mirror_groups.json` (one unplayable-but-larger candidate, one playable-but-smaller candidate) asserting `suggest_keep(...)["id"] == pick_canonical(...)["id"]`. This guards against the bug being reintroduced since there are currently no tests in this directory.
+
+No other files reference `suggest_keep`, `pick_canonical`, or `scan_mirror_group`, so this is a self-contained fix — no downstream callers need updating.

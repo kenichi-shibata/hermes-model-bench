@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead queue_state.json
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+Yes, all 5 items in the queue are stuck: they are marked as `downloading` at 0% progress and have been stalled for 47 minutes.

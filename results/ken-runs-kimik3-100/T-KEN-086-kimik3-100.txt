@@ -1,0 +1,12 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead top_processes.json
+Yes — something is hogging the CPU.
+
+**`log_rotate.sh`** is pinned at **100% CPU** and has been running for **6 hours**, which strongly suggests it's stuck (likely an infinite loop or blocked on something) rather than doing legitimate work.
+
+Recommended next steps:
+- Inspect what it's doing: `cat /proc/<pid>/cmdline`, `strace -p <pid>`, or check its logs.
+- If it's not needed right now, kill it: `kill <pid>` (or `kill -9` if unresponsive).
+- Review the script afterward — a log rotation job shouldn't run for hours; it probably needs a fix (e.g., a loop missing a sleep/exit condition).

@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m→ [0mRead split_vs_solo.json
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+**Yes**, the split arm is worth it. It achieves a lower cost (2.5 vs. 3.0) while reducing safety failures from 1 to 0.

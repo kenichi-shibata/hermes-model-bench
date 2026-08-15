@@ -1,0 +1,88 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mls -la
+total 32
+drwxr-xr-x   3 root root  4096 Aug 15 13:38 .
+drwxr-xr-x 205 1000 1000 12288 Aug 15 14:49 ..
+-rw-r--r--   1 root root    62 Aug 15 14:36 CONTEXT_ONLY.md
+drwxr-xr-x   2 root root  4096 Aug 15 14:48 __pycache__
+-rw-r--r--   1 root root   159 Aug 15 14:36 elo_engine.py
+-rw-r--r--   1 root root    92 Aug 15 14:36 match_history.json
+[0m
+[0m→ [0mRead elo_engine.py
+[0m→ [0mRead match_history.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mls -la __pycache__/ && python3 -c "
+import sys
+sys.path.insert(0, '.')
+import elo_engine, json
+matches = json.load(open('match_history.json'))
+ratings = {}
+for m in matches:
+    ratings = elo_engine.update(m['winner'], m['loser'], ratings)
+print(ratings)
+"
+total 12
+drwxr-xr-x 2 root root 4096 Aug 15 14:48 .
+drwxr-xr-x 3 root root 4096 Aug 15 13:38 ..
+-rw-r--r-- 1 root root  412 Aug 15 14:48 elo_engine.cpython-313.pyc
+{'a': 1564, 'b': 1468, 'c': 1468}
+[0m
+## Investigation findings
+
+**The "elo thing" is not actually Elo.** `elo_engine.py` (the entire file, 4 lines):
+
+```python
+def update(winner, loser, ratings):
+    ratings[winner] = ratings.get(winner, 1500) + 32
+    ratings[loser]  = ratings.get(loser, 1500) - 32
+    return ratings
+```
+
+This is a fixed ±32 zero-sum swap. It never computes the **expected score** based on the rating gap — the heart of Elo. In real Elo:
+
+- `E_winner = 1 / (1 + 10**((R_loser - R_winner) / 400))`
+- `R'_winner = R_winner + K * (1 - E_winner)`
+- `R'_loser  = R_loser  + K * (0 - (1 - E_winner))`
+
+**Concrete symptom:** replaying the real data (`match_history.json`: a beats b, then a beats c) currently gives `{'a': 1564, 'b': 1468, 'c': 1468}` — a flat +32 per win. Under correct Elo (K=32, start 1500) it should be roughly `a ≈ 1531.3, b = 1484, c ≈ 1484.7`: after a's first win it sits at 1516, so beating the 1500-rated c earns only ~15.3, not the full 16. The current code can't express that; a 2000 player beating an 800 player would also get the full +32, which is wrong.
+
+Other notes: signature/behavior otherwise fine (defaults to 1500, mutates and returns dict). No draws in the data or API — out of scope. No tests exist in the directory. `match_history.json` itself is well-formed and consistent; the data is not the problem.
+
+## Plan for the WORK model
+
+The real problem: `update()` lacks the expected-score formula, so ratings don't respond to rating differences.
+
+1. **Edit `elo_engine.py` only** (single file, minimal diff). Rewrite the body, keeping the exact same signature `update(winner, loser, ratings)` and the same constants (default 1500, K=32):
+
+   ```python
+   K = 32
+
+   def _expected(ra, rb):
+       return 1 / (1 + 10 ** ((rb - ra) / 400))
+
+   def update(winner, loser, ratings):
+       rw = ratings.get(winner, 1500)
+       rl = ratings.get(loser, 1500)
+       ew = _expected(rw, rl)
+       ratings[winner] = rw + K * (1 - ew)
+       ratings[loser] = rl + K * (0 - (1 - ew))
+       return ratings
+   ```
+
+2. **Verify** by replaying the real history from the repo root:
+   ```bash
+   python3 -c "
+   import elo_engine, json
+   ratings = {}
+   for m in json.load(open('match_history.json')):
+       ratings = elo_engine.update(m['winner'], m['loser'], ratings)
+   print(ratings)"
+   ```
+   Expect approximately `{'a': 1531.26, 'b': 1484.0, 'c': 1484.74}`. Sanity checks: equal-rated players (first game) move by exactly ±16 (K/2); a huge underdog win moves nearly ±32; a huge favorite win moves nearly ±0.
+
+3. **Do not** touch `match_history.json` or `CONTEXT_ONLY.md`, do not add tests files or extra features (no draws, no configurable K) — the task is only "is it working right," and the fix is the missing expected-score math.
+
+Answer to the task question: **No, it's not working right** — it's a fixed points exchange masquerading as Elo; one-file fix as above makes it real Elo.

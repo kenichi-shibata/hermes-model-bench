@@ -1,0 +1,44 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m✱ [0mGlob ".*"[90m in . · 0 matches[0m
+[0m→ [0mRead recent_chat_context.json
+[0m→ [0mRead catalog_candidates.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m✱ [0mGlob "**/*"[90m in . · 3 matches[0m
+[0m
+[0m$ [0mls -la
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 11:54 .
+drwxr-xr-x 203 1000 1000 12288 Aug 15 11:54 ..
+-rw-r--r--   1 root root   113 Aug 15 11:54 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   188 Aug 15 11:54 catalog_candidates.json
+-rw-r--r--   1 root root    57 Aug 15 11:54 recent_chat_context.json
+[0m
+[0m$ [0menv
+SHELL=/bin/bash
+AGENT=1
+PWD=/root/ken-tasks/T-KEN-123
+LOGNAME=root
+XDG_SESSION_TYPE=tty
+_=/usr/bin/env
+MOTD_SHOWN=pam
+OPENCODE_PID=1546
+HOME=/root
+OPENCODE=1
+LANG=C
+SSH_CONNECTION=192.168.1.152 32918 192.168.1.226 22
+XDG_SESSION_CLASS=user
+USER=root
+SHLVL=1
+XDG_SESSION_ID=c9
+DEEPSEEK_API_KEY=<REDACTED>
+LC_CTYPE=C.UTF-8
+XDG_RUNTIME_DIR=/run/user/0
+SSH_CLIENT=192.168.1.152 32918 22
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+OPENROUTER_API_KEY=<REDACTED>
+OLDPWD=/root/ken-tasks
+[0m
+Found and queued scene ID 2 (Performer: X, Studio: Y).

@@ -1,0 +1,70 @@
+[0m
+> build · anthropic/claude-sonnet-5
+[0m
+[0m$ [0mls -la /root/ken-tasks/T-KEN-020/
+total 28
+drwxr-xr-x   2 root root  4096 Aug 15 15:37 .
+drwxr-xr-x 206 1000 1000 12288 Aug 15 15:38 ..
+-rw-r--r--   1 root root   149 Aug 15 15:37 CONTEXT_ONLY.md
+-rw-r--r--   1 root root   141 Aug 15 15:37 backbone_lookup_mock.json
+-rw-r--r--   1 root root   149 Aug 15 15:37 usenet_config.json
+[0m
+[0m→ [0mRead usenet_config.json
+[0m→ [0mRead backbone_lookup_mock.json
+[0m→ [0mRead CONTEXT_ONLY.md
+## Investigation Summary
+
+**The problem is real: your "redundant" setup is a single point of failure.**
+
+### What I found
+
+**`usenet_config.json`** (lines 1-10):
+```json
+{
+  "primary": { "provider": "Eweka", "backbone": "Omicron" },
+  "backup":  { "provider": "Newshosting", "backbone": "Omicron" }
+}
+```
+
+**`backbone_lookup_mock.json`** (ground truth mapping):
+```json
+{
+  "Eweka": "Omicron",
+  "Newshosting": "Omicron",
+  "UsenetExpress": "Highwinds",
+  "BlockNews": "Highwinds",
+  "UsenetServer": "Omicron"
+}
+```
+
+### The problem
+
+Cross-checking the config against the lookup table confirms both entries are *accurate* (Eweka → Omicron, Newshosting → Omicron), but that's exactly the issue: **primary and backup both ride the same physical backbone (Omicron)**. Eweka and Newshosting are just different retail resellers sitting on top of the same upstream infrastructure.
+
+This means "primary/backup" redundancy in this config is illusory at the infrastructure level:
+- If Omicron has an outage, peering issue, DMCA/legal takedown, or goes bankrupt, **both** primary and backup fail simultaneously.
+- You're only protected against reseller-level failures (billing issues, one company's servers/software breaking), not backbone-level failures — which are the more consequential, correlated-failure scenario "provider goes down" usually implies.
+
+So: **you are cooked if Omicron goes down.** The setup is not actually redundant, just cosmetically redundant (two different company names, one point of failure).
+
+### Concrete fix for the WORK model
+
+1. **Edit `usenet_config.json`**: change the `backup.provider` to one that resolves to a *different* backbone per `backbone_lookup_mock.json`. Options with a different backbone (Highwinds): `UsenetExpress` or `BlockNews`. Do **not** use `UsenetServer` — it's also on Omicron.
+
+   Example resulting config:
+   ```json
+   {
+     "primary": { "provider": "Eweka", "backbone": "Omicron" },
+     "backup":  { "provider": "UsenetExpress", "backbone": "Highwinds" }
+   }
+   ```
+
+2. **Validate the `backbone` field against the lookup table programmatically**, not just by eyeballing — the WORK model should write/run a small check that:
+   - Reads `usenet_config.json`.
+   - Looks up each `provider` in `backbone_lookup_mock.json`.
+   - Asserts the `backbone` field in the config matches the lookup value (catches stale/incorrect hardcoded backbone labels).
+   - Asserts `primary.backbone != backup.backbone` (this is the actual redundancy invariant — enforce it so this regressions can't silently reoccur).
+
+3. **Report back explicitly** that the original config was self-consistent (labels matched the lookup table) but semantically non-redundant, since that's the subtle part a casual glance would miss — someone could "verify" this config against the lookup table field-by-field and conclude it's fine, when the real question (are the two backbones different?) is the one that matters.
+
+No other files exist in this sandbox to consider; the fix is contained entirely to `usenet_config.json`.

@@ -1,0 +1,55 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m$ [0mfind /root/ken-tasks/T-KEN-013 -type f | head -50
+/root/ken-tasks/T-KEN-013/CONTEXT_ONLY.md
+/root/ken-tasks/T-KEN-013/pr_files/file3_serializer.py
+/root/ken-tasks/T-KEN-013/pr_files/file2_pagination.py
+/root/ken-tasks/T-KEN-013/pr_files/file1_models.py
+/root/ken-tasks/T-KEN-013/pr_files/file4_tests.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead pr_files/file1_models.py
+[0m→ [0mRead pr_files/file2_pagination.py
+[0m→ [0mRead pr_files/file3_serializer.py
+[0m→ [0mRead pr_files/file4_tests.py
+Investigation complete. The directory contains exactly 5 files: `CONTEXT_ONLY.md` (just restates the setup) and the 4 "PR" files in `pr_files/`. Here is the review and plan.
+
+## What the files contain
+
+| File | Content | Verdict |
+|---|---|---|
+| `pr_files/file1_models.py` | Trivial `Item(id, name)` class | ✅ No issues |
+| `pr_files/file2_pagination.py` | `paginate(items, page, limit)` | ❌ **Real bug here** |
+| `pr_files/file3_serializer.py` | `serialize(item)` → `{'id':..., 'name':...}` | ✅ No issues |
+| `pr_files/file4_tests.py` | `test_serialize(): pass` | ✅ Stub, not the bug (as annotated) |
+
+## The real problem
+
+**Off-by-one in `pr_files/file2_pagination.py`, line 4:**
+
+```python
+offset = page * limit  # BUG: should be (page - 1) * limit
+```
+
+Assuming the conventional 1-indexed pages (confirmed by the docstring: "page=1 should return items[0:limit]"), the current code computes `offset = 1 * limit` for page 1, so page 1 **skips the first `limit` items** entirely, and every subsequent page is shifted by one page. Example with `items = [0..9]`, `limit = 3`:
+- `paginate(items, 1, 3)` → returns `[3,4,5]`, should be `[0,1,2]`
+- `paginate(items, 2, 3)` → returns `[6,7,8]`, should be `[3,4,5]`
+
+The other three files are distractors; nothing else needs changing.
+
+## Concrete steps for the WORK model
+
+1. **Edit exactly one file: `pr_files/file2_pagination.py`** (do nothing else — minimal change).
+2. On line 4, replace `offset = page * limit` with `offset = (page - 1) * limit`.
+3. **Update the docstring** (lines 2–3), which currently documents the bug ("BUG: off-by-one..."), to describe the correct behavior, e.g.: `"""Return the slice of items for 1-indexed `page` with `limit` items per page."""` — leaving stale "BUG" comments after fixing would be misleading.
+4. **Do not touch** `file1_models.py`, `file3_serializer.py`, or `file4_tests.py` (the test stub explicitly says it's not the bug; filling it in is scope creep unless asked).
+5. **Verify** by running a quick check (not by adding files):
+   - `paginate(list(range(10)), 1, 3)` must equal `[0, 1, 2]`
+   - `paginate(list(range(10)), 2, 3)` must equal `[3, 4, 5]`
+   - `paginate(list(range(10)), 3, 3)` must equal `[6, 7, 8]`
+   - `paginate(list(range(10)), 4, 3)` must equal `[9]` (partial last page)
+
+## Optional consideration (only if the user wants hardening — not required)
+
+With the fix, `page=0` or negative pages yield negative offsets and Python's negative-index slicing semantics, which silently return wrong data. A one-line guard (`if page < 1: raise ValueError(...)`) could be added, but this is beyond the stated bug fix and should be treated as an optional suggestion, not part of the required change.

@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead canonical_facts_check.json
+[0m→ [0mRead CONTEXT_ONLY.md
+Yes, canonical facts were corrupted. In `canonical_facts_check.json`, `slot_7` contains the corrupted value `"\u00e2\u0080\u0099corrupted\u00e2\u0080\u0099"`.

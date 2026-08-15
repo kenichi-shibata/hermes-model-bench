@@ -1,0 +1,35 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead garbage_scan.json
+[0m✱ [0mGrep "\(EN\)\(EN\)"[90m in . · 3 matches[0m
+[0m
+[0m$ [0mpython3 -c '
+import json
+with open("garbage_scan.json") as f:
+    data = json.load(f)
+for item in data:
+    if item["value"] != "x(EN)":
+        print(item)
+'
+{'id': 5, 'value': 'x(EN)(EN)'}
+{'id': 22, 'value': 'x(EN)(EN)'}
+{'id': 41, 'value': 'x(EN)(EN)'}
+[0m
+[0m$ [0mpython3 -c '
+import json
+with open("garbage_scan.json") as f:
+    data = json.load(f)
+from collections import Counter
+c = Counter(item["value"] for item in data)
+print(c)
+'
+Counter({'x(EN)': 47, 'x(EN)(EN)': 3})
+[0m
+Double-translation garbage was detected in `garbage_scan.json` for 3 entries containing `(EN)(EN)`:
+
+- **ID 5**: `"x(EN)(EN)"`
+- **ID 22**: `"x(EN)(EN)"`
+- **ID 41**: `"x(EN)(EN)"`

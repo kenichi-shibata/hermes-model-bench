@@ -1,0 +1,25 @@
+[0m
+> build · moonshotai/kimi-k3
+[0m
+[0m→ [0mRead .
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead workflow_runs.json
+**No — the workflow is not running.**
+
+Evidence from `workflow_runs.json`:
+
+| Field | Value | Meaning |
+|---|---|---|
+| `workflow_file_exists` | `true` | The workflow file is present in the repo |
+| `runs_last_30_days` | `0` | Zero executions in the past 30 days |
+| `qualifying_commits` | `15` | 15 commits occurred that *should* have triggered it |
+
+**Conclusion:** The workflow file exists and there was plenty of triggering activity (15 qualifying commits), yet it produced 0 runs. This is a "dead trigger" situation — the workflow is effectively not running.
+
+Likely causes to investigate:
+- **Trigger misconfiguration** — `on:` section doesn't match actual activity (wrong event, wrong branch filter, or a `paths:` filter that excludes the changed files)
+- **Workflow disabled** — manually disabled in the GitHub Actions UI, or disabled due to inactivity (GH auto-disables scheduled workflows after 60 days of repo inactivity)
+- **File not on the default branch** — the workflow file exists on a branch but not on the default branch, so triggers never fire
+- **Syntax/parse error** — invalid YAML prevents GitHub from registering the workflow at all
+
+Next step would be to inspect the workflow file's `on:` triggers and compare them against the 15 qualifying commits to find the mismatch.

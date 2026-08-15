@@ -1,0 +1,7 @@
+[0m
+> build · google/gemini-3.7-flash
+[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead missed_incident.json
+The health check only inspects the HTTP status code (`"check_examines": "status_code_only"`). Because the endpoint returned an HTTP `200` OK status despite the error message in the response body (`"internal error occurred"`), the check treated the response as successful.
