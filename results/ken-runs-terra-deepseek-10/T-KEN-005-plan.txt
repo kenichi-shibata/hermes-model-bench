@@ -1,0 +1,40 @@
+[0m
+> build · openai/gpt-5.6-terra
+[0m
+[0m→ [0mRead .[90m [offset=1, limit=200][0m
+I’ll inspect the homepage builders and the relevant scene data read-only, then identify the actual untranslated fields and the smallest concrete remediation plan.
+[0m→ [0mRead scenes.json[90m [offset=1, limit=1000][0m
+[0m→ [0mRead api.py[90m [offset=1, limit=2000][0m
+[0m→ [0mRead CONTEXT_ONLY.md[90m [offset=1, limit=1000][0m
+**Problem**
+
+The homepage card payload already supports a translation/romanized line below Japanese performer names through each performer’s `name_en` field.
+
+- Trending cards work correctly: `_home_trending()` calls `_scene_out(..., translate=True)`, which fills a missing `name_en` using `romanize()`.
+- Resume/continue-watching cards are broken: `_hydrate_code()` calls `_scene_out(scene)` without `translate=True`. As a result, `name_en` remains `null`, so performer cards have no blue translation line.
+- The supplied `scenes.json` confirms the same performer, `彩月七緒`, has no stored English name in both sections. The fallback should produce `Nanao Ayatsuki`.
+
+This is a code-path bug, not a data-only problem. Updating `scenes.json` would only fix these sample records and would leave all future missing translations in resume cards broken.
+
+**Work Plan**
+
+1. Edit `api.py`.
+2. Change `_hydrate_code()` to call:
+   ```python
+   return _scene_out(scene, translate=True)
+   ```
+   This makes resume/continue-watching cards use the same missing-name translation fallback as trending cards.
+3. Update the `_hydrate_code()` docstring/comment to remove the now-resolved “BUG” wording, or replace it with a neutral description of its purpose.
+4. Keep `scenes.json` unchanged:
+   - Its `name_en: null` values are intentional inputs for the fallback behavior.
+   - After the code fix, both trending and resume payloads should emit:
+     ```json
+     {"name_jp": "彩月七緒", "name_en": "Nanao Ayatsuki"}
+     ```
+5. Add or run a focused verification, if the work environment permits:
+   - Load `scenes.json`.
+   - Assert `_home_trending(data["trending"])` has `name_en == "Nanao Ayatsuki"`.
+   - Assert `[_hydrate_code(scene) for scene in data["resume"]]` has the same value.
+   - Optionally confirm a performer with a preexisting `name_en` is preserved rather than overwritten.
+
+No homepage scene-title translation issue is represented in the supplied data or builder: the observed missing “blue translation” content maps specifically to performer `name_en`.

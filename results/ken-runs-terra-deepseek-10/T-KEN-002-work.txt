@@ -1,0 +1,48 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead dedupe.py
+[0m→ [0mRead mirror_groups.json
+[0m✱ [0mGlob "**/*"[90m 4 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit dedupe.py
+Index: /root/ken-tasks-terra/T-KEN-002/dedupe.py
+===================================================================
+--- /root/ken-tasks-terra/T-KEN-002/dedupe.py
++++ /root/ken-tasks-terra/T-KEN-002/dedupe.py
+@@ -8,11 +8,10 @@
+ 
+ 
+ def suggest_keep(candidates):
+     """DISPLAY-ONLY ranking shown on the review page.
+-    BUG: no playability check at all -- ranks by size alone, so it can
+-    recommend a proven-dead file over a playable smaller one."""
+-    return max(candidates, key=lambda c: c["size_gb"])
++    Uses the canonical ranking: playability first, then size."""
++    return pick_canonical(candidates)
+ 
+ 
+ def scan_mirror_group(group_id, db):
+     candidates = db[group_id]
+
+[0m
+Plan verified against real files. Applying the fix.
+[0m← [0mWrite test_dedupe.py
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 -m unittest -v
+test_largest_wins_as_fallback_when_none_playable (test_dedupe.SuggestKeepTests.test_largest_wins_as_fallback_when_none_playable) ... ok
+test_playable_larger_wins_when_multiple_playable (test_dedupe.SuggestKeepTests.test_playable_larger_wins_when_multiple_playable) ... ok
+test_review_matches_canonical_on_regression_fixture (test_dedupe.SuggestKeepTests.test_review_matches_canonical_on_regression_fixture) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK
+[0m
+All 3 tests pass. Fix complete.
+
+- `dedupe.py:10` — `suggest_keep()` now delegates to `pick_canonical()`, so the review page uses the same playability-first, size-tiebreak ranking as the write path. Docstring bug note removed.
+- Added `test_dedupe.py` — regression test on `group_42` (both `suggested_keep` and `canonical_would_be` now return `scenes:101`), plus coverage for multi-playable size selection and the none-playable fallback.
+- `mirror_groups.json` unchanged.

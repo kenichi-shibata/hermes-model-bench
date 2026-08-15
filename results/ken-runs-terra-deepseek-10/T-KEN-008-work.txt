@@ -1,0 +1,172 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m✱ [0mGlob "*.json"[90m 3 matches[0m
+[0m
+[0m$ [0mls -la
+total 24
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 18:52 ..
+-rw-r--r--  1 root root  165 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  342 Aug 13 21:43 samantha_saint_wicked_catalog.json
+-rw-r--r--  1 root root 1188 Aug 13 21:43 scenes_db.json
+-rw-r--r--  1 root root    2 Aug 13 21:43 wanted_list.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead wanted_list.json
+[0m
+[0m# [0mTodos
+[•] Fix studio misattribution in scenes_db.json for IDs 200-203
+[ ] Populate wanted_list.json with structured queue
+[ ] Validate JSON syntax and verify plan invariants
+[0m
+The files match the plan. Executing now.
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-terra/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-terra/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-terra/T-KEN-008/scenes_db.json
+@@ -38,10 +38,9 @@
+ {
+   "id": 200,
+   "title": "Misattributed Scene 1",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 201,
+   "title": "Misattributed Scene 2",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-terra/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-terra/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-terra/T-KEN-008/scenes_db.json
+@@ -44,10 +44,9 @@
+ {
+   "id": 201,
+   "title": "Misattributed Scene 2",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 202,
+   "title": "Misattributed Scene 3",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-terra/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-terra/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-terra/T-KEN-008/scenes_db.json
+@@ -50,10 +50,9 @@
+ {
+   "id": 202,
+   "title": "Misattributed Scene 3",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 203,
+   "title": "Misattributed Scene 4",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-terra/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-terra/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-terra/T-KEN-008/scenes_db.json
+@@ -56,8 +56,7 @@
+   {
+     "id": 203,
+     "title": "Misattributed Scene 4",
+     "movie_id": null,
+-    "studio": "FliXXX",
+-    "real_studio": "Digital Playground"
++    "studio": "Digital Playground"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+[0m← [0mWrite wanted_list.json
+Wrote file successfully.
+[0m
+[0m✗ [0mEdit wanted_list.json failed
+[91m[1mError: [0mNo changes to apply: oldString and newString are identical.
+I introduced a malformed entry for Wicked Movie 11. Fixing it.
+[0m→ [0mRead wanted_list.json[90m [offset=80, limit=20][0m
+File is correct. Now validating.
+[0m
+[0m$ [0mpython3 -c "
+import json
+scenes = json.load(open('scenes_db.json'))
+wanted = json.load(open('wanted_list.json'))
+catalog = json.load(open('samantha_saint_wicked_catalog.json'))
+
+# scenes_db checks
+studios = {s['id']: s['studio'] for s in scenes}
+assert studios[200] == studios[201] == studios[202] == studios[203] == 'Digital Playground', studios
+assert all('real_studio' not in s for s in scenes), 'real_studio still present'
+assert all(s['movie_id'] is None for s in scenes)
+assert [s['id'] for s in scenes] == list(range(100,106)) + list(range(200,204))
+
+raw = open('scenes_db.json').read()
+assert 'FliXXX' not in raw, 'FliXXX still present'
+
+# wanted checks
+by_kind = {}
+for w in wanted:
+    by_kind.setdefault(w['kind'], []).append(w)
+
+sg = by_kind['scene_group']
+assert len(sg) == 1
+assert sg[0]['name'] == 'MovieX'
+assert sg[0]['studio'] == 'Wicked'
+assert sg[0]['scene_ids'] == [100,101,102,103,104,105]
+assert sorted(sg[0]['scene_ids']) == list(range(100,106)) and len(set(sg[0]['scene_ids'])) == 6
+
+sc = by_kind['scene']
+assert len(sc) == 4, sc
+assert [x['id'] for x in sc] == [200,201,202,203]
+assert all(x['studio'] == 'Digital Playground' for x in sc)
+assert not any('kind' in w and w['kind'] == 'movie' and 'MovieX' in str(w) for w in wanted), 'invented MovieX movie'
+
+mv = by_kind['movie']
+assert len(mv) == 12, len(mv)
+assert [m['title'] for m in mv] == catalog['movies'], 'titles mismatch'
+assert all(m['studio'] == 'Wicked' and m['performer'] == 'Samantha Saint' for m in mv)
+assert not any(w.get('name') == 'MovieX' and w.get('kind') == 'movie' for w in wanted), 'whole-movie MovieX invented'
+
+print('ALL CHECKS PASSED')
+print('wanted total:', len(wanted), '| kinds:', {k: len(v) for k,v in by_kind.items()})
+"
+
+ALL CHECKS PASSED
+wanted total: 17 | kinds: {'scene_group': 1, 'scene': 4, 'movie': 12}
+[0m
+[0m# [0mTodos
+[✓] Fix studio misattribution in scenes_db.json for IDs 200-203
+[✓] Populate wanted_list.json with structured queue
+[✓] Validate JSON syntax and verify plan invariants
+[0m
+Done. All checks pass.
+
+**scenes_db.json**
+- IDs 200–203: `studio` corrected `FliXXX` → `Digital Playground`; `real_studio` removed from all four. `FliXXX` no longer appears anywhere. Titles/IDs/`movie_id` untouched.
+
+**wanted_list.json** (17 entries, `kind`-typed queue)
+- 1 `scene_group`: `MovieX` → `scene_ids: [100–105]`, `studio: Wicked`, with a note that no whole-movie source exists (`movie_id: null` on all six), so it's queued as a stash group of six scenes — no invented whole-movie fallback.
+- 4 `scene` requests: IDs 200–203, `studio: Digital Playground`.
+- 12 `movie` requests: `Wicked Movie 1–12`, `studio: Wicked`, `performer: Samantha Saint`, titles exact-match the catalog.
+
+To answer the original question: group the six parts into a stash group (they share the `MovieX` identity); whole-movie download isn't possible from the supplied data since every scene has `movie_id: null` and there's no movie asset to reference.

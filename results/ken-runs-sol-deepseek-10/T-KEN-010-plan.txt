@@ -1,0 +1,33 @@
+[0m
+> build · openai/gpt-5.6-sol
+[0m
+I’ll trace the follow/unfollow logic in `bot.py` against the recorded events in `follow_log.json`, focusing on whether follow events recurse or cause unintended follows and what Discord-side removal behavior exists.
+[0m✱ [0mGlob "**/*"[90m in . · 3 matches[0m
+[0m→ [0mRead bot.py[90m [offset=1, limit=2000][0m
+[0m→ [0mRead follow_log.json[90m [offset=1, limit=2000][0m
+The defect is not recursive: the tracking handler directly performs one Discord follow as an unintended side effect. The log distinguishes 142 bug-created follows from 20 manual follows, including `codey_steele` and `cherry_kiss`; I’m checking the remaining local context before specifying the cleanup boundary and implementation steps.
+[0m✱ [0mGrep "follow|track|unfollow|remove|codey|cherry"[90m in . · 100 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md[90m [offset=1, limit=2000][0m
+**Diagnosis**
+There is a real follow bug, but it is not recursive.
+
+- `bot.py:3-8`: `track_studio_or_performer()` both tracks the entity and calls `db.follow_discord()`. Every use of the track action therefore creates one unintended Discord follow.
+- Nothing calls `track_studio_or_performer()` or `follow_discord()` recursively.
+- `follow_log.json:803-810` confirms `codey_steele` and `cherry_kiss` came from `track_button_bug` and have `"legit": false`. They were not manual follows.
+- The log contains 142 illegitimate `track_button_bug` follows total: `perf_0` through `perf_139`, plus `codey_steele` and `cherry_kiss`.
+- It also contains 20 legitimate `manual_follow` records. Those must not be removed.
+
+**Work Plan**
+1. Edit `bot.py`.
+2. Remove the `db.follow_discord(entity_id, entity_type)` call from `track_studio_or_performer()` at line 7.
+3. Update its docstring to describe tracking normally rather than retaining the `BUG`/`Fix` instructions.
+4. Leave `db.follow_discord()` available for the separate, explicit manual-follow path. Do not conflate following with tracking again.
+5. Unfollow only `codey_steele` and `cherry_kiss` through the real Discord follow API/account, since the log conclusively marks both as unintended.
+6. Do not delete their entries from `follow_log.json`: it is historical evidence explaining why the cleanup was performed, not an implementation of the Discord follow state.
+7. Do not unfollow the 20 `manual_follow` records.
+8. Separately review the other 140 `"legit": false` records with the user before bulk-unfollowing them. They appear to have the same cause, but the current request explicitly names only Codey Steele and Cherry Kiss.
+9. Verify that calling `track_studio_or_performer()` adds exactly one item to `db._tracks`, adds nothing to `db._follows`, and still returns `{"tracked": True}`.
+10. Verify that the explicit follow path still adds a follow when deliberately invoked.
+
+**Important Limitation**
+This directory contains no Discord client, credentials, API call, unfollow method, or executable cleanup integration. A WORK model can fix `bot.py`, but it cannot truthfully remove live Discord follows using only the provided files. It must use the actual external Discord integration if available in the deployment environment rather than pretending that editing `follow_log.json` performs an unfollow.

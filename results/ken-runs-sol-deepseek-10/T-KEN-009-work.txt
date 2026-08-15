@@ -1,0 +1,35 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead disk_fleet.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mls -la
+total 16
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 18:49 ..
+-rw-r--r--  1 root root   65 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  367 Aug 13 21:43 disk_fleet.json
+[0m
+Plan verified against `disk_fleet.json` — numbers match (host3 media-pool 92% thin, others 45/38/22/30, fleet median 38%, host3 the clear outlier).
+
+I can't reach the real hosts from this sandbox, so remediation steps 2–4 can't be executed here; `disk_fleet.json` is operational input and stays unmodified. Report:
+
+## Fleet capacity assessment
+
+| Host | Used % | Thin | Action |
+|------|--------|------|--------|
+| host1 | 45% | no | none |
+| host2 | 38% | no | none |
+| host3 (`media-pool`) | **92%** | **yes** | **HIGH — act now** |
+| host4 | 22% | no | none |
+| host5 | 30% | no | none |
+
+## host3 remediation procedure (run on the host)
+1. Confirm live usage and backing device: `lvdisplay media-pool`, `lvs`, and thin-pool data/meta usage (`lvs -o lv_name,data_percent,metadata_percent`); note absolute capacity and free extents.
+2. Find reclaimable space: expired media files, snapshots (`lvs` for snapshots), caches, deleted-but-open files (`lsof +L1`), and `df`/`lvs` growth trend (sample twice, hours apart, for growth rate).
+3. Clean up if safe headroom results; otherwise extend the thin pool (`lvextend -L +<size> <thinpool>`) or migrate data off before saturation — thin-pool exhaustion disrupts all dependent volumes.
+4. Recheck data+metadata percent after remediation.
+5. Set monitoring: warn at 80%, critical at 90%, on `media-pool` data_percent and metadata_percent.
+
+No repository files were changed. Remaining hosts (host1, host2, host4, host5) require no immediate capacity action.

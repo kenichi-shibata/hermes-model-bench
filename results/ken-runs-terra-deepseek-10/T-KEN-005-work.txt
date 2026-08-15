@@ -1,0 +1,84 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 18:52 ..
+-rw-r--r--  1 root root  110 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 1136 Aug 13 21:42 api.py
+-rw-r--r--  1 root root  224 Aug 13 21:42 scenes.json
+[0m
+[0m→ [0mRead api.py
+[0m→ [0mRead scenes.json
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit api.py
+Index: /root/ken-tasks-terra/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks-terra/T-KEN-005/api.py
++++ /root/ken-tasks-terra/T-KEN-005/api.py
+@@ -1,12 +1,9 @@
+ """Scene homepage sections."""
+ 
+ def _scene_out(scene, translate=False):
+     """Builds a scene card payload.
+-    BUG: translate defaults to False, and _hydrate_code() below never
+-    passes translate=True, so performer names never get romanized on
+-    the resume/continue-watching section even though _home_trending
+-    correctly passes translate=True."""
++    When translate=True, missing name_en values are filled via romanize()."""
+     out = {"id": scene["id"], "title": scene["title"], "performers": []}
+     for p in scene["performers"]:
+         name_en = p.get("name_en")
+         if translate and not name_en:
+
+[0m
+[0m← [0mEdit api.py
+Index: /root/ken-tasks-terra/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks-terra/T-KEN-005/api.py
++++ /root/ken-tasks-terra/T-KEN-005/api.py
+@@ -16,10 +16,10 @@
+     return [_scene_out(s, translate=True) for s in scenes]
+ 
+ 
+ def _hydrate_code(scene):
+-    """Used by the resume/continue-watching section. BUG: forgot translate=True."""
+-    return _scene_out(scene)  # missing translate=True
++    """Used by the resume/continue-watching section. Fills missing performer name_en via romanize()."""
++    return _scene_out(scene, translate=True)
+ 
+ 
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+
+[0m
+Plan matches the code. Making the edits.
+Now running the focused verification.
+[0m$ [0mpython3 -c "
+import json
+import api
+
+data = json.load(open('scenes.json'))
+
+trending = api._home_trending(data['trending'])
+resume = [api._hydrate_code(s) for s in data['resume']]
+
+assert trending[0]['performers'][0]['name_en'] == 'Nanao Ayatsuki', trending
+assert resume[0]['performers'][0]['name_en'] == 'Nanao Ayatsuki', resume
+assert resume[0]['performers'][0]['name_jp'] == '彩月七緒', resume
+
+# preexisting name_en preserved (not overwritten)
+preserved = api._scene_out({'id': 9, 'title': 'x', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Existing Name'}]}, translate=True)
+assert preserved['performers'][0]['name_en'] == 'Existing Name', preserved
+
+print('trending:', json.dumps(trending, ensure_ascii=False))
+print('resume:  ', json.dumps(resume, ensure_ascii=False))
+print('OK')
+"
+trending: [{"id": 1, "title": "Trending Scene", "performers": [{"name_jp": "彩月七緒", "name_en": "Nanao Ayatsuki"}]}]
+resume:   [{"id": 2, "title": "Resume Scene", "performers": [{"name_jp": "彩月七緒", "name_en": "Nanao Ayatsuki"}]}]
+OK
+[0m
+Fixed. `_hydrate_code()` now passes `translate=True` to `_scene_out()`, so resume/continue-watching cards get the same romanized `name_en` fallback as trending cards. Docstrings updated, `scenes.json` untouched. Verified: both sections emit `"name_en": "Nanao Ayatsuki"`, and preexisting `name_en` values are preserved.

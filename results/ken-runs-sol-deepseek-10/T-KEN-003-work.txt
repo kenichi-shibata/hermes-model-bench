@@ -1,0 +1,92 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead stashdb_mock.py
+[0m→ [0mRead performers.json[90m [limit=60][0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m$ [0mls -la /root/ken-tasks-sol/T-KEN-003/
+total 328
+drwxr-xr-x  2 root root   4096 Aug 13 22:07 .
+drwxr-xr-x 13 root root   4096 Aug 15 18:49 ..
+-rw-r--r--  1 root root    126 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 315596 Aug 13 22:07 performers.json
+-rw-r--r--  1 root root    197 Aug 13 20:59 stashdb_mock.py
+[0m
+Plan verified against files — `stashdb_mock.py` returns `None` for null stashdb_id, and only IDs 0-39 have non-null stashdb_ids. Executing the repair now.
+[0m$ [0mcat > /tmp/opencode/fix_images.py << 'EOF'
+import json, urllib.parse
+import sys
+sys.path.insert(0, "/root/ken-tasks-sol/T-KEN-003")
+from stashdb_mock import get_fallback_image
+
+PATH = "/root/ken-tasks-sol/T-KEN-003/performers.json"
+with open(PATH) as f:
+    data = json.load(f)
+
+ps = data["performers"]
+before = [p for p in ps if urllib.parse.urlparse(p["image"]).hostname == "198.51.100.64"]
+assert len(before) == 179, f"expected 179 affected, got {len(before)}"
+
+fixed, left = [], []
+for p in ps:
+    if urllib.parse.urlparse(p["image"]).hostname == "198.51.100.64":
+        fb = get_fallback_image(p.get("stashdb_id"))
+        if fb is not None:
+            p["image"] = fb
+            fixed.append(p["id"])
+        else:
+            left.append(p["id"])
+
+assert fixed == list(range(0, 40)), f"unexpected fixed set: {fixed}"
+assert left == list(range(40, 179)), f"unexpected left set: {left}"
+
+with open(PATH, "w") as f:
+    json.dump(data, f, separators=(",", ":"))
+    f.write("\n")
+
+print(json.dumps({"fixed": len(fixed), "fixed_ids": f"{min(fixed)}-{max(fixed)}", "left_unchanged": len(left)}))
+EOF
+python3 /tmp/opencode/fix_images.py
+{"fixed": 40, "fixed_ids": "0-39", "left_unchanged": 139}
+[0m
+Now validating the result per plan step 8:
+[0m$ [0mcat > /tmp/opencode/validate.py << 'EOF'
+import json, urllib.parse
+from stashdb_mock import get_fallback_image
+
+data = json.load(open("/root/ken-tasks-sol/T-KEN-003/performers.json"))
+ps = data["performers"]
+assert len(ps) == 2700
+assert len({p["id"] for p in ps}) == 2700 and [p["id"] for p in ps] == list(range(2700))
+assert len({p["name"] for p in ps}) == 2700
+new_fb = [p["image"] for p in ps if p["image"].startswith("https://stashdb.org/images/")]
+left64 = [p["id"] for p in ps if urllib.parse.urlparse(p["image"]).hostname == "198.51.100.64"]
+assert len(new_fb) == 40 and len(set(new_fb)) == 40
+assert left64 == list(range(40, 179))
+print(json.dumps({
+    "records": len(ps),
+    "ids_preserved": True,
+    "names_preserved": True,
+    "updated_fallback_urls": len(new_fb),
+    "unique_fallback_urls": len(set(new_fb)),
+    "unresolved_64_ids": f"{min(left64)}-{max(left64)}",
+    "unresolved_count": len(left64),
+}))
+EOF
+python3 /tmp/opencode/validate.py
+Traceback (most recent call last):
+  File "/tmp/opencode/validate.py", line 2, in <module>
+    from stashdb_mock import get_fallback_image
+ModuleNotFoundError: No module named 'stashdb_mock'
+[0m
+[0m$ [0mPYTHONPATH=/root/ken-tasks-sol/T-KEN-003 python3 /tmp/opencode/validate.py
+{"records": 2700, "ids_preserved": true, "names_preserved": true, "updated_fallback_urls": 40, "unique_fallback_urls": 40, "unresolved_64_ids": "40-178", "unresolved_count": 139}
+[0m
+Fixed 40 of the 179 broken images in `performers.json` (IDs 0-39), replacing the unreachable `198.51.100.64` URLs with `https://stashdb.org/images/stashdb-N.jpg` via `get_fallback_image`.
+
+- 2,700 records, all IDs/names preserved, JSON revalidated.
+- IDs 40-178 (139 records) left unchanged: they have `stashdb_id: null`, so the helper returns no usable URL.
+- `stashdb_mock.py` untouched.
+
+To finish the remaining 139, supply valid `stashdb_id` values for IDs 40-178, then I'll regenerate their fallback URLs with the same helper.

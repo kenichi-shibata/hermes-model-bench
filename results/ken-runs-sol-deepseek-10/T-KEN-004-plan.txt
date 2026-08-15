@@ -1,0 +1,64 @@
+[0m
+> build · openai/gpt-5.6-sol
+[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+I’ll inspect the sandbox contents and the candidate-node facts, then report the safest concrete LXC placement and implementation steps without changing anything.
+[0m→ [0mRead node_facts.json[90m [offset=1, limit=2000][0m
+[0m→ [0mRead CONTEXT_ONLY.md[90m [offset=1, limit=2000][0m
+**Finding**
+
+Place the test LXC on `node_A`.
+
+- `node_A` has more immediately free RAM: 674 MB versus 478 MB (`node_facts.json:3`, `node_facts.json:9`).
+- It has substantially more reclaimable cache: 8.5 GB versus 4.5 GB (`node_facts.json:4`, `node_facts.json:10`).
+- Disk capacity is effectively equal: 200 GB versus 202 GB free in the thin pool (`node_facts.json:5`, `node_facts.json:11`).
+- Most importantly, `node_B` runs the financial `trading-stack` (`node_facts.json:12-13`). A disposable test workload should not add resource contention or operational risk there.
+
+The real blocker is that this directory contains only placement facts. It has no LXC definition, provisioning scripts, host connection details, template name, networking configuration, container ID, or requested resource sizing. The facts support a placement decision, but not an executable provisioning command.
+
+**Work Plan**
+
+1. Confirm the test container requirements:
+   - Unique container ID and hostname.
+   - Distribution/template.
+   - CPU, RAM, swap, and root-disk allocation.
+   - Network bridge, VLAN, IP configuration, and DNS.
+   - Whether the container must be privileged or unprivileged.
+   - Required SSH keys, packages, and expiration/cleanup date.
+
+2. Use `node_A` as the target. Do not schedule the container on `node_B` unless `node_A` fails a fresh capacity or health check.
+
+3. Before provisioning, query live host state rather than relying solely on this snapshot:
+   - Verify `node_A` is healthy and in quorum, if clustered.
+   - Verify its LXC storage and template storage are available.
+   - Confirm the requested RAM can be supplied safely. Only 674 MB is immediately free; reclaimable cache is not equivalent to guaranteed free memory.
+   - Confirm thin-pool data and metadata utilization are below operational thresholds.
+   - Check that the selected container ID, hostname, and IP are unused.
+
+4. Provision through the environment’s existing management interface, such as Proxmox API/CLI or native LXC tooling. Start with conservative test sizing unless requirements dictate otherwise:
+   - Unprivileged container.
+   - One vCPU.
+   - 512 MB RAM or less, given the currently reported free RAM.
+   - Minimal swap.
+   - Small thin-provisioned root disk.
+   - No nesting, device passthrough, or elevated capabilities unless explicitly needed.
+
+5. Start and validate the container:
+   - Confirm it reaches the running state.
+   - Confirm console or SSH access.
+   - Verify IP assignment, DNS, gateway connectivity, and package repositories.
+   - Check memory pressure and thin-pool usage on `node_A`.
+   - Confirm the `trading-stack` node remains untouched.
+
+6. Record ownership, purpose, and an expiration date. Remove the container and its volumes after testing if it is temporary.
+
+7. If provisioning fails or causes memory pressure, stop and destroy the new test container. Do not fail over automatically to `node_B`; reassess capacity or reduce the requested size first.
+
+**Files**
+
+No existing files should be edited:
+
+- `node_facts.json` is input evidence and should remain unchanged.
+- `CONTEXT_ONLY.md` contains orientation only and should remain unchanged.
+
+If the environment expects infrastructure-as-code, the WORK model must first locate or be given the relevant repository or manifest convention. None exists in this sandbox, so creating an arbitrary LXC configuration file here would not provision anything and would be unjustified.

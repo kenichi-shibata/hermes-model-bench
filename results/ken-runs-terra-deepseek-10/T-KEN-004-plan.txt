@@ -1,0 +1,57 @@
+[0m
+> build · openai/gpt-5.6-terra
+[0m
+[0m✱ [0mGlob "**/*"[90m in . · 2 matches[0m
+I’ll inspect the supplied node facts and any in-directory operational documentation, then identify the safest concrete provisioning steps without making changes.
+[0m→ [0mRead node_facts.json[90m [offset=1, limit=200][0m
+[0m→ [0mRead CONTEXT_ONLY.md[90m [offset=1, limit=400][0m
+**Investigation**
+
+Only operational input is `node_facts.json`; `CONTEXT_ONLY.md` adds no instructions.
+
+`node_A` is the appropriate target:
+
+- It does **not** host the financial system.
+- It has `200 GB` free thin-pool capacity.
+- It has `674 MB` immediately free RAM and `8.5 GB` reclaimable cache, for roughly `9.2 GB` potentially available memory.
+
+Do not place a test container on `node_B`: although it has similar disk capacity, it hosts `trading-stack`, creating unnecessary operational risk. Its immediately free RAM is also lower (`478 MB`).
+
+**Real Problem**
+
+There is no stated container specification: name, image/release, CPU/RAM/disk limits, networking/IP requirements, lifetime/cleanup owner, or confirmation that “LXC” means the LXD-managed `lxc` CLI rather than raw liblxc. The facts support selecting a node but are insufficient to safely choose production-affecting settings.
+
+**Plan For The WORK Model**
+
+1. Obtain or select the missing container requirements:
+   - Confirm this uses LXD/Incus-style `lxc`, versus raw LXC.
+   - Choose a unique test container name.
+   - Confirm the base image and release.
+   - Define conservative resource limits, a network profile/IP requirement, and expected expiry/cleanup ownership.
+
+2. Target `node_A` exclusively. Do not make any deployment or configuration change to `node_B`.
+
+3. On `node_A`, preflight the LXC/LXD environment:
+   - Verify the daemon is available and initialized.
+   - Inspect existing instances to avoid a naming collision.
+   - Verify a suitable image remote is available.
+   - Inspect storage-pool free capacity and network/profile availability.
+   - Recheck current memory availability immediately before launch, because `node_facts.json` is only a snapshot.
+
+4. Launch the test instance with explicit conservative constraints rather than consuming unbounded host resources. For example, once the confirmed requirements are known, use an LXD-style command in this form:
+   ```bash
+   lxc launch images:ubuntu/24.04 <test-container-name> \
+     -c limits.cpu=<approved-cpu-limit> \
+     -c limits.memory=<approved-memory-limit> \
+     -d root,size=<approved-disk-limit>
+   ```
+   Apply the approved network profile or static network settings as part of launch/configuration. Do not assume the example image, limits, or default profile are correct until confirmed.
+
+5. Validate the result:
+   - Confirm the instance is `RUNNING`.
+   - Verify its assigned IP and network reachability required for testing.
+   - Execute a simple command inside the container.
+   - Confirm its disk size and configured CPU/memory limits match the approved values.
+   - Recheck host memory/storage after launch.
+
+6. Record the container name, selected node (`node_A`), image, limits, network assignment, and cleanup/expiry details in the team’s normal operational tracking system. No repository file currently exists for this purpose, so the WORK model should not invent or edit one unless asked.

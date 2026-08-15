@@ -1,0 +1,228 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead wanted_list.json
+[0m✱ [0mGlob "*"[90m 4 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sol/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+@@ -1,9 +1,9 @@
+ [
+   {
+     "id": 100,
+     "title": "MovieX Part 1",
+-    "movie_id": null,
++    "movie_id": "moviex",
+     "studio": "Wicked"
+   },
+   {
+     "id": 101,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sol/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+@@ -7,9 +7,9 @@
+ },
+ {
+   "id": 101,
+   "title": "MovieX Part 2",
+-  "movie_id": null,
++  "movie_id": "moviex",
+   "studio": "Wicked"
+ },
+ {
+   "id": 102,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sol/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+@@ -13,9 +13,9 @@
+ },
+ {
+   "id": 102,
+   "title": "MovieX Part 3",
+-  "movie_id": null,
++  "movie_id": "moviex",
+   "studio": "Wicked"
+ },
+ {
+   "id": 103,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sol/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+@@ -19,9 +19,9 @@
+ },
+ {
+   "id": 103,
+   "title": "MovieX Part 4",
+-  "movie_id": null,
++  "movie_id": "moviex",
+   "studio": "Wicked"
+ },
+ {
+   "id": 104,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sol/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+@@ -25,9 +25,9 @@
+ },
+ {
+   "id": 104,
+   "title": "MovieX Part 5",
+-  "movie_id": null,
++  "movie_id": "moviex",
+   "studio": "Wicked"
+ },
+ {
+   "id": 105,
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sol/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+@@ -31,9 +31,9 @@
+ },
+ {
+   "id": 105,
+   "title": "MovieX Part 6",
+-  "movie_id": null,
++  "movie_id": "moviex",
+   "studio": "Wicked"
+ },
+ {
+   "id": 200,
+
+[0m
+Plan verified against actual files — all findings match. Executing edits.
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sol/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+@@ -38,10 +38,9 @@
+ {
+   "id": 200,
+   "title": "Misattributed Scene 1",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 201,
+   "title": "Misattributed Scene 2",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sol/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+@@ -44,10 +44,9 @@
+ {
+   "id": 201,
+   "title": "Misattributed Scene 2",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 202,
+   "title": "Misattributed Scene 3",
+
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sol/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+@@ -50,10 +50,9 @@
+ {
+   "id": 202,
+   "title": "Misattributed Scene 3",
+   "movie_id": null,
+-  "studio": "FliXXX",
+-  "real_studio": "Digital Playground"
++  "studio": "Digital Playground"
+ },
+ {
+   "id": 203,
+   "title": "Misattributed Scene 4",
+
+[0m
+Now canonicalizing the four FliXXX scenes:
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-sol/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-sol/T-KEN-008/scenes_db.json
+@@ -56,8 +56,7 @@
+   {
+     "id": 203,
+     "title": "Misattributed Scene 4",
+     "movie_id": null,
+-    "studio": "FliXXX",
+-    "real_studio": "Digital Playground"
++    "studio": "Digital Playground"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+Now populating the wanted list:
+[0m← [0mWrite wanted_list.json
+Wrote file successfully.
+[0m
+Validating:
+[0m$ [0mpython3 -c "
+import json
+scenes = json.load(open('scenes_db.json'))
+catalog = json.load(open('samantha_saint_wicked_catalog.json'))
+wanted = json.load(open('wanted_list.json'))
+
+mx = [s['id'] for s in scenes if s.get('movie_id')=='moviex']
+assert mx == [100,101,102,103,104,105], mx
+assert all(s['studio']=='Wicked' for s in scenes if s['id'] in mx)
+
+dp = {s['id']: s for s in scenes if s['id'] in [200,201,202,203]}
+assert all(s['studio']=='Digital Playground' for s in dp.values())
+assert all('real_studio' not in s for s in dp.values())
+
+assert wanted == catalog['movies']
+assert len(set(wanted)) == 12
+titles = {s['title'] for s in scenes}
+assert not (set(wanted) & titles)
+print('ALL CHECKS PASSED')
+"
+ALL CHECKS PASSED
+[0m
+Done. All three edits applied and validated:
+
+1. **MovieX grouping** — scenes `100-105` now share `movie_id: "moviex"`, forming one Stash group while preserving individual titles/studio. No duplicate whole-movie download queued.
+2. **Studio canonicalization** — scenes `200-203` now have only `studio: "Digital Playground"`; `real_studio` removed, fixing the FliXXX flip-flop.
+3. **Wanted list** — `wanted_list.json` now queues all 12 Samantha Saint Wicked movies from the catalog.
+
+Note: the actual movie downloads still require source URLs/provider IDs not present in this sandbox; this plan only populates the queue and corrects metadata. `samantha_saint_wicked_catalog.json` untouched.

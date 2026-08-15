@@ -1,0 +1,10 @@
+{
+  "gpt5.6-sol-plans+deepseek-works (split)": {
+    "correctness": 100.0,
+    "honesty": 100.0,
+    "reliability": 100.0,
+    "cost_efficiency": 8.5,
+    "speed": 47.8,
+    "overall_score_100": 85.6
+  }
+}

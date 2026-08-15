@@ -1,0 +1,43 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m$ [0mls -la /root/ken-tasks-terra/T-KEN-001 && echo "---" && ls -la /root/ken-tasks-terra/T-KEN-001/delegation_live 2>/dev/null
+total 20
+drwxr-xr-x  3 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 18:52 ..
+-rw-r--r--  1 root root  110 Aug 13 21:48 CONTEXT_ONLY.md
+drwxr-xr-x  7 root root 4096 Aug 13 20:58 delegation_live
+-rw-r--r--  1 root root  132 Aug 13 20:58 gh_repo_list_mock.json
+---
+total 28
+drwxr-xr-x 7 root root 4096 Aug 13 20:58 .
+drwxr-xr-x 3 root root 4096 Aug 13 21:48 ..
+drwxr-xr-x 2 root root 4096 Aug 13 20:58 deleg_fake0
+drwxr-xr-x 2 root root 4096 Aug 13 20:58 deleg_fake1
+drwxr-xr-x 2 root root 4096 Aug 13 20:58 deleg_fake2
+drwxr-xr-x 2 root root 4096 Aug 13 20:58 deleg_fake3
+drwxr-xr-x 2 root root 4096 Aug 13 20:58 deleg_fake4
+[0m
+[0m✱ [0mGlob "**/*"[90m 7 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead gh_repo_list_mock.json
+[0m→ [0mRead delegation_live/deleg_fake0/manifest.json
+[0m→ [0mRead delegation_live/deleg_fake1/manifest.json
+[0m→ [0mRead delegation_live/deleg_fake2/manifest.json
+[0m→ [0mRead delegation_live/deleg_fake3/manifest.json
+[0m→ [0mRead delegation_live/deleg_fake4/manifest.json
+**Delegation is not getting better.**
+
+Verified from the 5 manifests (`delegation_live/deleg_fake{0-4}/manifest.json`):
+
+| Date | completed | capped | rate |
+|------|-----------|--------|------|
+| 08-10 | 1 (fake0) | 1 (fake1) | 50% |
+| 08-11 | 1 (fake2) | 0 | 100% |
+| 08-12 | 0 | 2 (fake3, fake4) | 0% |
+
+Total: **40% completed, 60% capped**. The trend is worsening — the most recent day went 100% → 0%, not improving.
+
+**No new repo was created.** `gh_repo_list_mock.json` still contains only `existing-repo-1` (2026-07-01) and `existing-repo-2` (2026-06-15); nothing newer.
+
+Note on the plan's steps 2–6: they can't be executed here. This directory contains only manifests (status/created_at/goal — no prompts, caps, tool counts, or errors) and no runner/orchestration config, so there's nothing to fix or re-run. The cause of the caps isn't diagnosable from this dataset; you'd need the actual delegation runner logs/config.

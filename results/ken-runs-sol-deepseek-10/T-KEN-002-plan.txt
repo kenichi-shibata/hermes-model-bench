@@ -1,0 +1,71 @@
+[0m
+> build · openai/gpt-5.6-sol
+[0m
+I’ll inspect the dedupe implementation and the shape of the real mirror groups, then report defects, edge cases, and an exact implementation and verification plan without modifying files.
+[0m✱ [0mGlob "**/*"[90m in . · 3 matches[0m
+[0m→ [0mRead mirror_groups.json[90m [offset=1, limit=2000][0m
+[0m→ [0mRead dedupe.py[90m [offset=1, limit=2000][0m
+[0m→ [0mRead CONTEXT_ONLY.md[90m [offset=1, limit=2000][0m
+The implementation has two independent ranking paths, and the real data triggers a disagreement: the review recommendation favors the larger dead file while the write path preserves the smaller playable file. I’m validating the observed output and checking whether the smallest fix preserves all existing ranking semantics.
+[0m
+[0m$ [0mPYTHONDONTWRITEBYTECODE=1 python -c 'import json; from pathlib import Path; import dedupe; db=json.loads(Path("mirror_groups.json").read_text()); print(dedupe.scan_mirror_group("group_42", db))'
+/bin/bash: line 1: python: command not found
+[0m
+[0m$ [0mPYTHONDONTWRITEBYTECODE=1 python3 -c 'import json; from pathlib import Path; import dedupe; db=json.loads(Path("mirror_groups.json").read_text()); print(dedupe.scan_mirror_group("group_42", db))'
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+[0m
+**Problem**
+`dedupe.py` contains inconsistent duplicate-ranking logic:
+
+- `pick_canonical()` at `dedupe.py:3` correctly prefers playable files, then chooses the largest playable file.
+- `suggest_keep()` at `dedupe.py:10` ignores playability and chooses only by size.
+- `scan_mirror_group()` exposes both results, causing the review UI to recommend a file that the write path would not preserve.
+
+The supplied `mirror_groups.json` reproduces the issue:
+
+```python
+{
+    "group_id": "group_42",
+    "suggested_keep": "scenes:100",
+    "canonical_would_be": "scenes:101",
+}
+```
+
+`scenes:100` is 5.2 GB but unplayable. `scenes:101` is 1.8 GB and playable. The review recommendation therefore tells the user to keep the proven-dead file.
+
+The actual canonical/write-path ranking appears correct. The defect is duplicated ranking logic in the display path, not the removal algorithm itself.
+
+**Implementation Plan**
+1. Edit `dedupe.py`.
+2. Replace the independent size-only implementation of `suggest_keep()` with delegation to `pick_canonical()`:
+
+```python
+def suggest_keep(candidates):
+    """Return the same preferred file used by the write path."""
+    return pick_canonical(candidates)
+```
+
+3. Remove the obsolete `BUG` docstring text.
+4. Keep `pick_canonical()` as the single source of ranking policy. This preserves current behavior:
+   - Playable candidates beat all unplayable candidates.
+   - The largest playable candidate wins when multiple playable candidates exist.
+   - The largest candidate wins when none are playable.
+   - Existing first-candidate behavior for equal sizes remains unchanged.
+5. Do not modify `mirror_groups.json`; it is valid regression data demonstrating the bug.
+6. Add `test_dedupe.py` using the standard-library `unittest` module, since the directory has no dependency or test configuration. Cover:
+   - The real `group_42` data produces `scenes:101` for both `suggested_keep` and `canonical_would_be`.
+   - A smaller playable file beats a larger unplayable file.
+   - The largest playable file wins among multiple playable files.
+   - The largest file wins when every candidate is unplayable.
+7. Run `python3 -m unittest -v`.
+8. Re-run the real-data scan and verify:
+
+```python
+{
+    "group_id": "group_42",
+    "suggested_keep": "scenes:101",
+    "canonical_would_be": "scenes:101",
+}
+```
+
+Empty groups currently raise `ValueError` through `max()`, and malformed candidates raise `KeyError`. There is no evidence in the supplied data that either case is valid, so the WORK model should not invent fallback behavior without an explicit product requirement.

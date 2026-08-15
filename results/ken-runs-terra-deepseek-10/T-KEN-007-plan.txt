@@ -1,0 +1,37 @@
+[0m
+> build · openai/gpt-5.6-terra
+[0m
+I’ll inspect the two supplied artifacts and correlate the dependency status with the service’s alert behavior, without modifying anything.
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead upstream_status_mock.json[90m [offset=1, limit=2000][0m
+[0m→ [0mRead service_logs.txt[90m [offset=1, limit=2000][0m
+[0m→ [0mRead CONTEXT_ONLY.md[90m [offset=1, limit=2000][0m
+**Problem Confirmed**
+
+The alert appears broken or, at minimum, incorrectly scoped.
+
+- `payments-api` entered a `major_outage` at `2026-08-13T09:55:00Z`, with an active provider-side incident and no ETA: `upstream_status_mock.json:1`.
+- The service observed a `503` from that dependency at `10:03:01`: `service_logs.txt:4`.
+- One minute later it emitted `INFO service healthy (own health check green)`: `service_logs.txt:5`.
+- There is no log evidence of an alert being raised for the dependency failure or the known active major outage.
+
+The likely defect is an alert tied only to the service's own liveness/health endpoint. That endpoint remains green while a required upstream dependency is unavailable, suppressing or clearing the operationally relevant alert.
+
+**Plan For WORK Model**
+
+1. Locate the service health-check, alerting, and dependency-monitoring implementation (none is present in this sandbox; only diagnostic artifacts exist).
+2. Determine whether `payments-api` is a critical dependency for the affected service path.
+3. Update the aggregate readiness/operational-health signal so a sustained `payments-api` 5xx failure marks the service degraded or unavailable as appropriate. Do not change the basic liveness check merely because an upstream is down.
+4. Add alerting rules that trigger on either:
+   - sustained upstream `payments-api` failures (for example, 503/error-rate threshold over a defined window), or
+   - a declared `major_outage` status from the dependency-status feed, if that feed is intended to drive alerts.
+5. Include alert context: dependency name, observed failure status, outage start time, provider incident message, and whether the service’s own liveness remains green.
+6. Ensure the recovery condition requires the dependency to be healthy for a stability window, rather than clearing immediately because the service process is alive.
+7. Add tests for:
+   - own health green + `payments-api` 503 produces degraded readiness and an alert;
+   - active `major_outage` produces an alert;
+   - transient single failure does not page if a sustained-failure threshold is chosen;
+   - dependency recovery clears the alert only after the configured recovery window.
+8. Validate using the supplied scenario: the `10:03:01` 503 must create or maintain an upstream-dependency alert despite the `10:04:01` own-health success log.
+
+No files should be edited in this directory because it contains no service or alerting source/configuration, only the evidence needed to diagnose the issue.

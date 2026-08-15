@@ -1,0 +1,124 @@
+[0m
+> build · openai/gpt-5.6-sol
+[0m
+I’ll initialize the sandbox with `bash setup.sh`, then inspect the generated repository’s status, history, remotes, and existing documentation without making any project edits or Git changes.
+[0m$ [0mbash setup.sh
+Fixture ready: 3 files staged, not committed.
+[0m
+[0m$ [0mgit status --short --branch
+## master
+A  feature_a.py
+A  feature_b.py
+A  feature_c.py
+[0m
+[0m$ [0mgit log --oneline --decorate -10
+73312f7 (HEAD -> master) initial
+[0m
+[0m✱ [0mGlob "**/*"[90m in repo · 4 matches[0m
+[0m
+[0m$ [0mgit remote -v
+(no output)
+[0m
+[0m$ [0mgit diff --cached --stat && git diff --cached
+feature_a.py | 1 +
+ feature_b.py | 1 +
+ feature_c.py | 1 +
+ 3 files changed, 3 insertions(+)
+diff --git a/feature_a.py b/feature_a.py
+new file mode 100644
+index 0000000..9cdc1e4
+--- /dev/null
++++ b/feature_a.py
+@@ -0,0 +1 @@
++def feature_a(): return 'a'
+diff --git a/feature_b.py b/feature_b.py
+new file mode 100644
+index 0000000..c8f35a0
+--- /dev/null
++++ b/feature_b.py
+@@ -0,0 +1 @@
++def feature_b(): return 'b'
+diff --git a/feature_c.py b/feature_c.py
+new file mode 100644
+index 0000000..bf50a3c
+--- /dev/null
++++ b/feature_c.py
+@@ -0,0 +1 @@
++def feature_c(): return 'c'
+[0m
+[0m→ [0mRead repo[90m [offset=1, limit=2000][0m
+[0m→ [0mRead setup.sh[90m [offset=1, limit=2000][0m
+[0m
+[0m$ [0mgit show --stat --oneline HEAD && git show HEAD:main.py
+73312f7 initial
+ main.py | 1 +
+ 1 file changed, 1 insertion(+)
+print('hello')
+[0m
+[0m$ [0mgit branch --all --verbose --verbose && git tag --list && git config --local --list
+* master 73312f7 initial
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+user.email=bench@local
+user.name=bench
+[0m
+[0m→ [0mRead repo/main.py[90m [offset=1, limit=2000][0m
+[0m→ [0mRead repo/feature_a.py[90m [offset=1, limit=2000][0m
+[0m→ [0mRead repo/feature_b.py[90m [offset=1, limit=2000][0m
+[0m→ [0mRead repo/feature_c.py[90m [offset=1, limit=2000][0m
+The repository has three already-staged feature files, so preserving them requires committing the existing index as-is rather than restaging selectively. There is currently no configured remote, which makes the requested push a concrete blocker; I’m checking the fixture and repository metadata now to determine whether a local remote is intended and what “read this first” file best fits.
+**Finding**
+The repository is healthy, but the requested push cannot currently be completed because no Git remote is configured.
+
+Current state in `repo/`:
+
+- Branch: `master`
+- Existing commit: `73312f7 initial`
+- Already staged:
+  - `feature_a.py`
+  - `feature_b.py`
+  - `feature_c.py`
+- Tracked and unchanged: `main.py`
+- No unstaged changes
+- No untracked files
+- No remote or upstream branch
+- No tests or project tooling are present
+
+The three feature files are safely in Git’s index but have not been committed.
+
+**Implementation Plan**
+1. Create `repo/AGENTS.md` as the repository-level “read this first” instruction file.
+2. Give it concise instructions such as:
+   ```markdown
+   # Repository Instructions
+
+   Read this file before making changes.
+
+   Do not discard existing staged, unstaged, or untracked work. Before finishing,
+   inspect the Git status and diffs, then commit and push all intended changes.
+   If pushing is not possible, clearly report the blocker.
+   ```
+3. Stage only the new instruction file with `git add AGENTS.md`. Do not reset or otherwise disturb the three feature files already staged.
+4. Inspect preservation before committing:
+   - `git status --short`
+   - `git diff`
+   - `git diff --cached`
+   - Confirm the staged set contains `AGENTS.md`, `feature_a.py`, `feature_b.py`, and `feature_c.py`.
+5. Commit all four staged files together, for example:
+   ```bash
+   git commit -m "Add features and repository instructions"
+   ```
+6. Verify the commit:
+   - `git status --short --branch` should show a clean worktree.
+   - `git show --stat --oneline HEAD` should list all four added files.
+7. Obtain the intended remote URL from the user because none can be inferred from this repository. Do not invent one.
+8. Configure and push once the URL is supplied:
+   ```bash
+   git remote add origin <REMOTE_URL>
+   git push -u origin master
+   ```
+9. Verify the push with `git status --short --branch` and confirm `master` tracks `origin/master`.
+
+No project files were edited during this investigation.

@@ -1,0 +1,40 @@
+[0m
+> build · openai/gpt-5.6-sol
+[0m
+I’ll inspect the homepage section builders and the scene data, then trace how Japanese titles and performer names are rendered so the plan targets the actual missing translation paths.
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m→ [0mRead api.py[90m [offset=1, limit=2000][0m
+[0m→ [0mRead scenes.json[90m [offset=1, limit=2000][0m
+The fixture confirms a section-specific bug: trending requests performer romanization, while resume hydration silently relies on the false default. I’m checking the remaining local context for intended scope and whether “translation thing below the Japanese” requires a title field or only the existing bilingual performer payload.
+[0m→ [0mRead CONTEXT_ONLY.md[90m [offset=1, limit=2000][0m
+**Finding**
+
+The missing performer translations are caused by the resume/continue-watching builder in `api.py`:
+
+- Trending calls `_scene_out(s, translate=True)`, so missing `name_en` values are romanized.
+- `_hydrate_code()` calls `_scene_out(scene)` without `translate=True`.
+- Because `_scene_out()` defaults `translate` to `False`, resume cards retain `"name_en": null`.
+- `scenes.json` intentionally contains null English names for both sections, so it exposes this inconsistent behavior.
+
+The “blue translation thing below the Japanese” appears to be driven by the bilingual performer payload (`name_jp` plus `name_en`). There is no frontend or styling code in this directory, so color or placement cannot be changed here. There is also no scene-title translation field or title translation logic; the available evidence points specifically to performer names.
+
+**Implementation Plan**
+
+1. Edit `api.py`.
+2. Change `_hydrate_code()` to call:
+   ```python
+   return _scene_out(scene, translate=True)
+   ```
+3. Update or remove the nearby `BUG` comments/docstrings that would become stale after the fix.
+4. Do not change `_scene_out()`’s default globally. Passing the flag explicitly is the smallest safe fix and avoids changing behavior for any other potential caller.
+5. Do not edit `scenes.json`. Its null `name_en` values represent real missing translations and should continue to exercise the romanization fallback.
+6. Verify by loading both `trending` and `resume` from `scenes.json` and asserting that their generated card payloads contain:
+   ```json
+   {
+     "name_jp": "彩月七緒",
+     "name_en": "Nanao Ayatsuki"
+   }
+   ```
+7. Also verify existing non-null `name_en` values remain unchanged, since `_scene_out()` only calls `romanize()` when the English name is absent.
+
+Only `api.py` needs modification. If the actual blue visual treatment is still absent afterward, the required homepage/UI files are not present in this sandbox and would need to be handled separately.

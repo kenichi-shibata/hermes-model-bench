@@ -1,0 +1,71 @@
+[0m
+> build · openai/gpt-5.6-sol
+[0m
+I’ll inspect the three data files and their schemas, then trace movie-part relationships, Flixxx/Digital Playground attribution, and the Samantha Saint Wicked catalog into an exact queue/update plan without changing anything.
+[0m→ [0mRead scenes_db.json[90m [offset=1, limit=2000][0m
+[0m→ [0mRead samantha_saint_wicked_catalog.json[90m [offset=1, limit=2000][0m
+[0m→ [0mRead wanted_list.json[90m [offset=1, limit=2000][0m
+[0m✱ [0mGlob "*"[90m in . · 4 matches[0m
+[0m→ [0mRead CONTEXT_ONLY.md[90m [offset=1, limit=2000][0m
+The data confirms two distinct metadata problems: six Wicked scenes have no movie linkage despite a shared movie title pattern, while four items are explicitly stored under FliXXX even though their authoritative studio is Digital Playground. I’m checking the local context file for any queue schema or grouping constraints before specifying edits.
+**Findings**
+
+1. `scenes_db.json:2-37` contains six scenes named `MovieX Part 1` through `MovieX Part 6`. All have `movie_id: null`, so they are downloaded/stored as independent scenes rather than linked parts of one movie.
+2. The available schema already has a grouping mechanism: `movie_id`. Therefore, the six scenes can be grouped by assigning the same non-null movie identifier. There is no need to download another whole-movie copy based on the provided data.
+3. There is no movie/group record file, downloader configuration, source URL, or complete MovieX download entry in this directory. A WORK model cannot initiate or define a whole-movie download from these files alone.
+4. `scenes_db.json:39-65` confirms the FliXXX problem. Scenes `200-203` have conflicting metadata:
+   - `studio`: `FliXXX`
+   - `real_studio`: `Digital Playground`
+   
+   Keeping both values can cause studio attribution to flip depending on which field an importer prioritizes.
+5. `samantha_saint_wicked_catalog.json` lists 12 Samantha Saint Wicked movies. `wanted_list.json` is empty, and none of those movie titles appears in `scenes_db.json`, so all 12 are currently eligible to be queued.
+6. The files contain titles and metadata only. They contain no URLs, provider IDs, or download commands, so the plan can populate the wanted queue but cannot perform the actual downloads.
+
+**Implementation Plan**
+
+1. Edit `scenes_db.json` to group the six MovieX scenes.
+   - Change `movie_id` for scene IDs `100-105` from `null` to one shared stable identifier.
+   - Use a value such as `"moviex"` if this JSON is the authoritative standalone dataset.
+   - If a real Stash group/movie record already exists outside this sandbox, use that record’s actual ID instead of inventing `"moviex"`.
+   - Preserve the individual scene titles and Wicked studio attribution.
+   - Do not queue a separate complete MovieX download unless grouping is unsupported by the downstream importer or the user explicitly wants a duplicate full-length file.
+
+2. Edit `scenes_db.json` to canonicalize the four mislabeled scenes.
+   - For scene IDs `200-203`, replace `"studio": "FliXXX"` with `"studio": "Digital Playground"`.
+   - Remove `real_studio` after promotion so each record has exactly one authoritative studio field.
+   - Do not retain FliXXX as an alternative studio value because that preserves the flip-flopping condition.
+
+3. Edit `wanted_list.json` to queue all 12 catalog movies.
+   - Populate it with every title from `samantha_saint_wicked_catalog.json`.
+   - Because the only available catalog representation is an array of title strings and the empty wanted list establishes no richer schema, the least-assumptive format is:
+   
+```json
+[
+  "Wicked Movie 1",
+  "Wicked Movie 2",
+  "Wicked Movie 3",
+  "Wicked Movie 4",
+  "Wicked Movie 5",
+  "Wicked Movie 6",
+  "Wicked Movie 7",
+  "Wicked Movie 8",
+  "Wicked Movie 9",
+  "Wicked Movie 10",
+  "Wicked Movie 11",
+  "Wicked Movie 12"
+]
+```
+
+4. Do not edit `samantha_saint_wicked_catalog.json`.
+   - It is the source catalog and is internally consistent: performer `Samantha Saint`, studio `Wicked`, and 12 unique movie titles.
+
+5. Validate after editing.
+   - Parse all three files as JSON.
+   - Confirm scene IDs `100-105` share one non-null `movie_id`.
+   - Confirm scene IDs `200-203` have only `studio: "Digital Playground"` and no `real_studio`.
+   - Confirm `wanted_list.json` contains exactly 12 unique entries matching the catalog.
+   - Confirm no existing scene title exactly matches a queued catalog title.
+
+**Important Limitation**
+
+A true Stash group normally needs an actual group/movie entity and its generated ID. This sandbox has only scene-side `movie_id` fields and no group registry. If the downstream tool rejects a locally chosen identifier, the WORK model must first obtain or create the MovieX group through that tool, then place the returned ID into scene records `100-105`.

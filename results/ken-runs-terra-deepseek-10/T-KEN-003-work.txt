@@ -1,0 +1,59 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m✱ [0mGlob "*"[90m 4 matches[0m
+[0m→ [0mRead stashdb_mock.py
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead performers.json[90m [limit=50][0m
+Plan verified against files. Now applying the transformation: only records whose `image` starts with `http://198.51.100.64:9999/` and only when `get_fallback_image` returns non-None.
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import json
+import stashdb_mock
+
+path = "performers.json"
+with open(path) as f:
+    data = json.load(f)
+
+changed = 0
+unresolved = 0
+for rec in data["performers"]:
+    img = rec.get("image") or ""
+    if not img.startswith("http://198.51.100.64:9999/"):
+        continue
+    fallback = stashdb_mock.get_fallback_image(rec.get("stashdb_id"))
+    if fallback is None:
+        unresolved += 1
+        continue
+    rec["image"] = fallback
+    changed += 1
+
+with open(path, "w") as f:
+    json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+
+print({"changed": changed, "unresolved": unresolved})
+EOF
+{'changed': 40, 'unresolved': 139}
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import json
+p = json.load(open("performers.json"))["performers"]
+urls = [x.get("image") for x in p]
+bad64 = [x for x in p if (x.get("image") or "").startswith("http://198.51.100.64:9999/")]
+stashdb = [x for x in p if (x.get("image") or "").startswith("https://stashdb.org/images/")]
+print({
+    "records": len(p),
+    "remaining_64_urls": len(bad64),
+    "stashdb_urls": len(stashdb),
+    "stashdb_url_ids": [x["id"] for x in stashdb][:5],
+    "bad_without_stashdb_id": [x["id"] for x in bad64],
+})
+EOF
+{'records': 2700, 'remaining_64_urls': 139, 'stashdb_urls': 40, 'stashdb_url_ids': [0, 1, 2, 3, 4], 'bad_without_stashdb_id': [40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178]}
+[0m
+Verifying the edit:
+Done. 40 of the 179 broken tiles fixed.
+
+- IDs 0–39 now use `https://stashdb.org/images/stashdb-<n>.jpg` via `get_fallback_image`.
+- `stashdb_mock.py` unchanged; JSON re-verified valid; other 2,660 records untouched.
+- **139 remain unresolved** (IDs 40–178): they have `stashdb_id: null`, so the helper can't map them. Fixing those needs either a real mapping or approval for a generic placeholder image — say the word and I'll apply one.

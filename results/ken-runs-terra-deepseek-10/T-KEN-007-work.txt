@@ -1,0 +1,22 @@
+[0m
+> build · deepseek-v4-flash
+[0m
+[0m→ [0mRead upstream_status_mock.json
+[0m→ [0mRead service_logs.txt
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m✱ [0mGlob "*"[90m 3 matches[0m
+Yes — the alert is broken. Verified against the supplied artifacts.
+
+**Evidence**
+- `upstream_status_mock.json:1` — `payments-api` has been in `major_outage` since `09:55:00Z` ("Active incident, provider-side, no ETA").
+- `service_logs.txt:1-3` — the service still logs `INFO service healthy` at 10:00–10:02, 5+ minutes into the declared outage, so the dependency-status feed is not driving any alert.
+- `service_logs.txt:4` — the `503` at `10:03:01` is only a `WARN`, with no alert raised.
+- `service_logs.txt:5` — at `10:04:01` it logs `INFO service healthy (own health check green)`, i.e. own-liveness stays green while the required upstream is unavailable.
+
+**Diagnosis (scenario validation)**
+The 10:03:01 503 does not create or maintain an upstream-dependency alert; the 10:04:01 own-health success suppresses/clears the signal. The alert is scoped to the service's own liveness/health endpoint only, which remains green, so the operationally relevant dependency failure (known active major outage + 503) is invisible to paging. That is the defect.
+
+**Root cause & fix (not applicable here)**
+No service/alerting source exists in this sandbox — only evidence files. In the real service, the fix is: an aggregate readiness/operational-health signal that marks the service degraded/unavailable on sustained `payments-api` 5xx (without changing basic liveness), alert rules on a sustained failure threshold or the `major_outage` feed, alert context (dependency, observed status, outage start, provider message, own-liveness state), recovery only after a stability window, and corresponding tests. None of those files are present here, so per the plan no edits are warranted in this directory.
+
+**Answer to the original question:** yes, the alert is broken (incorrectly scoped to own liveness; dependency outage and 503 go unalerted).

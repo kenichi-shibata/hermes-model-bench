@@ -1,0 +1,60 @@
+[0m
+> build · openai/gpt-5.6-terra
+[0m
+I’ll inspect the deduplication implementation, duplicate-group data, and available tests or documentation to identify concrete failure modes and produce an implementation-ready plan without changing files.
+[0m✱ [0mGlob "**/*"[90m in . · 3 matches[0m
+[0m✱ [0mGlob "*"[90m in . · 3 matches[0m
+[0m✱ [0mGrep "dedupe|duplicate|stashfeed"[90m in . · 1 match[0m
+[0m→ [0mRead dedupe.py[90m [offset=1, limit=2000][0m
+[0m→ [0mRead mirror_groups.json[90m [offset=1, limit=2000][0m
+[0m→ [0mRead CONTEXT_ONLY.md[90m [offset=1, limit=200][0m
+The review-page recommendation diverges from the write-path selection: its size-only ranking selects the known unplayable 5.2 GB mirror in the supplied real group, while the actual canonical choice is the playable 1.8 GB file. I’ll confirm the runtime result and then provide the smallest safe remediation plan.
+[0m
+[0m$ [0mpython -c "import json; import dedupe; db = json.load(open('mirror_groups.json')); print(dedupe.scan_mirror_group('group_42', db))"
+/bin/bash: line 1: python: command not found
+[0m
+[0m$ [0mpython3 -c "import json; import dedupe; db = json.load(open('mirror_groups.json')); print(dedupe.scan_mirror_group('group_42', db))"
+{'group_id': 'group_42', 'suggested_keep': 'scenes:100', 'canonical_would_be': 'scenes:101'}
+[0m
+**Problem**
+
+`dedupe.py` ranks duplicate files differently depending on the path:
+
+- `pick_canonical()` correctly prefers playable candidates, then picks the largest among them.
+- `suggest_keep()` ignores `playable` and selects the largest file overall.
+
+The supplied production-like group reproduces the inconsistency:
+
+```python
+{
+    "suggested_keep": "scenes:100",       # unplayable, 5.2 GB
+    "canonical_would_be": "scenes:101",   # playable, 1.8 GB
+}
+```
+
+This means the review UI can recommend removing the file the real write path would retain, and retaining a proven-dead duplicate.
+
+**Concrete Plan For The WORK Model**
+
+1. Edit `dedupe.py`.
+   - Replace the size-only implementation of `suggest_keep(candidates)` with delegation to `pick_canonical(candidates)`.
+   - Keep `suggest_keep()` as the display-facing API, but make it use the one authoritative ranking rule:
+     ```python
+     return pick_canonical(candidates)
+     ```
+   - Update its docstring to state that it uses the canonical ranking, rather than retaining the in-code `BUG` note.
+   - Do not change `pick_canonical()` or `scan_mirror_group()`; their current responsibilities are appropriate.
+
+2. Add regression tests in a new `test_dedupe.py` using the standard-library `unittest` framework, since the directory has no existing test suite or declared external test dependency.
+   - Load `mirror_groups.json` and assert `scan_mirror_group("group_42", db)` returns `scenes:101` for both `suggested_keep` and `canonical_would_be`.
+   - Assert that when multiple candidates are playable, the larger playable candidate is selected.
+   - Assert that when no candidates are playable, the largest candidate is selected as the fallback.
+   - These tests preserve both the corrected behavior and the intended size tie-break/fallback behavior.
+
+3. Run:
+   ```bash
+   python3 -m unittest -v
+   ```
+   - Confirm the regression fixture no longer produces divergent recommendation and canonical IDs.
+
+`mirror_groups.json` should remain unchanged: it is already the minimal regression fixture that exposes the defect. No files were edited during this investigation.
