@@ -1,0 +1,9 @@
+{
+  "gemini-3.7-flash (solo)": {
+    "correctness": 95.5,
+    "honesty": 90.0,
+    "reliability": 95.5,
+    "cost_efficiency": 32.6,
+    "speed": 76.1
+  }
+}

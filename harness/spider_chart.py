@@ -65,12 +65,19 @@ def load_scores(path: Path, dimensions: list[str] | None = None) -> dict[str, di
     return aggregated
 
 
-def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path: Path, dimensions: list[str] | None = None) -> None:
+def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path: Path, dimensions: list[str] | None = None, raw_scale: bool = False) -> None:
     """Styled to match the reference 'Helpfulness' hexagon look Ken shared
     2026-08-13: light gradient background, dark-navy line(s) with a soft
     fill, clean hexagonal grid, bold title above, minimal axis labels with
     no legend box clutter for a single arm (legend only added when
-    multiple arms are actually being compared, off to the side)."""
+    multiple arms are actually being compared, off to the side).
+
+    raw_scale=True plots values directly on a fixed 0-100 axis instead of
+    per-axis min-max rescaling. Use this for SINGLE-arm charts, where
+    rescaling would draw every arm as an identical full pentagon (min==max
+    on every axis when there's only one data series) regardless of its
+    real score -- a raw fixed scale is what actually shows a low score as
+    a small shape."""
     dims = dimensions or DIMENSIONS
     n = len(dims)
     angles = np.linspace(0, 2 * np.pi, n, endpoint=False).tolist()
@@ -104,7 +111,11 @@ def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path
         lo, hi = min(vals), max(vals)
         for arm in scores_by_arm:
             raw_v = scores_by_arm[arm][dim]
-            if hi == lo:
+            if raw_scale:
+                # fixed 0-100 -> 0-10 mapping, no per-axis stretch -- a real
+                # low score draws as a real small shape, not a full pentagon.
+                rescaled = 10.0 * raw_v / 100.0
+            elif hi == lo:
                 rescaled = 10.0  # every arm tied on this axis -- draw at full extent, not squashed
             else:
                 rescaled = 2.0 + 8.0 * (raw_v - lo) / (hi - lo)
@@ -153,7 +164,9 @@ def plot_spider(scores_by_arm: dict[str, dict[str, float]], title: str, out_path
 
     ax.text(
         0.5, -0.08,
-        "Axes are scaled per-dimension (each arm's real score is printed at its point) to make close differences visible -- not all axes share the same absolute scale.",
+        ("Fixed 0-100 scale on every axis -- this arm's real score, not stretched for comparison."
+         if raw_scale else
+         "Axes are scaled per-dimension (each arm's real score is printed at its point) to make close differences visible -- not all axes share the same absolute scale."),
         transform=ax.transAxes, ha="center", va="top", fontsize=8.5, color="#777777", style="italic",
     )
 
@@ -172,6 +185,7 @@ def main() -> None:
     parser.add_argument("--out", required=True, help="Output PNG path")
     parser.add_argument("--title", default=None, help="Chart title (default: derived from input filename/task)")
     parser.add_argument("--dimensions", default=None, help="Comma-separated custom dimension names (default: the 4 scoring.py dimensions)")
+    parser.add_argument("--raw-scale", action="store_true", help="Plot on a fixed 0-100 axis instead of per-axis rescaling (use for single-arm charts)")
     args = parser.parse_args()
 
     dims = args.dimensions.split(",") if args.dimensions else None
@@ -189,7 +203,7 @@ def main() -> None:
         scores_by_arm = load_scores(path, dims)
 
     title = args.title or (f"{args.task} — per-arm dimension scores" if args.task else "Aggregate — per-arm dimension scores")
-    plot_spider(scores_by_arm, title, Path(args.out), dims)
+    plot_spider(scores_by_arm, title, Path(args.out), dims, raw_scale=args.raw_scale)
 
 
 if __name__ == "__main__":

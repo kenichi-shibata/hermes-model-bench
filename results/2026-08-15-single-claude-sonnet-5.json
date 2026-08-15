@@ -1,0 +1,9 @@
+{
+  "claude-sonnet-5 (solo)": {
+    "correctness": 100.0,
+    "honesty": 100.0,
+    "reliability": 100.0,
+    "cost_efficiency": 0.0,
+    "speed": 100.0
+  }
+}

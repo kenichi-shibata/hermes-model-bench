@@ -25,6 +25,24 @@ unattended" from "needs supervision" was never raw correctness, it was
 whether the model fabricated success on a task it couldn't actually
 complete, or executed an unsafe instruction faithfully.
 
+## Full dimension breakdown (raw scores, 0-100 each)
+
+| Arm | Correctness | Honesty | Reliability | Cost Eff. | Speed | **Overall /100** |
+|---|---|---|---|---|---|---|
+| DeepSeek v4 Pro (solo) | 98.0 | 80.0 | 98.0 | 91.6 | 87.0 | **90.9** |
+| Claude Sonnet-5 (solo) | 100.0 | 100.0 | 100.0 | 0.0 | 100.0 | **90.0** |
+| DeepSeek v4 Flash (solo) | 99.5 | 70.0 | 99.5 | 100.0 | 69.6 | **87.7** |
+| Gemini 3.7 Flash (solo) | 95.5 | 90.0 | 95.5 | 32.6 | 76.1 | **85.6** |
+| Sonnet5-plans+Gemini-works (split) | 100.0 | 100.0 | 100.0 | 15.8 | 37.0 | **85.3** |
+| Kimi K3 (solo) | 98.0 | 30.0 | 100.0 | 17.6 | 4.3 | **60.5** |
+| Kimi-plans+Gemini-works (split) | 90.0 | 20.0 | 90.0 | 5.6 | 0.0 | **51.6** |
+
+Cost Efficiency and Speed are relative-within-this-7-arm-cohort (log-scaled
+inverse cost, linear inverse latency) — Sonnet-5's 0.0 Cost Efficiency does
+NOT mean "bad value," it means "most expensive of these 7 by a wide margin"
+(650x DeepSeek Flash); its Correctness/Honesty/Reliability are all
+independently 100.0 in real terms.
+
 ## Real caveat on sample sizes (read before trusting small differences)
 
 Not every arm ran the same number of tasks — reported honestly, not
@@ -175,22 +193,43 @@ and significant," not "precisely 30 points worse on some absolute scale."
   (weak planner + capable executor), not a fluke of one specific model
   pairing.
 
-## Spider graphs
+## Spider graphs — one per arm (real fixed 0-100 scale, not rescaled)
 
-Split into two comparisons (7 arms on one chart would be unreadable —
-axes are per-dimension rescaled so real differences stay visible even
-where several arms cluster; true raw values are printed at every vertex):
+Each arm gets its own chart on a genuine fixed 0-100 axis (not the
+per-axis-rescaled comparison style used elsewhere in this project) so a
+real low score draws as a real small shape — useful for seeing exactly
+which dimension(s) drag an arm down, arm by arm, rather than only in
+relative comparison to the others.
 
-**Solo models** (5 arms — DeepSeek Pro, Sonnet-5, DeepSeek Flash, Gemini
-3.7 Flash, Kimi K3): `results/2026-08-15-spider-solo-arms.png`
+### 1. DeepSeek v4 Pro (solo) — 90.9/100
+![DeepSeek v4 Pro](2026-08-15-spider-deepseek-v4-pro.png)
 
-**Delegation combos** (Sonnet-5 solo as reference + both split arms):
-`results/2026-08-15-spider-combo-arms.png`
+### 2. Claude Sonnet-5 (solo) — 90.0/100
+![Claude Sonnet-5](2026-08-15-spider-claude-sonnet-5.png)
 
-Both charts use the same 5 axes: Correctness, Honesty, Reliability, Cost
-Efficiency, Speed — the same weighted dimensions behind the /100 scores
-above, so the shapes and the ranking table tell the same story from two
-angles.
+### 3. DeepSeek v4 Flash (solo) — 87.7/100
+![DeepSeek v4 Flash](2026-08-15-spider-deepseek-v4-flash.png)
+
+### 4. Gemini 3.7 Flash (solo) — 85.6/100
+![Gemini 3.7 Flash](2026-08-15-spider-gemini-3.7-flash.png)
+
+### 5. Sonnet5-plans + Gemini-works (split) — 85.3/100
+![Sonnet5-plans+Gemini-works](2026-08-15-spider-sonnet5-plans-gemini-works.png)
+
+### 6. Kimi K3 (solo) — 60.5/100
+![Kimi K3](2026-08-15-spider-kimi-k3.png)
+
+### 7. Kimi-plans + Gemini-works (split) — 51.6/100
+![Kimi-plans+Gemini-works](2026-08-15-spider-kimi-plans-gemini-works.png)
+
+## Comparison charts (per-axis rescaled, for relative comparison)
+
+Split into two groups (7 arms on one chart would be unreadable) — these
+use the per-axis rescaling style so close scores stay visually
+distinguishable even when several arms cluster:
+
+**Solo models** (5 arms): `results/2026-08-15-spider-solo-arms.png`
+**Delegation combos** (Sonnet-5 solo + both splits): `results/2026-08-15-spider-combo-arms.png`
 
 ## Practical recommendations (what to actually run, going forward)
 
@@ -235,7 +274,15 @@ angles.
 - `results/2026-08-15-all-arms-final.json` — the full 7-arm scored dataset
   behind this report (correctness/honesty/reliability/cost_efficiency/
   speed, all 0-100 normalized).
+- `results/2026-08-15-single-<arm>.json` — per-arm single-entry JSON used
+  to render each individual raw-scale chart.
 - `results/2026-08-15-solo-arms.json`, `results/2026-08-15-combo-arms.json`
-  — the two chart-input subsets.
+  — the two rescaled-comparison chart-input subsets.
+- `results/2026-08-15-spider-<arm>.png` (×7) — individual raw-scale spider
+  charts, one per arm.
 - `results/2026-08-15-spider-solo-arms.png`,
-  `results/2026-08-15-spider-combo-arms.png` — the two spider graphs.
+  `results/2026-08-15-spider-combo-arms.png` — the two rescaled comparison
+  spider graphs.
+- `harness/spider_chart.py` — now supports `--raw-scale` for genuine
+  single-arm charts (fixed 0-100 axis) alongside the existing per-axis
+  rescaled multi-arm comparison mode.

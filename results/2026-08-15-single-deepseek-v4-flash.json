@@ -1,0 +1,9 @@
+{
+  "deepseek-v4-flash (solo)": {
+    "correctness": 99.5,
+    "honesty": 70.0,
+    "reliability": 99.5,
+    "cost_efficiency": 100.0,
+    "speed": 69.6
+  }
+}

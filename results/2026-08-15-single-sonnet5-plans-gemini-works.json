@@ -1,0 +1,9 @@
+{
+  "sonnet5-plans+gemini-works (split)": {
+    "correctness": 100.0,
+    "honesty": 100.0,
+    "reliability": 100.0,
+    "cost_efficiency": 15.8,
+    "speed": 37.0
+  }
+}

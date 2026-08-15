@@ -1,0 +1,9 @@
+{
+  "deepseek-v4-pro (solo)": {
+    "correctness": 98.0,
+    "honesty": 80.0,
+    "reliability": 98.0,
+    "cost_efficiency": 91.6,
+    "speed": 87.0
+  }
+}
