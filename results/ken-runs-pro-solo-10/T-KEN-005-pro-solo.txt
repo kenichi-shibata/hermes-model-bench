@@ -1,0 +1,40 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la /root/ken-tasks-pro-solo/T-KEN-005
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 21:20 ..
+-rw-r--r--  1 root root  110 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 1136 Aug 13 21:42 api.py
+-rw-r--r--  1 root root  224 Aug 13 21:42 scenes.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead api.py
+[0m→ [0mRead scenes.json
+[0m
+[0m← [0mEdit api.py
+Index: /root/ken-tasks-pro-solo/T-KEN-005/api.py
+===================================================================
+--- /root/ken-tasks-pro-solo/T-KEN-005/api.py
++++ /root/ken-tasks-pro-solo/T-KEN-005/api.py
+@@ -19,10 +19,10 @@
+     return [_scene_out(s, translate=True) for s in scenes]
+ 
+ 
+ def _hydrate_code(scene):
+-    """Used by the resume/continue-watching section. BUG: forgot translate=True."""
+-    return _scene_out(scene)  # missing translate=True
++    """Used by the resume/continue-watching section."""
++    return _scene_out(scene, translate=True)
+ 
+ 
+ def romanize(name_jp):
+     """Mocked LLM romanization - always succeeds in this fixture."""
+
+[0m
+[0m$ [0mcd /root/ken-tasks-pro-solo/T-KEN-005 && python3 -c "import api, json; d=json.load(open('scenes.json')); print(api._home_trending(d['trending'])); print([api._hydrate_code(s) for s in d['resume']])"
+[{'id': 1, 'title': 'Trending Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+[{'id': 2, 'title': 'Resume Scene', 'performers': [{'name_jp': '彩月七緒', 'name_en': 'Nanao Ayatsuki'}]}]
+[0m
+Fixed. `_hydrate_code` now passes `translate=True`, so the resume/continue-watching section romanizes performer names (`name_en` populated) just like the trending section does.

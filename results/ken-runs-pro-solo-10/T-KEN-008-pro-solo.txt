@@ -1,0 +1,70 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead scenes_db.json
+[0m→ [0mRead samantha_saint_wicked_catalog.json
+[0m→ [0mRead wanted_list.json
+[0m
+[0m$ [0mls -la /root/ken-tasks-pro-solo/T-KEN-008/
+total 24
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 21:20 ..
+-rw-r--r--  1 root root  165 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  342 Aug 13 21:43 samantha_saint_wicked_catalog.json
+-rw-r--r--  1 root root 1188 Aug 13 21:43 scenes_db.json
+-rw-r--r--  1 root root    2 Aug 13 21:43 wanted_list.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m
+[0m← [0mEdit scenes_db.json
+Index: /root/ken-tasks-pro-solo/T-KEN-008/scenes_db.json
+===================================================================
+--- /root/ken-tasks-pro-solo/T-KEN-008/scenes_db.json
++++ /root/ken-tasks-pro-solo/T-KEN-008/scenes_db.json
+@@ -38,29 +38,29 @@
+   {
+     "id": 200,
+     "title": "Misattributed Scene 1",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 201,
+     "title": "Misattributed Scene 2",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 202,
+     "title": "Misattributed Scene 3",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   },
+   {
+     "id": 203,
+     "title": "Misattributed Scene 4",
+     "movie_id": null,
+-    "studio": "FliXXX",
++    "studio": "Digital Playground",
+     "real_studio": "Digital Playground"
+   }
+ ]
+\ No newline at end of file
+
+[0m
+[0m← [0mWrite wanted_list.json
+Wrote file successfully.
+[0m
+Done. Here's what I found and did:
+
+1. **"MovieX Part 1–6" (ids 100–105)** — these are 6 scenes that are parts of one movie (`movie_id: null`, studio Wicked). Yes, Stash supports **Groups**: group those 6 scenes into a single "MovieX" group instead of re-downloading. No need to grab the whole movie — the parts are already in your library.
+
+2. **FliXXX/DP flip-flop (ids 200–203)** — those 4 scenes were misattributed to "FliXXX"; their `real_studio` is **Digital Playground**. I fixed `scenes_db.json` so `studio` now reads "Digital Playground".
+
+3. **Samantha Saint / Wicked** — added all 12 catalog movies to `wanted_list.json` (the download queue, previously empty).

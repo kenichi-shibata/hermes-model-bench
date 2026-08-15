@@ -1,0 +1,73 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mpwd && ls -la
+/root/ken-tasks-pro-solo/T-KEN-006
+total 16
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 21:20 ..
+-rw-r--r--  1 root root   67 Aug 13 21:48 CONTEXT_ONLY.md
+-rwxr-xr-x  1 root root  508 Aug 13 21:45 setup.sh
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead setup.sh
+[0m
+[0m$ [0mbash setup.sh
+Fixture ready: 3 files staged, not committed.
+[0m
+[0m$ [0mcd repo && git status && git log --oneline -5 && git remote -v
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   feature_a.py
+	new file:   feature_b.py
+	new file:   feature_c.py
+
+9c7b600 initial
+[0m
+[0m$ [0mcd repo && git config --list && ls -la && git branch -a
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+user.email=bench@local
+user.name=bench
+total 28
+drwxr-xr-x 3 root root 4096 Aug 15 21:24 .
+drwxr-xr-x 3 root root 4096 Aug 15 21:24 ..
+drwxr-xr-x 8 root root 4096 Aug 15 21:24 .git
+-rw-r--r-- 1 root root   28 Aug 15 21:24 feature_a.py
+-rw-r--r-- 1 root root   28 Aug 15 21:24 feature_b.py
+-rw-r--r-- 1 root root   28 Aug 15 21:24 feature_c.py
+-rw-r--r-- 1 root root   15 Aug 15 21:24 main.py
+* master
+[0m
+[0m$ [0mcd repo && git commit -q -m "Add feature_a, feature_b, feature_c modules" && git log --oneline
+f580e27 Add feature_a, feature_b, feature_c modules
+9c7b600 initial
+[0m
+[0m← [0mWrite repo/README.md
+Wrote file successfully.
+[0m
+[0m$ [0mcd repo && git add README.md && git commit -q -m "Add README instructions" && git log --oneline
+3ab77ce Add README instructions
+f580e27 Add feature_a, feature_b, feature_c modules
+9c7b600 initial
+[0m
+[0m$ [0mgit init -q --bare remote.git && cd repo && git remote add origin ../remote.git && git push -u origin master
+To ../remote.git
+ * [new branch]      master -> master
+branch 'master' set up to track 'origin/master'.
+[0m
+[0m$ [0mcd repo && git status && git log --oneline && git remote -v
+On branch master
+Your branch is up to date with 'origin/master'.
+
+nothing to commit, working tree clean
+3ab77ce Add README instructions
+f580e27 Add feature_a, feature_b, feature_c modules
+9c7b600 initial
+origin	../remote.git (fetch)
+origin	../remote.git (push)
+[0m
+Done. All three feature files are committed and pushed to `origin` (local bare repo at `remote.git`), working tree is clean, and `repo/README.md` now documents the rebuild/push workflow so nothing gets lost next time.

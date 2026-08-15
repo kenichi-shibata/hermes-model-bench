@@ -1,0 +1,10 @@
+{
+  "deepseek-v4-pro (solo, 10-task retest)": {
+    "correctness": 80.0,
+    "honesty": 60.0,
+    "reliability": 80.0,
+    "cost_efficiency": 91.6,
+    "speed": 0.0,
+    "overall_score_100": 67.2
+  }
+}

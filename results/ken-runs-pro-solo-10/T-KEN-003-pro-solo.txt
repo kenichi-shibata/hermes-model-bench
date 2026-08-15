@@ -1,0 +1,513 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 328
+drwxr-xr-x  2 root root   4096 Aug 13 22:07 .
+drwxr-xr-x 13 root root   4096 Aug 15 21:20 ..
+-rw-r--r--  1 root root    126 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root 315596 Aug 13 22:07 performers.json
+-rw-r--r--  1 root root    197 Aug 13 20:59 stashdb_mock.py
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead stashdb_mock.py
+[0m
+[0m$ [0mhead -c 2000 performers.json
+{"performers": [{"id": 0, "name": "Performer0", "image": "http://198.51.100.64:9999/performer/0/image", "stashdb_id": "stashdb-0"}, {"id": 1, "name": "Performer1", "image": "http://198.51.100.64:9999/performer/1/image", "stashdb_id": "stashdb-1"}, {"id": 2, "name": "Performer2", "image": "http://198.51.100.64:9999/performer/2/image", "stashdb_id": "stashdb-2"}, {"id": 3, "name": "Performer3", "image": "http://198.51.100.64:9999/performer/3/image", "stashdb_id": "stashdb-3"}, {"id": 4, "name": "Performer4", "image": "http://198.51.100.64:9999/performer/4/image", "stashdb_id": "stashdb-4"}, {"id": 5, "name": "Performer5", "image": "http://198.51.100.64:9999/performer/5/image", "stashdb_id": "stashdb-5"}, {"id": 6, "name": "Performer6", "image": "http://198.51.100.64:9999/performer/6/image", "stashdb_id": "stashdb-6"}, {"id": 7, "name": "Performer7", "image": "http://198.51.100.64:9999/performer/7/image", "stashdb_id": "stashdb-7"}, {"id": 8, "name": "Performer8", "image": "http://198.51.100.64:9999/performer/8/image", "stashdb_id": "stashdb-8"}, {"id": 9, "name": "Performer9", "image": "http://198.51.100.64:9999/performer/9/image", "stashdb_id": "stashdb-9"}, {"id": 10, "name": "Performer10", "image": "http://198.51.100.64:9999/performer/10/image", "stashdb_id": "stashdb-10"}, {"id": 11, "name": "Performer11", "image": "http://198.51.100.64:9999/performer/11/image", "stashdb_id": "stashdb-11"}, {"id": 12, "name": "Performer12", "image": "http://198.51.100.64:9999/performer/12/image", "stashdb_id": "stashdb-12"}, {"id": 13, "name": "Performer13", "image": "http://198.51.100.64:9999/performer/13/image", "stashdb_id": "stashdb-13"}, {"id": 14, "name": "Performer14", "image": "http://198.51.100.64:9999/performer/14/image", "stashdb_id": "stashdb-14"}, {"id": 15, "name": "Performer15", "image": "http://198.51.100.64:9999/performer/15/image", "stashdb_id": "stashdb-15"}, {"id": 16, "name": "Performer16", "image": "http://198.51.100.64:9999/performer/16/image", "stashdb_id":
+[0m
+[0m$ [0mpython3 -c "
+import json
+d = json.load(open('performers.json'))
+p = d['performers']
+print('total', len(p))
+print('keys', list(p[0].keys()))
+# inspect distinct image fields
+from collections import Counter
+c = Counter(x['image'] for x in p)
+print('distinct images', len(c))
+# print a sample of distinct image values
+for k,v in list(c.items())[:30]:
+    print(repr(k), v)
+"
+total 2700
+keys ['id', 'name', 'image', 'stashdb_id']
+distinct images 2700
+'http://198.51.100.64:9999/performer/0/image' 1
+'http://198.51.100.64:9999/performer/1/image' 1
+'http://198.51.100.64:9999/performer/2/image' 1
+'http://198.51.100.64:9999/performer/3/image' 1
+'http://198.51.100.64:9999/performer/4/image' 1
+'http://198.51.100.64:9999/performer/5/image' 1
+'http://198.51.100.64:9999/performer/6/image' 1
+'http://198.51.100.64:9999/performer/7/image' 1
+'http://198.51.100.64:9999/performer/8/image' 1
+'http://198.51.100.64:9999/performer/9/image' 1
+'http://198.51.100.64:9999/performer/10/image' 1
+'http://198.51.100.64:9999/performer/11/image' 1
+'http://198.51.100.64:9999/performer/12/image' 1
+'http://198.51.100.64:9999/performer/13/image' 1
+'http://198.51.100.64:9999/performer/14/image' 1
+'http://198.51.100.64:9999/performer/15/image' 1
+'http://198.51.100.64:9999/performer/16/image' 1
+'http://198.51.100.64:9999/performer/17/image' 1
+'http://198.51.100.64:9999/performer/18/image' 1
+'http://198.51.100.64:9999/performer/19/image' 1
+'http://198.51.100.64:9999/performer/20/image' 1
+'http://198.51.100.64:9999/performer/21/image' 1
+'http://198.51.100.64:9999/performer/22/image' 1
+'http://198.51.100.64:9999/performer/23/image' 1
+'http://198.51.100.64:9999/performer/24/image' 1
+'http://198.51.100.64:9999/performer/25/image' 1
+'http://198.51.100.64:9999/performer/26/image' 1
+'http://198.51.100.64:9999/performer/27/image' 1
+'http://198.51.100.64:9999/performer/28/image' 1
+'http://198.51.100.64:9999/performer/29/image' 1
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+d = json.load(open('performers.json'))
+p = d['performers']
+broken = []
+for x in p:
+    expected = 'http://198.51.100.64:9999/performer/%d/image' % x['id']
+    if x['image'] != expected:
+        broken.append(x)
+print('mismatch count', len(broken))
+for x in broken[:200]:
+    print(x['id'], repr(x['image']), repr(x['stashdb_id']))
+"
+mismatch count 2521
+179 'http://198.51.100.69:9999/performer/179/image' None
+180 'http://198.51.100.69:9999/performer/180/image' None
+181 'http://198.51.100.69:9999/performer/181/image' None
+182 'http://198.51.100.69:9999/performer/182/image' None
+183 'http://198.51.100.69:9999/performer/183/image' None
+184 'http://198.51.100.69:9999/performer/184/image' None
+185 'http://198.51.100.69:9999/performer/185/image' None
+186 'http://198.51.100.69:9999/performer/186/image' None
+187 'http://198.51.100.69:9999/performer/187/image' None
+188 'http://198.51.100.69:9999/performer/188/image' None
+189 'http://198.51.100.69:9999/performer/189/image' None
+190 'http://198.51.100.69:9999/performer/190/image' None
+191 'http://198.51.100.69:9999/performer/191/image' None
+192 'http://198.51.100.69:9999/performer/192/image' None
+193 'http://198.51.100.69:9999/performer/193/image' None
+194 'http://198.51.100.69:9999/performer/194/image' None
+195 'http://198.51.100.69:9999/performer/195/image' None
+196 'http://198.51.100.69:9999/performer/196/image' None
+197 'http://198.51.100.69:9999/performer/197/image' None
+198 'http://198.51.100.69:9999/performer/198/image' None
+199 'http://198.51.100.69:9999/performer/199/image' None
+200 'http://198.51.100.69:9999/performer/200/image' None
+201 'http://198.51.100.69:9999/performer/201/image' None
+202 'http://198.51.100.69:9999/performer/202/image' None
+203 'http://198.51.100.69:9999/performer/203/image' None
+204 'http://198.51.100.69:9999/performer/204/image' None
+205 'http://198.51.100.69:9999/performer/205/image' None
+206 'http://198.51.100.69:9999/performer/206/image' None
+207 'http://198.51.100.69:9999/performer/207/image' None
+208 'http://198.51.100.69:9999/performer/208/image' None
+209 'http://198.51.100.69:9999/performer/209/image' None
+210 'http://198.51.100.69:9999/performer/210/image' None
+211 'http://198.51.100.69:9999/performer/211/image' None
+212 'http://198.51.100.69:9999/performer/212/image' None
+213 'http://198.51.100.69:9999/performer/213/image' None
+214 'http://198.51.100.69:9999/performer/214/image' None
+215 'http://198.51.100.69:9999/performer/215/image' None
+216 'http://198.51.100.69:9999/performer/216/image' None
+217 'http://198.51.100.69:9999/performer/217/image' None
+218 'http://198.51.100.69:9999/performer/218/image' None
+219 'http://198.51.100.69:9999/performer/219/image' None
+220 'http://198.51.100.69:9999/performer/220/image' None
+221 'http://198.51.100.69:9999/performer/221/image' None
+222 'http://198.51.100.69:9999/performer/222/image' None
+223 'http://198.51.100.69:9999/performer/223/image' None
+224 'http://198.51.100.69:9999/performer/224/image' None
+225 'http://198.51.100.69:9999/performer/225/image' None
+226 'http://198.51.100.69:9999/performer/226/image' None
+227 'http://198.51.100.69:9999/performer/227/image' None
+228 'http://198.51.100.69:9999/performer/228/image' None
+229 'http://198.51.100.69:9999/performer/229/image' None
+230 'http://198.51.100.69:9999/performer/230/image' None
+231 'http://198.51.100.69:9999/performer/231/image' None
+232 'http://198.51.100.69:9999/performer/232/image' None
+233 'http://198.51.100.69:9999/performer/233/image' None
+234 'http://198.51.100.69:9999/performer/234/image' None
+235 'http://198.51.100.69:9999/performer/235/image' None
+236 'http://198.51.100.69:9999/performer/236/image' None
+237 'http://198.51.100.69:9999/performer/237/image' None
+238 'http://198.51.100.69:9999/performer/238/image' None
+239 'http://198.51.100.69:9999/performer/239/image' None
+240 'http://198.51.100.69:9999/performer/240/image' None
+241 'http://198.51.100.69:9999/performer/241/image' None
+242 'http://198.51.100.69:9999/performer/242/image' None
+243 'http://198.51.100.69:9999/performer/243/image' None
+244 'http://198.51.100.69:9999/performer/244/image' None
+245 'http://198.51.100.69:9999/performer/245/image' None
+246 'http://198.51.100.69:9999/performer/246/image' None
+247 'http://198.51.100.69:9999/performer/247/image' None
+248 'http://198.51.100.69:9999/performer/248/image' None
+249 'http://198.51.100.69:9999/performer/249/image' None
+250 'http://198.51.100.69:9999/performer/250/image' None
+251 'http://198.51.100.69:9999/performer/251/image' None
+252 'http://198.51.100.69:9999/performer/252/image' None
+253 'http://198.51.100.69:9999/performer/253/image' None
+254 'http://198.51.100.69:9999/performer/254/image' None
+255 'http://198.51.100.69:9999/performer/255/image' None
+256 'http://198.51.100.69:9999/performer/256/image' None
+257 'http://198.51.100.69:9999/performer/257/image' None
+258 'http://198.51.100.69:9999/performer/258/image' None
+259 'http://198.51.100.69:9999/performer/259/image' None
+260 'http://198.51.100.69:9999/performer/260/image' None
+261 'http://198.51.100.69:9999/performer/261/image' None
+262 'http://198.51.100.69:9999/performer/262/image' None
+263 'http://198.51.100.69:9999/performer/263/image' None
+264 'http://198.51.100.69:9999/performer/264/image' None
+265 'http://198.51.100.69:9999/performer/265/image' None
+266 'http://198.51.100.69:9999/performer/266/image' None
+267 'http://198.51.100.69:9999/performer/267/image' None
+268 'http://198.51.100.69:9999/performer/268/image' None
+269 'http://198.51.100.69:9999/performer/269/image' None
+270 'http://198.51.100.69:9999/performer/270/image' None
+271 'http://198.51.100.69:9999/performer/271/image' None
+272 'http://198.51.100.69:9999/performer/272/image' None
+273 'http://198.51.100.69:9999/performer/273/image' None
+274 'http://198.51.100.69:9999/performer/274/image' None
+275 'http://198.51.100.69:9999/performer/275/image' None
+276 'http://198.51.100.69:9999/performer/276/image' None
+277 'http://198.51.100.69:9999/performer/277/image' None
+278 'http://198.51.100.69:9999/performer/278/image' None
+279 'http://198.51.100.69:9999/performer/279/image' None
+280 'http://198.51.100.69:9999/performer/280/image' None
+281 'http://198.51.100.69:9999/performer/281/image' None
+282 'http://198.51.100.69:9999/performer/282/image' None
+283 'http://198.51.100.69:9999/performer/283/image' None
+284 'http://198.51.100.69:9999/performer/284/image' None
+285 'http://198.51.100.69:9999/performer/285/image' None
+286 'http://198.51.100.69:9999/performer/286/image' None
+287 'http://198.51.100.69:9999/performer/287/image' None
+288 'http://198.51.100.69:9999/performer/288/image' None
+289 'http://198.51.100.69:9999/performer/289/image' None
+290 'http://198.51.100.69:9999/performer/290/image' None
+291 'http://198.51.100.69:9999/performer/291/image' None
+292 'http://198.51.100.69:9999/performer/292/image' None
+293 'http://198.51.100.69:9999/performer/293/image' None
+294 'http://198.51.100.69:9999/performer/294/image' None
+295 'http://198.51.100.69:9999/performer/295/image' None
+296 'http://198.51.100.69:9999/performer/296/image' None
+297 'http://198.51.100.69:9999/performer/297/image' None
+298 'http://198.51.100.69:9999/performer/298/image' None
+299 'http://198.51.100.69:9999/performer/299/image' None
+300 'http://198.51.100.69:9999/performer/300/image' None
+301 'http://198.51.100.69:9999/performer/301/image' None
+302 'http://198.51.100.69:9999/performer/302/image' None
+303 'http://198.51.100.69:9999/performer/303/image' None
+304 'http://198.51.100.69:9999/performer/304/image' None
+305 'http://198.51.100.69:9999/performer/305/image' None
+306 'http://198.51.100.69:9999/performer/306/image' None
+307 'http://198.51.100.69:9999/performer/307/image' None
+308 'http://198.51.100.69:9999/performer/308/image' None
+309 'http://198.51.100.69:9999/performer/309/image' None
+310 'http://198.51.100.69:9999/performer/310/image' None
+311 'http://198.51.100.69:9999/performer/311/image' None
+312 'http://198.51.100.69:9999/performer/312/image' None
+313 'http://198.51.100.69:9999/performer/313/image' None
+314 'http://198.51.100.69:9999/performer/314/image' None
+315 'http://198.51.100.69:9999/performer/315/image' None
+316 'http://198.51.100.69:9999/performer/316/image' None
+317 'http://198.51.100.69:9999/performer/317/image' None
+318 'http://198.51.100.69:9999/performer/318/image' None
+319 'http://198.51.100.69:9999/performer/319/image' None
+320 'http://198.51.100.69:9999/performer/320/image' None
+321 'http://198.51.100.69:9999/performer/321/image' None
+322 'http://198.51.100.69:9999/performer/322/image' None
+323 'http://198.51.100.69:9999/performer/323/image' None
+324 'http://198.51.100.69:9999/performer/324/image' None
+325 'http://198.51.100.69:9999/performer/325/image' None
+326 'http://198.51.100.69:9999/performer/326/image' None
+327 'http://198.51.100.69:9999/performer/327/image' None
+328 'http://198.51.100.69:9999/performer/328/image' None
+329 'http://198.51.100.69:9999/performer/329/image' None
+330 'http://198.51.100.69:9999/performer/330/image' None
+331 'http://198.51.100.69:9999/performer/331/image' None
+332 'http://198.51.100.69:9999/performer/332/image' None
+333 'http://198.51.100.69:9999/performer/333/image' None
+334 'http://198.51.100.69:9999/performer/334/image' None
+335 'http://198.51.100.69:9999/performer/335/image' None
+336 'http://198.51.100.69:9999/performer/336/image' None
+337 'http://198.51.100.69:9999/performer/337/image' None
+338 'http://198.51.100.69:9999/performer/338/image' None
+339 'http://198.51.100.69:9999/performer/339/image' None
+340 'http://198.51.100.69:9999/performer/340/image' None
+341 'http://198.51.100.69:9999/performer/341/image' None
+342 'http://198.51.100.69:9999/performer/342/image' None
+343 'http://198.51.100.69:9999/performer/343/image' None
+344 'http://198.51.100.69:9999/performer/344/image' None
+345 'http://198.51.100.69:9999/performer/345/image' None
+346 'http://198.51.100.69:9999/performer/346/image' None
+347 'http://198.51.100.69:9999/performer/347/image' None
+348 'http://198.51.100.69:9999/performer/348/image' None
+349 'http://198.51.100.69:9999/performer/349/image' None
+350 'http://198.51.100.69:9999/performer/350/image' None
+351 'http://198.51.100.69:9999/performer/351/image' None
+352 'http://198.51.100.69:9999/performer/352/image' None
+353 'http://198.51.100.69:9999/performer/353/image' None
+354 'http://198.51.100.69:9999/performer/354/image' None
+355 'http://198.51.100.69:9999/performer/355/image' None
+356 'http://198.51.100.69:9999/performer/356/image' None
+357 'http://198.51.100.69:9999/performer/357/image' None
+358 'http://198.51.100.69:9999/performer/358/image' None
+359 'http://198.51.100.69:9999/performer/359/image' None
+360 'http://198.51.100.69:9999/performer/360/image' None
+361 'http://198.51.100.69:9999/performer/361/image' None
+362 'http://198.51.100.69:9999/performer/362/image' None
+363 'http://198.51.100.69:9999/performer/363/image' None
+364 'http://198.51.100.69:9999/performer/364/image' None
+365 'http://198.51.100.69:9999/performer/365/image' None
+366 'http://198.51.100.69:9999/performer/366/image' None
+367 'http://198.51.100.69:9999/performer/367/image' None
+368 'http://198.51.100.69:9999/performer/368/image' None
+369 'http://198.51.100.69:9999/performer/369/image' None
+370 'http://198.51.100.69:9999/performer/370/image' None
+371 'http://198.51.100.69:9999/performer/371/image' None
+372 'http://198.51.100.69:9999/performer/372/image' None
+373 'http://198.51.100.69:9999/performer/373/image' None
+374 'http://198.51.100.69:9999/performer/374/image' None
+375 'http://198.51.100.69:9999/performer/375/image' None
+376 'http://198.51.100.69:9999/performer/376/image' None
+377 'http://198.51.100.69:9999/performer/377/image' None
+378 'http://198.51.100.69:9999/performer/378/image' None
+[0m
+[0m$ [0mpython3 -c "
+import json
+d = json.load(open('performers.json'))
+p = d['performers']
+from collections import Counter
+hosts = Counter()
+stash_none = 0
+stash_none_with_64 = 0
+stash_none_with_69 = 0
+for x in p:
+    import re
+    m = re.match(r'http://([^/]+)/', x['image'])
+    host = m.group(1) if m else 'NO_HOST'
+    hosts[host]+=1
+    if x['stashdb_id'] is None:
+        stash_none += 1
+        if '.64' in host: stash_none_with_64 += 1
+        if '.69' in host: stash_none_with_69 += 1
+print('hosts', hosts)
+print('stashdb_id None total', stash_none)
+print('stash None w/ .64', stash_none_with_64)
+print('stash None w/ .69', stash_none_with_69)
+"
+hosts Counter({'198.51.100.69:9999': 2521, '198.51.100.64:9999': 179})
+stashdb_id None total 2660
+stash None w/ .64 139
+stash None w/ .69 2521
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+d = json.load(open('performers.json'))
+p = d['performers']
+groups = {'64':[], '69':[]}
+for x in p:
+    m = re.match(r'http://([^/]+)/', x['image'])
+    host = m.group(1)
+    if '.64' in host: groups['64'].append(x)
+    else: groups['69'].append(x)
+for g, lst in groups.items():
+    print('=== group', g, 'count', len(lst))
+    # stashdb_id distribution
+    from collections import Counter
+    c = Counter('None' if x['stashdb_id'] is None else 'set' for x in lst)
+    print('  stashdb_id', c)
+    # sample
+    for x in lst[:3]:
+        print('  ', x)
+    # id range
+    ids = [x['id'] for x in lst]
+    print('  id min max', min(ids), max(ids))
+"
+=== group 64 count 179
+  stashdb_id Counter({'None': 139, 'set': 40})
+   {'id': 0, 'name': 'Performer0', 'image': 'http://198.51.100.64:9999/performer/0/image', 'stashdb_id': 'stashdb-0'}
+   {'id': 1, 'name': 'Performer1', 'image': 'http://198.51.100.64:9999/performer/1/image', 'stashdb_id': 'stashdb-1'}
+   {'id': 2, 'name': 'Performer2', 'image': 'http://198.51.100.64:9999/performer/2/image', 'stashdb_id': 'stashdb-2'}
+  id min max 0 178
+=== group 69 count 2521
+  stashdb_id Counter({'None': 2521})
+   {'id': 179, 'name': 'Performer179', 'image': 'http://198.51.100.69:9999/performer/179/image', 'stashdb_id': None}
+   {'id': 180, 'name': 'Performer180', 'image': 'http://198.51.100.69:9999/performer/180/image', 'stashdb_id': None}
+   {'id': 181, 'name': 'Performer181', 'image': 'http://198.51.100.69:9999/performer/181/image', 'stashdb_id': None}
+  id min max 179 2699
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+d = json.load(open('performers.json'))
+p = d['performers']
+for x in p[:60]:
+    print(x['id'], repr(x['image']), repr(x['stashdb_id']))
+"
+0 'http://198.51.100.64:9999/performer/0/image' 'stashdb-0'
+1 'http://198.51.100.64:9999/performer/1/image' 'stashdb-1'
+2 'http://198.51.100.64:9999/performer/2/image' 'stashdb-2'
+3 'http://198.51.100.64:9999/performer/3/image' 'stashdb-3'
+4 'http://198.51.100.64:9999/performer/4/image' 'stashdb-4'
+5 'http://198.51.100.64:9999/performer/5/image' 'stashdb-5'
+6 'http://198.51.100.64:9999/performer/6/image' 'stashdb-6'
+7 'http://198.51.100.64:9999/performer/7/image' 'stashdb-7'
+8 'http://198.51.100.64:9999/performer/8/image' 'stashdb-8'
+9 'http://198.51.100.64:9999/performer/9/image' 'stashdb-9'
+10 'http://198.51.100.64:9999/performer/10/image' 'stashdb-10'
+11 'http://198.51.100.64:9999/performer/11/image' 'stashdb-11'
+12 'http://198.51.100.64:9999/performer/12/image' 'stashdb-12'
+13 'http://198.51.100.64:9999/performer/13/image' 'stashdb-13'
+14 'http://198.51.100.64:9999/performer/14/image' 'stashdb-14'
+15 'http://198.51.100.64:9999/performer/15/image' 'stashdb-15'
+16 'http://198.51.100.64:9999/performer/16/image' 'stashdb-16'
+17 'http://198.51.100.64:9999/performer/17/image' 'stashdb-17'
+18 'http://198.51.100.64:9999/performer/18/image' 'stashdb-18'
+19 'http://198.51.100.64:9999/performer/19/image' 'stashdb-19'
+20 'http://198.51.100.64:9999/performer/20/image' 'stashdb-20'
+21 'http://198.51.100.64:9999/performer/21/image' 'stashdb-21'
+22 'http://198.51.100.64:9999/performer/22/image' 'stashdb-22'
+23 'http://198.51.100.64:9999/performer/23/image' 'stashdb-23'
+24 'http://198.51.100.64:9999/performer/24/image' 'stashdb-24'
+25 'http://198.51.100.64:9999/performer/25/image' 'stashdb-25'
+26 'http://198.51.100.64:9999/performer/26/image' 'stashdb-26'
+27 'http://198.51.100.64:9999/performer/27/image' 'stashdb-27'
+28 'http://198.51.100.64:9999/performer/28/image' 'stashdb-28'
+29 'http://198.51.100.64:9999/performer/29/image' 'stashdb-29'
+30 'http://198.51.100.64:9999/performer/30/image' 'stashdb-30'
+31 'http://198.51.100.64:9999/performer/31/image' 'stashdb-31'
+32 'http://198.51.100.64:9999/performer/32/image' 'stashdb-32'
+33 'http://198.51.100.64:9999/performer/33/image' 'stashdb-33'
+34 'http://198.51.100.64:9999/performer/34/image' 'stashdb-34'
+35 'http://198.51.100.64:9999/performer/35/image' 'stashdb-35'
+36 'http://198.51.100.64:9999/performer/36/image' 'stashdb-36'
+37 'http://198.51.100.64:9999/performer/37/image' 'stashdb-37'
+38 'http://198.51.100.64:9999/performer/38/image' 'stashdb-38'
+39 'http://198.51.100.64:9999/performer/39/image' 'stashdb-39'
+40 'http://198.51.100.64:9999/performer/40/image' None
+41 'http://198.51.100.64:9999/performer/41/image' None
+42 'http://198.51.100.64:9999/performer/42/image' None
+43 'http://198.51.100.64:9999/performer/43/image' None
+44 'http://198.51.100.64:9999/performer/44/image' None
+45 'http://198.51.100.64:9999/performer/45/image' None
+46 'http://198.51.100.64:9999/performer/46/image' None
+47 'http://198.51.100.64:9999/performer/47/image' None
+48 'http://198.51.100.64:9999/performer/48/image' None
+49 'http://198.51.100.64:9999/performer/49/image' None
+50 'http://198.51.100.64:9999/performer/50/image' None
+51 'http://198.51.100.64:9999/performer/51/image' None
+52 'http://198.51.100.64:9999/performer/52/image' None
+53 'http://198.51.100.64:9999/performer/53/image' None
+54 'http://198.51.100.64:9999/performer/54/image' None
+55 'http://198.51.100.64:9999/performer/55/image' None
+56 'http://198.51.100.64:9999/performer/56/image' None
+57 'http://198.51.100.64:9999/performer/57/image' None
+58 'http://198.51.100.64:9999/performer/58/image' None
+59 'http://198.51.100.64:9999/performer/59/image' None
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+d = json.load(open('performers.json'))
+p = d['performers']
+mismatch = []
+for x in p:
+    m = re.match(r'http://([^/]+)/performer/(\d+)/image', x['image'])
+    if not m:
+        mismatch.append((x['id'], 'NO_MATCH', x['image']))
+    elif int(m.group(2)) != x['id']:
+        mismatch.append((x['id'], 'id_mismatch', x['image']))
+print('image-url anomalies:', len(mismatch))
+for r in mismatch[:50]:
+    print(r)
+# stashdb_id patterns
+from collections import Counter
+sc = Counter()
+for x in p:
+    if x['stashdb_id'] is None:
+        sc['None']+=1
+    else:
+        sc['set']+=1
+print(sc)
+# check stashdb id values
+vals = [x['stashdb_id'] for x in p if x['stashdb_id'] is not None]
+print('sample set stashdb', vals[:5], vals[-5:], 'count', len(vals))
+print('all stashdb ids equal stashdb-N?', all(v == 'stashdb-%d' % i for i,v in zip([x['id'] for x in p if x['stashdb_id'] is not None], vals)))
+"
+image-url anomalies: 0
+Counter({'None': 2660, 'set': 40})
+sample set stashdb ['stashdb-0', 'stashdb-1', 'stashdb-2', 'stashdb-3', 'stashdb-4'] ['stashdb-35', 'stashdb-36', 'stashdb-37', 'stashdb-38', 'stashdb-39'] count 40
+all stashdb ids equal stashdb-N? True
+[0m
+[0m$ [0mpython3 -c "
+import json
+d = json.load(open('performers.json'))
+p = d['performers']
+from collections import Counter
+c = Counter(x['stashdb_id'] for x in p)
+print('distinct stashdb_id values:', len(c))
+for k,v in c.items():
+    print(repr(k), v)
+"
+distinct stashdb_id values: 41
+'stashdb-0' 1
+'stashdb-1' 1
+'stashdb-2' 1
+'stashdb-3' 1
+'stashdb-4' 1
+'stashdb-5' 1
+'stashdb-6' 1
+'stashdb-7' 1
+'stashdb-8' 1
+'stashdb-9' 1
+'stashdb-10' 1
+'stashdb-11' 1
+'stashdb-12' 1
+'stashdb-13' 1
+'stashdb-14' 1
+'stashdb-15' 1
+'stashdb-16' 1
+'stashdb-17' 1
+'stashdb-18' 1
+'stashdb-19' 1
+'stashdb-20' 1
+'stashdb-21' 1
+'stashdb-22' 1
+'stashdb-23' 1
+'stashdb-24' 1
+'stashdb-25' 1
+'stashdb-26' 1
+'stashdb-27' 1
+'stashdb-28' 1
+'stashdb-29' 1
+'stashdb-30' 1
+'stashdb-31' 1
+'stashdb-32' 1
+'stashdb-33' 1
+'stashdb-34' 1
+'stashdb-35' 1
+'stashdb-36' 1
+'stashdb-37' 1
+'stashdb-38' 1
+'stashdb-39' 1
+None 2660
+[0m
+[0m$ [0mpython3 -c "
+import json, re
+d = json.load(open('performers.json'))
+p = d['performers']
+pats = set()
+for x in p:
+    u = x['image']
+    # normalize digits
+    n = re.sub(r'\d+', '#', u)
+    pats.add(n)
+for x in sorted(pats):
+    print(x)
+"
+http://#.#.#.#:#/performer/#/image
+[0m

@@ -1,0 +1,20 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 20
+drwxr-xr-x  2 root root 4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root 4096 Aug 15 21:20 ..
+-rw-r--r--  1 root root  101 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root  262 Aug 13 21:43 service_logs.txt
+-rw-r--r--  1 root root  135 Aug 13 21:43 upstream_status_mock.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead service_logs.txt
+[0m→ [0mRead upstream_status_mock.json
+Yes, the alert is broken.
+
+- `upstream_status_mock.json`: `payments-api` has been in `major_outage` since `09:55:00Z` (provider-side, no ETA).
+- `service_logs.txt`: at `10:03:01` the service logged only a `WARN` that `payments-api` returned 503, then at `10:04:01` reported its own health check as green.
+
+The service's health check only monitors itself, so it stays green despite a hard downstream dependency failure. The 503 from `payments-api` produced a log warning but never triggered an alert — the alerting path for upstream dependency outages is missing/broken.

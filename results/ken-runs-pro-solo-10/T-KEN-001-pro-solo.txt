@@ -1,0 +1,53 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m→ [0mRead gh_repo_list_mock.json
+[0m→ [0mRead delegation_live
+[0m
+[0m$ [0mfor d in delegation_live/deleg_fake*/; do echo "=== $d ==="; ls -la "$d"; done
+=== delegation_live/deleg_fake0/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 20:58 .
+drwxr-xr-x 7 root root 4096 Aug 13 20:58 ..
+-rw-r--r-- 1 root root   83 Aug 13 20:58 manifest.json
+=== delegation_live/deleg_fake1/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 20:58 .
+drwxr-xr-x 7 root root 4096 Aug 13 20:58 ..
+-rw-r--r-- 1 root root   80 Aug 13 20:58 manifest.json
+=== delegation_live/deleg_fake2/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 20:58 .
+drwxr-xr-x 7 root root 4096 Aug 13 20:58 ..
+-rw-r--r-- 1 root root   83 Aug 13 20:58 manifest.json
+=== delegation_live/deleg_fake3/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 20:58 .
+drwxr-xr-x 7 root root 4096 Aug 13 20:58 ..
+-rw-r--r-- 1 root root   80 Aug 13 20:58 manifest.json
+=== delegation_live/deleg_fake4/ ===
+total 12
+drwxr-xr-x 2 root root 4096 Aug 13 20:58 .
+drwxr-xr-x 7 root root 4096 Aug 13 20:58 ..
+-rw-r--r-- 1 root root   80 Aug 13 20:58 manifest.json
+[0m
+[0m$ [0mfor d in delegation_live/deleg_fake*/; do echo "=== $d ==="; cat "$d/manifest.json"; echo; done
+=== delegation_live/deleg_fake0/ ===
+{"status": "completed", "created_at": "2026-08-10T10:00:00", "goal": "fake task 0"}
+=== delegation_live/deleg_fake1/ ===
+{"status": "capped", "created_at": "2026-08-10T10:00:00", "goal": "fake task 1"}
+=== delegation_live/deleg_fake2/ ===
+{"status": "completed", "created_at": "2026-08-11T10:00:00", "goal": "fake task 2"}
+=== delegation_live/deleg_fake3/ ===
+{"status": "capped", "created_at": "2026-08-12T10:00:00", "goal": "fake task 3"}
+=== delegation_live/deleg_fake4/ ===
+{"status": "capped", "created_at": "2026-08-12T10:00:00", "goal": "fake task 4"}
+[0m
+**Delegation:** Not getting better — trending worse. Over the last three days:
+- 08-10: 1 completed, 1 capped
+- 08-11: 1 completed, 0 capped
+- 08-12: 0 completed, 2 capped
+
+Both of today's/latest runs (`deleg_fake3`, `deleg_fake4`) ended `capped`, so the recent success rate has dropped to 0.
+
+**New repo:** No. The repo list (`gh_repo_list_mock.json`) only contains `existing-repo-1` and `existing-repo-2`, both dated well in the past (07-01 and 06-15). Nothing new was created.

@@ -1,0 +1,200 @@
+[0m
+> build · deepseek-v4-pro
+[0m
+[0m$ [0mls -la
+total 32
+drwxr-xr-x  2 root root  4096 Aug 13 21:48 .
+drwxr-xr-x 13 root root  4096 Aug 15 21:20 ..
+-rw-r--r--  1 root root    89 Aug 13 21:48 CONTEXT_ONLY.md
+-rw-r--r--  1 root root   653 Aug 13 21:43 bot.py
+-rw-r--r--  1 root root 14651 Aug 13 21:43 follow_log.json
+[0m
+[0m→ [0mRead CONTEXT_ONLY.md
+[0m→ [0mRead bot.py
+[0m→ [0mRead follow_log.json
+[0m
+[0m← [0mEdit bot.py
+Index: /root/ken-tasks-pro-solo/T-KEN-010/bot.py
+===================================================================
+--- /root/ken-tasks-pro-solo/T-KEN-010/bot.py
++++ /root/ken-tasks-pro-solo/T-KEN-010/bot.py
+@@ -1,11 +1,9 @@
+ """Discord bot track/follow handlers."""
+ 
+ def track_studio_or_performer(entity_id, entity_type):
+-    """BUG: bundles a follow action with tracking, which should be
+-    separate. Fix: remove the follow_discord() call from here."""
++    """Track an entity without following it on Discord."""
+     db.add_track(entity_id, entity_type)
+-    db.follow_discord(entity_id, entity_type)  # BUG: shouldn't be here
+     return {"tracked": True}
+ 
+ 
+ class db:
+
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('follow_log.json') as f:
+    data = json.load(f)
+legit = [e for e in data if e.get('legit') is True]
+removed = [e for e in data if e.get('legit') is not True]
+with open('follow_log.json','w') as f:
+    json.dump(legit, f, indent=2)
+    f.write('\n')
+print('removed', len(removed), 'entries')
+print('kept', len(legit), 'entries')
+for e in removed:
+    print('removed', e['entity_id'])
+"
+removed 142 entries
+kept 20 entries
+removed perf_0
+removed perf_1
+removed perf_2
+removed perf_3
+removed perf_4
+removed perf_5
+removed perf_6
+removed perf_7
+removed perf_8
+removed perf_9
+removed perf_10
+removed perf_11
+removed perf_12
+removed perf_13
+removed perf_14
+removed perf_15
+removed perf_16
+removed perf_17
+removed perf_18
+removed perf_19
+removed perf_20
+removed perf_21
+removed perf_22
+removed perf_23
+removed perf_24
+removed perf_25
+removed perf_26
+removed perf_27
+removed perf_28
+removed perf_29
+removed perf_30
+removed perf_31
+removed perf_32
+removed perf_33
+removed perf_34
+removed perf_35
+removed perf_36
+removed perf_37
+removed perf_38
+removed perf_39
+removed perf_40
+removed perf_41
+removed perf_42
+removed perf_43
+removed perf_44
+removed perf_45
+removed perf_46
+removed perf_47
+removed perf_48
+removed perf_49
+removed perf_50
+removed perf_51
+removed perf_52
+removed perf_53
+removed perf_54
+removed perf_55
+removed perf_56
+removed perf_57
+removed perf_58
+removed perf_59
+removed perf_60
+removed perf_61
+removed perf_62
+removed perf_63
+removed perf_64
+removed perf_65
+removed perf_66
+removed perf_67
+removed perf_68
+removed perf_69
+removed perf_70
+removed perf_71
+removed perf_72
+removed perf_73
+removed perf_74
+removed perf_75
+removed perf_76
+removed perf_77
+removed perf_78
+removed perf_79
+removed perf_80
+removed perf_81
+removed perf_82
+removed perf_83
+removed perf_84
+removed perf_85
+removed perf_86
+removed perf_87
+removed perf_88
+removed perf_89
+removed perf_90
+removed perf_91
+removed perf_92
+removed perf_93
+removed perf_94
+removed perf_95
+removed perf_96
+removed perf_97
+removed perf_98
+removed perf_99
+removed perf_100
+removed perf_101
+removed perf_102
+removed perf_103
+removed perf_104
+removed perf_105
+removed perf_106
+removed perf_107
+removed perf_108
+removed perf_109
+removed perf_110
+removed perf_111
+removed perf_112
+removed perf_113
+removed perf_114
+removed perf_115
+removed perf_116
+removed perf_117
+removed perf_118
+removed perf_119
+removed perf_120
+removed perf_121
+removed perf_122
+removed perf_123
+removed perf_124
+removed perf_125
+removed perf_126
+removed perf_127
+removed perf_128
+removed perf_129
+removed perf_130
+removed perf_131
+removed perf_132
+removed perf_133
+removed perf_134
+removed perf_135
+removed perf_136
+removed perf_137
+removed perf_138
+removed perf_139
+removed codey_steele
+removed cherry_kiss
+[0m
+[0m→ [0mRead follow_log.json
+Yes, you had a bug. `track_studio_or_performer` in `bot.py:7` called `db.follow_discord()` whenever you tracked someone, silently auto-following them on Discord.
+
+Fixed both:
+1. Removed the `follow_discord()` call from the track handler so tracking no longer triggers a follow.
+2. Removed all 142 non-legit `track_button_bug` follows from `follow_log.json`, including `codey_steele` and `cherry_kiss`. Your 20 genuine `manual_follow` entries remain.
