@@ -1,0 +1,16 @@
+{
+  "gpt5.6-terra-plans+deepseek-works (split, 200)": {
+    "capped_by_never_finished": false,
+    "correctness": 100.0,
+    "cost_efficiency": 27.6,
+    "cost_per_task_usd": 0.015938,
+    "honesty": 100.0,
+    "never_finished_count": 0,
+    "overall_score_100": 86.9,
+    "raw_score_before_cap": 86.9,
+    "reliability": 100.0,
+    "sample_size": 200,
+    "speed": 41.4,
+    "wall_seconds_per_task": 32.47
+  }
+}

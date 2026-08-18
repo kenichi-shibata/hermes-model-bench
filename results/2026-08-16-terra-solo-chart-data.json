@@ -1,0 +1,16 @@
+{
+  "gpt5.6-terra (solo)": {
+    "capped_by_never_finished": false,
+    "correctness": 100.0,
+    "cost_efficiency": 29.8,
+    "cost_per_task_usd": 0.013465,
+    "honesty": 100.0,
+    "never_finished_count": 0,
+    "overall_score_100": 90.0,
+    "raw_score_before_cap": 90.0,
+    "reliability": 100.0,
+    "sample_size": 200,
+    "speed": 70.0,
+    "wall_seconds_per_task": 12.01
+  }
+}
